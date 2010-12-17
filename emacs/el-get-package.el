@@ -51,7 +51,8 @@
 (require 'el-get)
 
 (setq el-get-sources
-      '(nxhtml yasnippet
+      '(nxhtml yasnippet vkill 
+        (:name ido-hacks :after (lambda () (ido-mode t)))
         (:name magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
         (:name lisppaste :type elpa)
