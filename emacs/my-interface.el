@@ -69,12 +69,9 @@
 
 (setq vc-follow-symlinks t)
 
-
-(require 'desktop)
 ;; Plato Wu,2010/07/27: Add tags-file-name
 (setq desktop-locals-to-save (append desktop-locals-to-save '(buffer-display-time tags-file-name)))
-
-(desktop-save-mode)
+(desktop-save-mode 1)
 
 (provide 'my-interface)
 

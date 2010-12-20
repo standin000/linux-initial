@@ -52,11 +52,12 @@
 
 (setq el-get-sources
       '(nxhtml yasnippet vkill 
-        (:name ido-hacks :after (lambda () (ido-mode t)))
+        (:name ido-hacks :after ido-configuration)
         (:name magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
         (:name lisppaste :type elpa)
-        (:name paredit :type elpa)))
+        (:name paredit :type elpa)
+        (:name emms :type elpa :after emms-configuration)))
         
 (el-get 'sync)
 
