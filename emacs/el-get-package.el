@@ -50,15 +50,25 @@
 
 (require 'el-get)
 
+;; Plato Wu,2010/12/26: features don't works for elpa type
 (setq el-get-sources
-      '(nxhtml yasnippet vkill 
+      '(el-get nxhtml yasnippet vkill 
         (:name ido-hacks :after ido-configuration)
         (:name magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
-        (:name lisppaste :type elpa)
-        (:name paredit :type elpa)
-        (:name emms :type elpa :after emms-configuration)))
+        (:name paredit :type elpa :after paredit-configuration)
+        (:name emms :type elpa :after emms-configuration)
+        (:name htmlize :type elpa)
+        ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
+        ;; get installed to pass error.
+        (:name muse :type elpa)
+        (:name xml-rpc :type elpa)
+	(:name lisppaste :type elpa)
+        (:name weblogger :type elpa :after blogger-configuration)
+        (:name smart-tab :type elpa :after 'smart-tab-configuration)))
         
 (el-get 'sync)
+
+;(blogger-configuration)
 
 (provide 'el-get-package)

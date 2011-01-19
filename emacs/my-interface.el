@@ -71,7 +71,43 @@
 
 ;; Plato Wu,2010/07/27: Add tags-file-name
 (setq desktop-locals-to-save (append desktop-locals-to-save '(buffer-display-time tags-file-name)))
+
+(setq desktop-buffers-not-to-save '("*Music*"))
+
 (desktop-save-mode 1)
+
+;;set personal information
+(setq user-full-name "Plato Wu")
+
+(setq user-mail-address "gtalk000@gmail.com")
+
+;;Non-nil means cutting and pasting uses the clipboard.
+(setq x-select-enable-clipboard t)
+
+;;set % like vi
+(global-set-key "%" 'match-parenthesis)
+
+(defun match-parenthesis (arg)
+  "Go to the matching parenthesis if on a parenthesis; otherwise insert %."
+  (interactive "p")
+  (cond ((looking-at "\\s\(") (forward-list 1) 
+;;08/08/05, Plato: remarks for using copy region situation.
+	 ;; (backward-char 1)
+	 )
+	((looking-at "\\s\)") (forward-char 1) 
+	 (backward-list 1))
+	(t (self-insert-command (or arg 1)))))
+
+;;move mouse point when cursor is closing it
+;; mouse avoidance animate mode is ng.
+(if (display-mouse-p)
+    (mouse-avoidance-mode 'jump))
+
+;;auto open & display image
+(if window-system
+    (auto-image-file-mode))
+
+(setq debug-on-error t)
 
 (provide 'my-interface)
 
