@@ -131,7 +131,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
     ;;   (setq weblogger-entry-ring (make-ring weblogger-max-entries-in-ring)))
     ;; (ring-insert weblogger-entry-ring '(("content" "")))
     ;; (setq weblogger-ring-index 0)
-    (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "blog.platowu.info" "80")))
+    (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "platowu.info" "80")))
       (setq weblogger-config-alist 
             (list (list "default"  
                         ;; Plato Wu,2010/09/01: use account instead default, default
@@ -455,5 +455,18 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
 (defun smart-tab-configuration ()
   (global-smart-tab-mode 1))
+
+(defun org-toodledo-configuration ()
+  (require 'org-toodledo)
+  (setq w3m-default-coding-system 'utf-8)
+  (let ((netrc-data 
+         (netrc-machine 
+          (netrc-parse my-authinfo) 
+          "toodledo.com" "80")))
+    (setq org-toodledo-userid (cdr (assoc "login" netrc-data)))
+    (setq org-toodledo-password (cdr (assoc "password" netrc-data)))
+    (setq org-toodledo-archive-location "* Done"))
+  ;; Plato Wu,2010/10/08: C-c C-c is used in org-mode
+  (define-key org-mode-map (kbd "C-M-x")   'org-toodledo-sync-task))
 
 (provide 'my-packages)

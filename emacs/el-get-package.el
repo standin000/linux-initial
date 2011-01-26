@@ -50,9 +50,14 @@
 
 (require 'el-get)
 
+(setq el-get-recipe-path 
+      (cons "~/linux-initial/emacs/recipes/" el-get-recipe-path))
+
 ;; Plato Wu,2010/12/26: features don't works for elpa type
 (setq el-get-sources
-      '(el-get nxhtml yasnippet vkill 
+      ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
+      ;; so remove el-get from el-get-sources
+      '(nxhtml yasnippet vkill
         (:name ido-hacks :after ido-configuration)
         (:name magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
@@ -65,7 +70,8 @@
         (:name xml-rpc :type elpa)
 	(:name lisppaste :type elpa)
         (:name weblogger :type elpa :after blogger-configuration)
-        (:name smart-tab :type elpa :after 'smart-tab-configuration)))
+        (:name org-toodledo :after org-toodledo-configuration)       
+        (:name smart-tab :type elpa :after smart-tab-configuration)))
         
 (el-get 'sync)
 

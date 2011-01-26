@@ -86,5 +86,7 @@
       (global-set-key (kbd "C-z") 'my-done)
     (global-set-key "\C-z" 'delete-frame)))
 
+;; Plato Wu,2011/01/23: it is need by blogger-configuration and org-toodledo-configuration
+(require 'netrc)
 
 (provide 'my-utility)
