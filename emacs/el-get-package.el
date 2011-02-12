@@ -1,3 +1,4 @@
+
 ;; Set el-get-sources and call el-get to init all those packages we need.
 
 (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
@@ -57,7 +58,7 @@
 (setq el-get-sources
       ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
       ;; so remove el-get from el-get-sources
-      '(nxhtml yasnippet vkill
+      '(nxhtml yasnippet vkill emacs-w3m
         (:name ido-hacks :after ido-configuration)
         (:name magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
@@ -67,8 +68,11 @@
         ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
         ;; get installed to pass error.
         (:name muse :type elpa)
-        (:name xml-rpc :type elpa)
-	(:name lisppaste :type elpa)
+;        (:name xml-rpc :type elpa)
+        ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
+        ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
+        ;; lisppaste, so disable lisppaste first, it is not useful for me.
+;	(:name lisppaste :type elpa)        
         (:name weblogger :type elpa :after blogger-configuration)
         (:name org-toodledo :after org-toodledo-configuration)       
         (:name smart-tab :type elpa :after smart-tab-configuration)))
