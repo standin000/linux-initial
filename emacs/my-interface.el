@@ -15,9 +15,9 @@
 (show-paren-mode t)
 (setq show-paren-style 'parentheses)
 
-(try-function toggle-scroll-bar -1)
+(try-function '(toggle-scroll-bar -1))
 
-(try-function tool-bar-mode -1)
+(try-function '(tool-bar-mode -1))
 
 ;;Display date
 (setq display-time-day-and-date t)

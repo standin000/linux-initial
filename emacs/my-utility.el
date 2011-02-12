@@ -1,7 +1,14 @@
-(defmacro try-function (function &rest parameters)
-  `(if (functionp (quote ,function))
-     (apply (quote ,function) (quote ,parameters))
-     'NG))
+(defmacro try-function (function)
+  `(if (functionp (car ,function))
+      (eval ,function)
+    'NG))
+
+(defmacro try-require (library)
+  `(try-function '(require ,library)))
+
+(defmacro try-require (library)
+  (try-function require library))
+
 
 (defun is-system (type)
   (string= system-type type))
