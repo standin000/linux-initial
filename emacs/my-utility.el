@@ -93,6 +93,86 @@
       (global-set-key (kbd "C-z") 'my-done)
     (global-set-key "\C-z" 'delete-frame)))
 
+;; set the following var to t if you like a newline to the end of copied text.
+(defvar my-kill-ring-save-include-last-newline nil)
+;; set the following var to t if you like a newline in the end of killed text.
+(defvar my-kill-region-include-last-newline nil)
+
+
+;; if no region is selected, C-w to kill line, M-w to copy line
+(defun my-kill-ring-save (&optional line)
+  "This function is a enhancement of `kill-ring-save', which is normal used
+to copy a region.  This function will do exactly as `kill-ring-save' if
+there is a region selected when it is called. If there is no region, then do
+copy lines as `yy' in vim."
+  (interactive "P")
+  (unless (or line (and mark-active (not (equal (mark) (point)))))
+    (setq line 1))
+  ;; Plato Wu,2008/11/18 add support () copy
+  ;; Plato Wu,2008/11/27 if mark is active do not use () copy.
+  (cond 
+   ((and (not mark-active) (looking-at "\\s\("))
+    (let ((beg (point))
+	  (end (scan-lists (point) 1 0))
+	  )
+      (kill-ring-save beg end)))
+   ;; Plato Wu,2009/03/02: sepecial for copy in *w3m* for
+   ;; translation Wuala project.
+   ((and (not mark-active) (eq major-mode 'w3m-mode))
+    (let ((link (w3m-anchor)))
+      (if (not link)
+	  (kill-ring-save (point) (line-end-position))
+        (message "Copied \"%s\" to kill-ring." link)
+	(kill-new link))))
+   (line
+    (let (
+	  ;; (beg (line-beginning-position))
+	  ;; 08/06/18, Modify by Plato for using current cursor
+	  (beg (point))
+	  (end (line-end-position)))
+      (when (>= line 2)
+	(setq end (line-end-position line)))
+      (when (<= line -2)
+	(setq beg (line-beginning-position (+ line 2))))
+      (if (and my-kill-ring-save-include-last-newline
+	       (not (= end (point-max))))
+	  (setq end (1+ end)))
+      (kill-ring-save beg end)))
+   (t (call-interactively 'kill-ring-save))))
+
+(defun my-kill-region (&optional line)
+  "This function is a enhancement of `kill-region', which is normal used to
+kill a region to kill-ring.  This function will do exactly as `kill-region'
+if there is a region selected when it is called. If there is no region, then
+do kill lines as `dd' in vim."
+  (interactive "P")
+  (unless (or line (and mark-active (not (equal (mark) (point)))))
+    (setq line 1))
+  ;; Plato Wu,2009/01/05: add () kill
+  (if (and (not mark-active) (looking-at "\\s\("))
+      (let ((beg (point))
+	    (end (scan-lists (point) 1 0)))
+	(kill-region beg end))
+   (if line
+       (let ((beg (line-beginning-position))
+	     (end (line-end-position)))
+	 (when (>= line 2)
+	   (setq end (line-end-position line)))
+	 (when (<= line -2)
+	   (setq beg (line-beginning-position (+ line 2))))
+	 (if (and my-kill-region-include-last-newline
+		  (not (= end (point-max))))
+	     (setq end (1+ end)))
+	 (kill-region beg end))
+     (call-interactively 'kill-region))))
+
+;; bind it
+(global-set-key [?\C-w] 'my-kill-region)
+
+;; bind it
+(global-set-key "\M-w" 'my-kill-ring-save)
+
+
 ;; Plato Wu,2011/01/23: it is need by blogger-configuration and org-toodledo-configuration
 (require 'netrc)
 

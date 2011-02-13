@@ -107,6 +107,10 @@
 (if window-system
     (auto-image-file-mode))
 
+(when window-system
+ (pc-selection-mode)			; use shift to select region
+ (setq pc-select-selection-keys-only t))
+
 (setq debug-on-error t)
 
 (provide 'my-interface)
