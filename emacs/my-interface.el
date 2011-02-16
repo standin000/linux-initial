@@ -15,9 +15,9 @@
 (show-paren-mode t)
 (setq show-paren-style 'parentheses)
 
-(try-function toggle-scroll-bar -1)
+(try-function '(toggle-scroll-bar -1))
 
-(try-function tool-bar-mode -1)
+(try-function '(tool-bar-mode -1))
 
 ;;Display date
 (setq display-time-day-and-date t)
@@ -106,6 +106,10 @@
 ;;auto open & display image
 (if window-system
     (auto-image-file-mode))
+
+(when window-system
+ (pc-selection-mode)			; use shift to select region
+ (setq pc-select-selection-keys-only t))
 
 (setq debug-on-error t)
 
