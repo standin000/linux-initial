@@ -469,4 +469,89 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;; Plato Wu,2010/10/08: C-c C-c is used in org-mode
   (define-key org-mode-map (kbd "C-M-x")   'org-toodledo-sync-task))
 
+(defun org-configuration ()
+  ;; Plato Wu,2010/08/29: use C-u C-c $ org-archive-subtree to archive DONE items
+  (require 'org)
+  (require 'org-archive)
+  (setq org-log-done t)
+  (setq org-log-into-drawer t)
+
+  ;; Turn off prefer future dates 
+  (setq org-read-date-prefer-future nil)
+
+  (setq org-list-demote-modify-bullet (quote (("+" . "-")
+                                              ("*" . "-")
+                                              ("1." . "-")
+                                              ("1)" . "-"))))
+                                        ;disable priority commands.
+  (setq org-enable-priority-commands nil)
+
+  (setq org-agenda-files '("~/org/todo.org"))
+  (define-key org-mode-map (kbd "C-M-j") 'org-insert-todo-heading)
+
+  (setq org-modules 
+        '(org-bbdb org-bibtex org-crypt org-gnus org-info
+                   org-jsinfo org-inlinetask org-irc org-mew org-mhe org-vm org-wl org-w3m))
+
+  (require 'org-crypt)
+                                        ; Encrypt all entries before saving
+  (org-crypt-use-before-save-magic)
+  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+                                        ; GPG key to use for encryption
+  (setq org-crypt-key "E87C1128")
+
+  (setq org-use-speed-commands t)
+
+
+
+
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
+  (setq w3m-default-coding-system 'utf-8)
+  (setq org-return-follows-link t)
+
+  (setq org-default-notes-file "~/org/todo.org")
+
+  ;; enable task blocking
+  (setq org-enforce-todo-dependencies t)
+
+  ;; I use C-M-r to start capture mode
+  (global-set-key (kbd "C-M-r") 'org-capture)
+
+  ;; hides all blank lines inside folded contents of a tasks
+  (setq org-cycle-separator-lines 0)
+
+  (setq org-special-ctrl-a/e t)
+  (setq org-special-ctrl-k t)
+  (setq org-yank-adjusted-subtrees t)
+
+                                        ;Non-nil means insert new headings after the current subtree.
+  (setq org-insert-heading-respect-content t)
+
+  ;; capture templates for TODO tasks
+  (setq org-capture-templates 
+        (quote (("t" "todo" entry (file+headline "~/org/todo.org" "Toodledo") "** TODO %?"))))
+
+  (require 'org-publish)
+  (add-to-list 'org-export-latex-packages-alist '("" "zhfontcfg" ))
+  (setq org-publish-project-alist
+        '(  ("CoreBoardTesting"
+             :base-directory "~/org/"
+             :base-extension "org"
+             :publishing-directory "~/org/public_pdf/"
+             :recursive t
+             :publishing-function org-publish-org-to-pdf
+             :headline-levels 4             ; Just the default for this project.
+             :auto-preamble t
+             :auto-index t
+             )
+            ;; ... add all the components here (see below)...
+            ))
+
+  (setq org-latex-to-pdf-process '("xelatex -output-directory  public_pdf/ %s" 
+                                   "xelatex -output-directory  public_pdf/ %s")))
+(org-configuration)
 (provide 'my-packages)
+
+  
