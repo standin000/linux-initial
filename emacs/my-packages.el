@@ -1,3 +1,120 @@
+(defun eshell-configuration ()
+  ;emacs21 uses eshell-ask-to-save-history but emacs 22 & 23 uses
+  ;eshell-save-history-on-exit
+  (if (string= (substring emacs-version 0 2) "21")
+    (setq eshell-ask-to-save-history 'always)
+    (setq eshell-save-history-on-exit t))
+  (setq eshell-prompt-function 
+      (function
+       (lambda ()
+	 (let ((pwd (eshell/pwd)))
+	   (if (< (length pwd) 30)
+	       (concat pwd
+		       (if (= (user-uid) 0) " # " " $ "))
+	     (concat (concat "..." (subseq pwd 20)) 
+		     (if (= (user-uid) 0) " # " " $ ")))))))
+  ;remove duplicate history items.
+  (setq eshell-hist-ignoredups t)
+  ;; ;; Plato Wu,2009/04/10: it seems there is not effect in emacs 22.2.1 To check
+  ;; ;; let eshell show color but it is slow.
+  ;; (require 'ansi-color)
+  ;; (add-hook 'eshell-preoutput-filter-functions
+  ;;           'ansi-color-apply)
+ ; (autoload 'ansi-color-apply "ansi-color" nil t)
+  ;; Do not let eshell show color
+  ;; (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
+
+  ;; Dealing With Wildcards and Multiple Files in eshell
+ ;; Assume you want to define an alias ‘emacs’ for ‘find-file’. See EshellAlias for a simple alias solution. The problem is that you cannot open multiple files that way. Using wildcards would also be a problem if these expand into multiple filenames. Instead of using an alias, use the following function.
+  (defun eshell/emacs (&rest args)
+    "Open a file in emacs. Some habits die hard."
+    (if (null args)
+	;; If I just ran "emacs", I probably expect to be launching
+	;; Emacs, which is rather silly since I'm already in Emacs.
+	;; So just pretend to do what I ask.
+	(bury-buffer)
+      ;; We have to expand the file names or else naming a directory in an
+      ;; argument causes later arguments to be looked for in that directory,
+      ;; not the starting directory
+      (mapc #'find-file 
+	    (mapcar #'expand-file-name (eshell-flatten-list (reverse args))))))
+
+  (defun eshell-maybe-bol ()
+    (interactive)
+    (let ((p (point)))
+      (eshell-bol)
+      (if (= p (point))
+	  (beginning-of-line))))
+
+  (add-hook 'eshell-mode-hook
+	    '(lambda () 
+	       (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)
+               ;; Plato Wu,2011/02/13: disable smart-tab-mode in eshell TODO
+               (smart-tab-mode -1)))
+
+  (defun eshel ()
+    "change to visited file's directory every time"
+    (interactive)
+    (let ((visited-file-directory default-directory))
+      (eshell)
+      (eshell/cd visited-file-directory)
+      ;there may be dangerous command input!
+      (if (string= (eshell-get-old-input) "")
+	  (eshell-send-input)
+	  (insert-and-inherit "dangeours!"))))
+  ;; Plato Wu,2010/07/06: It seems eshell in Windoes will use alias in .bash_profile first.
+  (setq eshell-command-aliases-list 
+      '(("rm" "~/linux-backup/movetotrash.sh $*")
+        ;; Plato Wu,2010/06/23: /bin don't work for Emacs in Windows
+	("del" "/bin/rm -i -f $*")
+;	("cp" "/bin/cp -i $*")
+        ;; Plato Wu,2010/09/13: rm -i cp -i don't work for Emacs in Linux
+;	
+	("cp" "/bin/cp -i $*")
+	("df" "df -h $* ")
+	("du" "du -h $*")
+	("less" "less -r $*")
+	("whence" "type -a $*")
+	("grep" "grep --color $*")
+	("dir" "ls --format vertical $*")
+	("vdir" "ls --format=long $*")
+	("ll" "ls -l $*")
+	("la" "ls -A $*")
+	("l" "ls -CF $*")
+	("ls" "ls -hF $*")
+;	("ls" "ls -hF --color=auto $*")
+	("mv" "mv -i $1 $2")
+	("free" "free -m")
+	("vi" "emacs $*")
+	("nano" "emacs $*")))
+  (when (string= system-type "windows-nt")
+      (setcdr (assoc "ls" eshell-command-aliases-list) '("ls -h $*"))
+      ;; Plato Wu,2010/11/03: I don't know why $* does work with $*
+      (setcdr (assoc "cp" eshell-command-aliases-list) '("cp $1 $2"))
+      ;; Plato Wu,2010/11/03: Don't active rm command for it could make use of movetotrash.sh
+;;      (setcdr (assoc "rm" eshell-command-aliases-list) '("rm -i -f"))
+      (setcdr (assoc "del" eshell-command-aliases-list) '("rm -i -f $*"))))
+
+(eshell-configuration)
+
+(require 'etags)
+;; Plato Wu,2009/04/07: In order to support lookup elisp function.
+(defun find-tag-also-for-elisp (tagname &optional next-p regexp-p)
+  (interactive (find-tag-interactive "Find tag: "))
+   (let ((tagsymbol (intern tagname)))
+    (cond
+     ((fboundp tagsymbol) 
+      (setq find-tag-history (cons tagsymbol find-tag-history))
+      (ring-insert find-tag-marker-ring (point-marker))
+      (find-function tagsymbol))
+     ((boundp tagsymbol) 
+      (setq find-tag-history (cons tagsymbol find-tag-history))
+      (ring-insert find-tag-marker-ring (point-marker))
+      (find-variable tagsymbol))
+     (t (find-tag tagname next-p regexp-p)))))
+
+(define-key emacs-lisp-mode-map "\M-." 'find-tag-also-for-elisp)
+
 (defun paredit-configuration ()
   ;; Plato Wu,2008/09/27, paredit will cause alt-s, ctrl-d can not used in ido mode
 ;;  (add-hook 'minibuffer-setup-hook '(lambda () (paredit-mode +1)))
@@ -19,6 +136,7 @@
 	;; or "svn-status".
 	  "^\\*[^es].\\{3\\}[^s].*"
 	  "TAGS"))
+  (setq ido-record-ftp-work-directories nil)
   (ido-mode t))
 
 (defun emms-configuration ()
@@ -454,6 +572,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
             (kill-buffer errbuf))))))
 
 (defun smart-tab-configuration ()
+  (setq smart-tab-using-hippie-expand t)
   (global-smart-tab-mode 1))
 
 (defun org-toodledo-configuration ()
