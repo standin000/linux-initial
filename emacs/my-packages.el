@@ -48,9 +48,7 @@
 
   (add-hook 'eshell-mode-hook
 	    '(lambda () 
-	       (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)
-               ;; Plato Wu,2011/02/13: disable smart-tab-mode in eshell TODO
-               (smart-tab-mode -1)))
+	       (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
 
   (defun eshel ()
     "change to visited file's directory every time"
@@ -573,7 +571,8 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
 (defun smart-tab-configuration ()
   (setq smart-tab-using-hippie-expand t)
-  (global-smart-tab-mode 1))
+  (global-smart-tab-mode 1)
+  (add-to-list 'smart-tab-disabled-major-modes 'eshell-mode))
 
 (defun org-toodledo-configuration ()
   (require 'org-toodledo)

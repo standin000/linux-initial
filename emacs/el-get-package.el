@@ -75,7 +75,7 @@
 ;	(:name lisppaste :type elpa)        
         (:name weblogger :type elpa :after blogger-configuration)
         (:name org-toodledo :after org-toodledo-configuration)       
-        (:name smart-tab :type elpa :after smart-tab-configuration)))
+        (:name smart-tab :after smart-tab-configuration)))
         
 (el-get 'sync)
 
