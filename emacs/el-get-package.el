@@ -58,7 +58,7 @@
 (setq el-get-sources
       ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
       ;; so remove el-get from el-get-sources
-      '(nxhtml yasnippet vkill emacs-w3m
+      '(nxhtml vkill emacs-w3m
         (:name ido-hacks :after ido-configuration)
         (:name magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
