@@ -113,6 +113,10 @@
 
 (setq debug-on-error t)
 
+(require 'savehist)
+
+(savehist-mode 1)
+
 (provide 'my-interface)
 
 
