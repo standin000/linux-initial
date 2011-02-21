@@ -654,22 +654,35 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
   (require 'org-publish)
   (add-to-list 'org-export-latex-packages-alist '("" "zhfontcfg" ))
-  (setq org-publish-project-alist
-        '(  ("CoreBoardTesting"
-             :base-directory "~/org/"
-             :base-extension "org"
-             :publishing-directory "~/org/public_pdf/"
-             :recursive t
-             :publishing-function org-publish-org-to-pdf
-             :headline-levels 4             ; Just the default for this project.
-             :auto-preamble t
-             :auto-index t
-             )
-            ;; ... add all the components here (see below)...
-            ))
-
-  (setq org-latex-to-pdf-process '("xelatex -output-directory  public_pdf/ %s" 
-                                   "xelatex -output-directory  public_pdf/ %s")))
+  ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
+  ;; for text which contains number.
+  (setq org-export-latex-emphasis-alist
+  '(("*" "\\textbf{%s}" t)
+    ("/" "\\emph{%s}" t)
+    ("_" "\\underline{%s}" t)
+    ("+" "\\st{%s}" t)
+    ("=" "\\verb" t)
+;    ("~" "\\verb" t)
+    ;; Plato Wu,2011/02/18: use @ to tag Chinese characters for song font
+    ;; if we use font as main font, the english font is ugly.
+    ("~" "\\song{%s}" t )))
+  ;; Plato Wu,2011/02/18: use org-export-as-pdf instead
+  ;; (setq org-publish-project-alist
+  ;;       '(  ("CoreBoardTesting"
+  ;;            :base-directory "~/org/"
+  ;;            :base-extension "org"
+  ;;            :publishing-directory "~/org/public_pdf/"
+  ;;            :recursive t
+  ;;            :publishing-function org-publish-org-to-pdf
+  ;;            :headline-levels 4             ; Just the default for this project.
+  ;;            :auto-preamble t
+  ;;            :auto-index t
+  ;;            )
+  ;;           ;; ... add all the components here (see below)...
+  ;;           ))
+  ;; (setq org-latex-to-pdf-process '("xelatex -output-directory  public_pdf/ %s" 
+  ;;                                  "xelatex -output-directory  public_pdf/ %s"))
+  (setq org-latex-to-pdf-process '("xelatex %s" "xelatex %s")))
 (org-configuration)
 (provide 'my-packages)
 
