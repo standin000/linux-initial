@@ -58,27 +58,27 @@
 (setq el-get-sources
       ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
       ;; so remove el-get from el-get-sources
-      '(nxhtml vkill emacs-w3m
-        (:name ido-hacks :after ido-configuration)
-        (:name magit
+      '(nxhtml vkill emacs-w3m 
+        ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
+        ;; which cause error, so must use features.
+        (:name ido-hacks :features ido-hacks :after ido-configuration) 
+        (:name magit :features magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
-        (:name paredit :type elpa :after paredit-configuration)
-        (:name emms :type elpa :after emms-configuration)
-        (:name htmlize :type elpa)
+        (:name paredit :type elpa :features paredit :after paredit-configuration)
+        (:name emms :type elpa :features emms :after emms-configuration)
+        (:name htmlize :type elpa :features htmlize)
         ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
         ;; get installed to pass error.
-        (:name muse :type elpa)
+        (:name muse :type elpa :features muse)
 ;        (:name xml-rpc :type elpa)
         ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
         ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
         ;; lisppaste, so disable lisppaste first, it is not useful for me.
 ;	(:name lisppaste :type elpa)        
-        (:name weblogger :type elpa :after blogger-configuration)
-        (:name org-toodledo :after org-toodledo-configuration)       
-        (:name smart-tab :after smart-tab-configuration)))
+        (:name weblogger :type elpa :features weblogger :after blogger-configuration)
+        (:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
+        (:name smart-tab :features smart-tab :after smart-tab-configuration)))
         
 (el-get 'sync)
-
-;(blogger-configuration)
 
 (provide 'el-get-package)
