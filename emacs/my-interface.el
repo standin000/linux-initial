@@ -117,6 +117,12 @@
 
 (savehist-mode 1)
 
+(require 'w3m)
+
+(setq w3m-default-coding-system 'utf-8)
+
+(setq browse-url-browser-function 'w3m-browse-url)
+
 (provide 'my-interface)
 
 
