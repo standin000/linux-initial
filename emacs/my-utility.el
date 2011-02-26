@@ -172,6 +172,13 @@ do kill lines as `dd' in vim."
 ;; bind it
 (global-set-key "\M-w" 'my-kill-ring-save)
 
+(defun view-msn-log ()
+  (interactive)
+  (let* ((filename (file-name-nondirectory (buffer-file-name)))
+        (output-buffer (get-buffer-create (concat filename ".html"))))
+    (with-current-buffer output-buffer
+      (call-process "xsltproc" nil t t filename)
+      (browse-url-of-buffer))))
 
 ;; Plato Wu,2011/01/23: it is need by blogger-configuration and org-toodledo-configuration
 (require 'netrc)

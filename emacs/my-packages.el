@@ -176,14 +176,14 @@
 ;    (shell-command "sleep 3 ") 
     (emms-player-mpd-connect)
     (switch-to-buffer emms-playlist-buffer))
-    ;;run (emms-history-save) first
+  ;; run (emms-history-save) first
+  ;; emms-shuffle will shuffle the playlist for mpd don't support random play
   (emms-history-load)) 
 
 (defvar my-authinfo "~/.authinfo")
 
 
 (defun blogger-configuration ()
-  (require 'w3m)
   (require 'muse) 
   (require 'muse-mode) 
   (require 'muse-publish) 
@@ -576,7 +576,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
 (defun org-toodledo-configuration ()
   (require 'org-toodledo)
-  (setq w3m-default-coding-system 'utf-8)
   (let ((netrc-data 
          (netrc-machine 
           (netrc-parse my-authinfo) 
