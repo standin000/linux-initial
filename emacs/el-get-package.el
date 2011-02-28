@@ -68,7 +68,7 @@
         (:name ido-hacks :features ido-hacks :after ido-configuration) 
         (:name magit :features magit
                :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
-        (:name paredit :type elpa :features paredit :after paredit-configuration)
+        (:name paredit :features paredit :after paredit-configuration)
         (:name emms :type elpa :features emms :after emms-configuration)
         (:name htmlize :type elpa :features htmlize)
         ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick

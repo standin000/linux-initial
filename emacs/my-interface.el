@@ -78,7 +78,6 @@
 
 ;;set personal information
 (setq user-full-name "Plato Wu")
-
 (setq user-mail-address "gtalk000@gmail.com")
 
 ;;Non-nil means cutting and pasting uses the clipboard.
@@ -103,19 +102,30 @@
 (if (display-mouse-p)
     (mouse-avoidance-mode 'jump))
 
-;;auto open & display image
-(if window-system
-    (auto-image-file-mode))
-
 (when window-system
- (pc-selection-mode)			; use shift to select region
- (setq pc-select-selection-keys-only t))
+  ;;auto open & display image
+  (auto-image-file-mode)
+  (pc-selection-mode)			; use shift to select region
+  (setq pc-select-selection-keys-only t))
 
 (setq debug-on-error t)
 
 (require 'savehist)
 
 (savehist-mode 1)
+
+
+;;set dired mode to operation recursively
+(setq dired-recursive-copies 'top)
+(setq dired-recursive-deletes 'top)
+
+;; Plato Wu,2010/01/26: Start to use shell mode instead of window in screen.
+;; Let shell don't query when exit emacs.
+(add-hook 'shell-mode-hook
+          (lambda ()
+            (set-process-query-on-exit-flag
+              (get-buffer-process (current-buffer)) nil))) 
+
 
 (provide 'my-interface)
 
