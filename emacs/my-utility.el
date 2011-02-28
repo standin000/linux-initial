@@ -183,4 +183,35 @@ do kill lines as `dd' in vim."
 ;; Plato Wu,2011/01/23: it is need by blogger-configuration and org-toodledo-configuration
 (require 'netrc)
 
+
+;;;;C-. set mark; C-, goto mark
+;;(global-set-key [(control ?\.)] 'ska-point-to-register)
+;;(global-set-key [(control ?\,)] 'ska-jump-to-register)
+;; f12 set mark; S-F12 goto mark in ssh mode
+(global-set-key [f12] 'ska-point-to-register)
+;; Plato Wu,2009/12/17: Alt+F12 does not work in X window and Windows
+;; Ctrl+F12 does not work in termial, so enable them both.
+(global-set-key (quote [C-f12]) 'ska-jump-to-register)
+(global-set-key (quote [27 f12]) 'ska-jump-to-register)
+;; Plato Wu,2010/04/07: M-f12 for windows
+(global-set-key (quote [M f12]) 'ska-jump-to-register)
+
+
+
+(defun ska-point-to-register()
+  "Store cursorposition _fast_ in a register. 
+Use ska-jump-to-register to jump back to the stored 
+position."
+  (interactive)
+  (point-to-register 8))
+
+(defun ska-jump-to-register()
+  "Switches between current cursorposition and position
+that was stored with ska-point-to-register."
+  (interactive)
+  (let ((tmp (point-marker)))
+        (jump-to-register 8)
+        (set-register 8 tmp)))
+
+
 (provide 'my-utility)
