@@ -58,7 +58,11 @@
 (setq el-get-sources
       ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
       ;; so remove el-get from el-get-sources
-      '(nxhtml vkill emacs-w3m 
+      '(nxhtml vkill 
+               (:name emacs-w3m :features w3m
+                      :after (lambda ()
+                               (setq w3m-default-coding-system 'utf-8)
+                               (setq browse-url-browser-function 'w3m-browse-url))) 
         ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
         ;; which cause error, so must use features.
         (:name ido-hacks :features ido-hacks :after ido-configuration) 
