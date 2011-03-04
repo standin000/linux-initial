@@ -126,6 +126,57 @@
             (set-process-query-on-exit-flag
               (get-buffer-process (current-buffer)) nil))) 
 
+(global-auto-revert-mode 1)
+
+(when (is-system "cygwin")
+  ;; Plato Wu,2010/03/29: emacs in cygwin does not support . of num area key
+  (global-set-key "On" 
+                  '(lambda () 
+                     (interactive)
+                     (insert ".")))
+  (defvar mode-line-position nil)
+  (let ((help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))
+    (setq mode-line-position `((-3 ,(propertize "%p" 'help-echo help-echo))
+			      (size-indication-mode
+			       (8 ,(propertize " of %I" 'help-echo help-echo)))
+			      (line-number-mode
+			       ((column-number-mode
+				 (10 ,(propertize " (%l,%c)" 'help-echo help-echo))
+				 (6 ,(propertize " L%l" 'help-echo help-echo))))
+			       ((column-number-mode
+				 (5 ,(propertize " C%c" 'help-echo help-echo)))))))))
+
+(setq-default 
+ mode-line-format
+ '("%e"
+   #("-" 0 1
+     (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))
+   ;; Plato Wu,2009/07/27: It seems meaningless
+   ;;       mode-line-mule-info 
+   mode-line-modified 
+   ;; Plato Wu,2009/07/27: It seems meaningless
+   ;;       mode-line-frame-identification 
+   mode-line-buffer-identification
+   #("   " 0 3
+     (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))
+   mode-line-position
+   (vc-mode vc-mode)
+   #("  " 0 2
+     (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))
+   ;; Plato Wu,2009/07/27: Disable it for it is very long sometime
+   ;;       mode-line-modes
+   (which-func-mode
+    ;; Plato Wu,2009/07/27: "" is need for symbol in list in mode line.
+    ("" which-func-format
+     #("--" 0 2
+       (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))))
+   (global-mode-string
+    (#("--" 0 2
+       (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))
+     global-mode-string))
+   #("-%-" 0 3
+     (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))))
+
 
 (provide 'my-interface)
 

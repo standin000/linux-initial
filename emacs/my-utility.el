@@ -213,5 +213,131 @@ that was stored with ska-point-to-register."
         (jump-to-register 8)
         (set-register 8 tmp)))
 
+;; Plato Wu,2009/12/25: emacs 23 has rgrep now
+(unless (is-version 23)
+                                        ;grep-find's pro version which filters files which does not blong current
+                                        ;file's class
+  (defvar wcy-find-grep-file-class
+    '(
+      ;; Plato Wu,2009/12/08: Dos prompt use | as key word so it can not be used at regrex expression
+      ;; ( ".*\\.h$"
+      ;;       ".*\\.c$"
+      ;;       ".*\\.cc$"
+      ;;       ".*\\.cxx$"
+      ;;       ".*\\.cpp$")
+      (".*\\.[ch]")
+      (".*\\.el$")
+      ;; Plato Wu,2008/11/24, Add other formats
+      (".*\\.lisp$")
+      (".*\\.htm$" ".*\\.html$")))
+
+  (defvar wcy-find-grep-file-class-history nil)
+
+  (if (boundp 'tool-bar-map)
+      (tool-bar-add-item "search-in-file"
+                         'wcy-find-grep
+                         'wcy-find-grep
+                         :help "search in files"))
+  ;; Plato Wu,2009/10/19: use find -print0 and xargs -0 to handle files whose
+  ;; name contain space.
+  (defun wcy-find-grep-internal (regexp dir-name regexp-for-filter-file)
+    ;; 08/7/30: modify by Plato for grep -e has a problem in eshell.
+    (let ((my-grep-command (concat 
+                            ;; 			  " grep  -e '"
+                            "'"
+                            (mapconcat 'identity regexp-for-filter-file "|")
+                            ;; 			  "'" 
+                            "' -print0 "
+                            )))
+      (setq dir-name (expand-file-name dir-name))
+      (grep-find (concat "find "
+                         dir-name
+                         ;;                        "  -type f -print | "
+                         ;; Plato Wu,2009/11/18: use iregex let the match being case insensitive
+                         " -type f -iregex "
+                         my-grep-command
+                         ;; Plato Wu,2008/12/07: About xargs options, -E is POSIX
+                         ;; compliant but -e is not, they both specify eof-str,
+                         ;; so if need use xargs in Mac OS X, use -E; Besides -e
+                         ;; is used without eof-str equals neither -E or -e is
+                         ;; used.
+                         " | xargs -0 grep -H -n -e '"		       
+                         regexp
+                         "'")))
+    (with-current-buffer compilation-last-buffer
+      (local-set-key (kbd "C-l") 'wcy-find-grep-hide-dirname)
+      (setq default-directory dir-name)
+      (wcy-find-grep-hide-dirname)))
+
+  (defun wcy-find-grep-hide-dirname ()
+    (interactive)
+    (if (not 
+         ;; Modify by Plato for it seems it may be grep-mode not compilation-mode
+         ;; (eq major-mode 'compilation-mode)
+         ;; Plato Wu,2009/09/22: in Cygwin, it is compilation-mode
+         (or (eq major-mode 'grep-mode) (eq major-mode 'compilation-mode)))
+        (error "must run this command under grep-find mode buffer")
+      (save-excursion
+        (goto-char (point-min))
+        (let* ((dir-name default-directory)
+               (r (re-search-forward (concat "^" (regexp-quote dir-name)) nil t))
+               begin end)              ;progn;remove progn for warning
+          (while r
+            (setq begin (match-beginning 0))
+            (setq end (match-end 0))
+            (let* ((x (overlays-in begin end))
+                   (e (or (and x (car x)) (make-overlay begin end))))
+              (overlay-put e 'invisible (not (overlay-get e 'invisible))))
+            (setq r (re-search-forward (concat "^" (regexp-quote dir-name)) nil t )))))))
+
+  ;; Plato Wu,2009/12/20: use rgrep command instead? TO check
+  (defun wcy-find-grep (regexp dir-name regexp-for-fileter-file)
+    (interactive (list  
+                  (read-from-minibuffer 
+                   "Regexp:"
+                   ; Modify by Plato for It seems <> is invalid.
+                   ; (concat "\\<"
+                   (regexp-quote
+                   ; Plato,08/08/27: current-word might return nil
+                    (or (current-word nil) ""))
+                   ; "\\>");; initial content is nil
+                   nil                  ;; key map is nil
+                   nil ;; read as lisp expression, false;
+                   'regexp-history
+                   nil                            ;; not default
+                   nil ;;inherit-input-method
+                   )
+                  (read-file-name (format "Directory(recursively):" )
+                                  nil default-directory nil)
+                  (if (buffer-file-name (current-buffer))
+                      nil
+                    (read-from-minibuffer "File Regexp:"
+                                          nil
+                                          nil
+                                          nil
+                                          'wcy-find-grep-file-class-history
+                                          nil
+                                          nil))))
+    (let ((files-filter
+           (if (null regexp-for-fileter-file)
+               (dolist-if (var wcy-find-grep-file-class)
+                          ;; Plato Wu,2009/11/18: let it ignores case
+                          (let ((case-fold-search t))
+                            (string-match
+                             (mapconcat 'identity var "\\|")
+                             (buffer-file-name (current-buffer))))
+                          var)
+             (list (list regexp-for-fileter-file)))))
+      (wcy-find-grep-internal regexp  dir-name (apply 'append files-filter))))
+  (defmacro dolist-if ( pair condtion body)
+    (list 'let '(result)
+          (list 'dolist  (append pair '(result))
+                (list 'if condtion
+                      (list 'setq 'result
+                            (list 'append 'result
+                                  (list 'list
+                                        (list 'progn
+                                              body)))))))))
+
 
 (provide 'my-utility)
