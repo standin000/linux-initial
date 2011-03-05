@@ -339,5 +339,51 @@ that was stored with ska-point-to-register."
                                         (list 'progn
                                               body)))))))))
 
+(defun cg-erc ()
+  (interactive)
+    ;; Plato Wu,2010/04/01: use 7000 in China Telecom network and
+    ;; 6667 in Greatwall network
+  (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "irc.freenode.net" "6667")))
+    (require 'erc)
+    (setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm")))
+    (setq erc-modules (cons 'log erc-modules))
+    (erc :server "irc.freenode.net" 
+           :port 6667 
+           :nick (cdr (assoc "login" netrc-data)) 
+           :password (cdr (assoc "password" netrc-data)) 
+           :full-name "Plato Wu")))
+
+(when (and (is-system "cygwin") (is-version 21))
+  (require 'midnight)
+  (defun clean-buffer-list ()
+    "Kill old buffers that have not been displayed recently.
+The relevant variables are `clean-buffer-list-delay-general',
+`clean-buffer-list-delay-special', `clean-buffer-list-kill-buffer-names',
+`clean-buffer-list-kill-never-buffer-names',
+`clean-buffer-list-kill-regexps' and
+`clean-buffer-list-kill-never-regexps'.
+While processing buffers, this procedure displays messages containing
+the current date/time, buffer name, how many seconds ago it was
+displayed (can be nil if the buffer was never displayed) and its
+lifetime, i.e., its \"age\" when it will be purged."
+    (interactive)
+    (let ((tm (float-time)) bts (ts (format-time-string "%Y-%m-%d %T"))
+          delay cbld bn)
+      (dolist (buf (buffer-list))
+        (when (buffer-live-p buf)
+          (setq bts (midnight-buffer-display-time buf) bn (buffer-name buf)
+                delay (if bts (- tm bts) 0) cbld (clean-buffer-list-delay bn))
+          ;; Plato Wu,2009/09/25: use fround intead of round in emacs 21 of Cygwin
+          (message "[%s] `%s' [%s %d]" ts bn (if bts (fround delay)) cbld)
+          (unless (or (midnight-find bn clean-buffer-list-kill-never-regexps
+                                     'string-match)
+                      (midnight-find bn clean-buffer-list-kill-never-buffer-names
+                                     'string-equal)
+                      (get-buffer-process buf)
+                      (and (buffer-file-name buf) (buffer-modified-p buf))
+                      (get-buffer-window buf 'visible) (< delay cbld))
+            (message "[%s] killing `%s'" ts bn)
+            (kill-buffer buf)))))))
+
 
 (provide 'my-utility)

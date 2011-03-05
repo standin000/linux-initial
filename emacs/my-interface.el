@@ -74,7 +74,20 @@
 
 (setq desktop-buffers-not-to-save '("*Music*"))
 
-(desktop-save-mode 1)
+(cond 
+ ((is-version 21)
+  (progn
+   ;; Plato Wu,2009/02/27: desktop-load-default is obsolete since 22.1
+   ;; use desktop-save-mode
+   (desktop-load-default) 
+   (desktop-read)
+   (unless (file-readable-p "~/.emacs.desktop")
+     (desktop-save "~/"))))
+ ((is-system "windows-nt")
+  (desktop-read "~/w32.emacs"))
+ (t (desktop-save-mode 1)))
+
+(add-hook 'desktop-after-read-hook 'clean-buffer-list)
 
 ;;set personal information
 (setq user-full-name "Plato Wu")
@@ -102,11 +115,25 @@
 (if (display-mouse-p)
     (mouse-avoidance-mode 'jump))
 
-(when window-system
+(when window-system 
   ;;auto open & display image
   (auto-image-file-mode)
   (pc-selection-mode)			; use shift to select region
-  (setq pc-select-selection-keys-only t))
+  (setq pc-select-selection-keys-only t)
+  (cond 
+   ((is-system "darwin")
+    (set-default-font "-apple-courier-medium-r-normal--18-180-72-72-m-180-iso10646-1"))
+   ((is-system "windows-nt")
+    nil)
+   (t (progn 
+        (create-fontset-from-fontset-spec 
+         (concat
+          "-*-fixed-*-*-*-*-*-200-*-*-*-*-fontset-courier," 
+          "chinese-gb2312:-ISAS-Fangsong ti-Medium-R-Normal--16-*-*-*-c-*-GB2312*-*,"))
+        (set-default-font "fontset-courier")
+        (setq default-frame-alist
+              (append
+               '((font . "fontset-courier")) default-frame-alist))))))
 
 (setq debug-on-error t)
 
@@ -176,7 +203,6 @@
      global-mode-string))
    #("-%-" 0 3
      (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))))
-
 
 (provide 'my-interface)
 
