@@ -21,7 +21,7 @@
      (expand-file-name "~/.emacs.d/elpa/package.el"))
   (package-initialize))
 
-;; Plato Wu,2010/12/17, this function should not use el-get-dir which is conflict with
+;; Plato Wu, 2010/12/17, this function should not use el-get-dir which is conflict with
 ;; el-get package itself
 (let ((el-get-install-dir        (expand-file-name "~/.emacs.d/el-get/"))
       (package           "el-get"))
@@ -31,6 +31,7 @@
                                 (make-directory el-get-install-dir t)))
            (pdir              (concat (file-name-as-directory el-get-install-dir) package))
            (git               (or (executable-find "git") (error "Unable to find `git'")))
+; Plato Wu,2010/10/11: use sslVerify = false in git config skip https verification in http clone
            (url               "https://github.com/dimitri/el-get.git")
            (el-get-sources    `((:name ,package :type "git" :url ,url :features el-get :compile "el-get.el")))
            (default-directory el-get-install-dir)
