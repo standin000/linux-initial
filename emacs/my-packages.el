@@ -1,7 +1,7 @@
 (defun eshell-configuration ()
   ;emacs21 uses eshell-ask-to-save-history but emacs 22 & 23 uses
   ;eshell-save-history-on-exit
-  (if (string= (substring emacs-version 0 2) "21")
+  (if (is-version 21)
     (setq eshell-ask-to-save-history 'always)
     (setq eshell-save-history-on-exit t))
   (setq eshell-prompt-function 
@@ -85,7 +85,7 @@
 	("free" "free -m")
 	("vi" "emacs $*")
 	("nano" "emacs $*")))
-  (when (string= system-type "windows-nt")
+  (when (is-system "windows-nt")
       (setcdr (assoc "ls" eshell-command-aliases-list) '("ls -h $*"))
       ;; Plato Wu,2010/11/03: I don't know why $* does work with $*
       (setcdr (assoc "cp" eshell-command-aliases-list) '("cp $1 $2"))
@@ -94,24 +94,6 @@
       (setcdr (assoc "del" eshell-command-aliases-list) '("rm -i -f $*"))))
 
 (eshell-configuration)
-
-(require 'etags)
-;; Plato Wu,2009/04/07: In order to support lookup elisp function.
-(defun find-tag-also-for-elisp (tagname &optional next-p regexp-p)
-  (interactive (find-tag-interactive "Find tag: "))
-   (let ((tagsymbol (intern tagname)))
-    (cond
-     ((fboundp tagsymbol) 
-      (setq find-tag-history (cons tagsymbol find-tag-history))
-      (ring-insert find-tag-marker-ring (point-marker))
-      (find-function tagsymbol))
-     ((boundp tagsymbol) 
-      (setq find-tag-history (cons tagsymbol find-tag-history))
-      (ring-insert find-tag-marker-ring (point-marker))
-      (find-variable tagsymbol))
-     (t (find-tag tagname next-p regexp-p)))))
-
-(define-key emacs-lisp-mode-map "\M-." 'find-tag-also-for-elisp)
 
 (defun paredit-configuration ()
   ;; Plato Wu,2008/09/27, paredit will cause alt-s, ctrl-d can not used in ido mode
@@ -123,7 +105,16 @@
 	  (let ((hook (intern (concat (symbol-name mode)
 				      "-mode-hook"))))
 	    (add-hook hook (lambda () (paredit-mode +1)))))
-	'(emacs-lisp lisp slime-repl scheme)))
+	'(emacs-lisp lisp slime-repl scheme ielm))
+  (defadvice ielm-eval-input (after ielm-paredit activate)
+    "Begin each IELM prompt with a ParEdit parenthesis pair."
+    (paredit-open-round))
+  (add-hook 'ielm-mode-hook
+            '(lambda () 
+               (setq comint-input-ring-file-name "~/.ielm.history")
+               (turn-on-eldoc-mode)))
+  ;; Plato Wu,2009/12/09: enable eldoc mode.
+(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode))
 
 (defun ido-configuration ()
   (setq ido-enable-tramp-completion nil) 
@@ -135,6 +126,10 @@
 	  "^\\*[^es].\\{3\\}[^s].*"
 	  "TAGS"))
   (setq ido-record-ftp-work-directories nil)
+
+;; Plato Wu,2009/06/04: let ido-work-directory-list not record /sudo
+;; so that ido do not need wait 60s for visit /sudo
+  (setq ido-work-directory-list-ignore-regexps '("/sudo:"))
   (ido-mode t))
 
 (defun emms-configuration ()
@@ -157,7 +152,7 @@
   ;; starts to play a track with "NP : "
   (add-hook 'emms-player-started-hook 'emms-show)
   (setq emms-volume-change-function 'emms-volume-mpd-change)
-  (setq emms-show-format "NP: %s")
+  (setq emms-show-format "%s")
   (setq emms-player-next-function 'emms-random)
   (setq emms-playlist-buffer-name "*Music*")
   (setq emms-player-mpd-music-directory "~/Music")
@@ -682,6 +677,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;                                  "xelatex -output-directory  public_pdf/ %s"))
   (setq org-latex-to-pdf-process '("xelatex %s" "xelatex %s")))
 (org-configuration)
+
 (provide 'my-packages)
 
   
