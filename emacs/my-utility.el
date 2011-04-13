@@ -18,6 +18,12 @@
 
 (defun mycomment (arg)
   (interactive "*P")
+  ;; ;; Plato Wu,2009/11/12: emacs 21.2.1 in cygwin does not have this code passage.
+  ;; (unless comment-start
+  ;;     (let ((cs (read-string "No comment syntax is defined.  Use: ")))
+  ;;       (if (zerop (length cs))
+  ;;           (error "No comment syntax defined")
+  ;;         (set (make-local-variable 'comment-start) cs))))
   (comment-dwim arg)
   (insert (user-full-name) (format-time-string ",%Y/%m/%d: " (current-time))))
 
@@ -82,16 +88,7 @@
 (unless (or (is-system "cygwin") window-system)
   (define-key global-map "" 'save-buffers-kill-client))
 
-(defun my-done ()
-    (interactive) 
-    (server-edit)
-    (make-frame-invisible nil t))
 
-(unless (or (is-system "cygwin") 
-            (is-version 21))
-  (if (is-system "windows-nt")
-      (global-set-key (kbd "C-z") 'my-done)
-    (global-set-key "\C-z" 'delete-frame)))
 
 ;; set the following var to t if you like a newline to the end of copied text.
 (defvar my-kill-ring-save-include-last-newline nil)
@@ -195,8 +192,6 @@ do kill lines as `dd' in vim."
 (global-set-key (quote [27 f12]) 'ska-jump-to-register)
 ;; Plato Wu,2010/04/07: M-f12 for windows
 (global-set-key (quote [M f12]) 'ska-jump-to-register)
-
-
 
 (defun ska-point-to-register()
   "Store cursorposition _fast_ in a register. 
@@ -338,21 +333,8 @@ that was stored with ska-point-to-register."
                                   (list 'list
                                         (list 'progn
                                               body)))))))))
-
-(defun cg-erc ()
-  (interactive)
-    ;; Plato Wu,2010/04/01: use 7000 in China Telecom network and
-    ;; 6667 in Greatwall network
-  (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "irc.freenode.net" "6667")))
-    (require 'erc)
-    (setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm")))
-    (setq erc-modules (cons 'log erc-modules))
-    (erc :server "irc.freenode.net" 
-           :port 6667 
-           :nick (cdr (assoc "login" netrc-data)) 
-           :password (cdr (assoc "password" netrc-data)) 
-           :full-name "Plato Wu")))
-
+;;; use (clean-buffer-list) to clean old buffer which is not visited by 3 day.
+;;; it need run after desktop-read
 (when (and (is-system "cygwin") (is-version 21))
   (require 'midnight)
   (defun clean-buffer-list ()
@@ -384,6 +366,170 @@ lifetime, i.e., its \"age\" when it will be purged."
                       (get-buffer-window buf 'visible) (< delay cbld))
             (message "[%s] killing `%s'" ts bn)
             (kill-buffer buf)))))))
+
+(defun comment-dwim-line (&optional arg)
+  "Replacement for the comment-dwim command.
+If no region is selected and current line is not blank and we are not at the end of the line,
+then comment current line.
+Replaces default behaviour of comment-dwim, when it inserts comment at the end of the line."
+  (interactive "*P")
+  (comment-normalize-vars)
+  (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+      (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+    (comment-dwim arg)))
+
+(global-set-key "\M-;" 'comment-dwim-line)
+
+(defun split-window-vertically-and-switch ()
+      "split window vertically ands switch to it"
+    (interactive)
+    (split-window-vertically)
+    (other-window 1))
+
+(global-set-key "2" 'split-window-vertically-and-switch)
+
+(defun cg-erc ()
+    (interactive)
+    ;; Plato Wu,2010/04/01: use 7000 in China Telecom network and
+    ;; 6667 in Greatwall network
+    (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "irc.freenode.net" "6667")))
+      (erc :server "irc.freenode.net" 
+           :port 6667 
+           :nick (cdr (assoc "login" netrc-data)) 
+           :password (cdr (assoc "password" netrc-data)) 
+           :full-name "Plato Wu"))
+    (setq erc-modules 
+      (append erc-modules
+              '(autojoin button completion fill irccontrols list log match menu 
+                         move-to-prompt netsplit networks noncommands readonly
+                         ring stamp track)))
+    ;;(setq erc-autojoin-channels-alist '(("freenode.net" "#symbolicweb")))
+    (setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm"))))
+
+
+(require 'etags)
+;; Plato Wu,2009/04/07: In order to support lookup elisp function.
+(defun find-tag-also-for-elisp (tagname &optional next-p regexp-p)
+  (interactive (find-tag-interactive "Find tag: "))
+   (let ((tagsymbol (intern tagname)))
+    (cond
+     ((fboundp tagsymbol) 
+      (setq find-tag-history (cons tagsymbol find-tag-history))
+      (ring-insert find-tag-marker-ring (point-marker))
+      (find-function tagsymbol))
+     ((boundp tagsymbol) 
+      (setq find-tag-history (cons tagsymbol find-tag-history))
+      (ring-insert find-tag-marker-ring (point-marker))
+      (find-variable tagsymbol))
+     (t (find-tag tagname next-p regexp-p)))))
+
+(define-key emacs-lisp-mode-map "\M-." 'find-tag-also-for-elisp)
+
+(unless (or (is-system "cygwin") 
+            (is-version 21))
+  (defun my-done ()
+    (interactive) 
+    (server-edit)
+    (make-frame-invisible nil t))
+  (if (is-system "windows-nt")
+      (global-set-key (kbd "C-z") 'my-done)
+    (global-set-key "\C-z" 'delete-frame)))
+
+;; Plato Wu,2010/09/30: revert-buffer will throw a error when the buffer is not modifed
+;; it cause revert-buffer-with-coding-system also works weirdly.
+
+(defvar ediff-do-hexl-diff nil
+  "variable used to store trigger for doing diff in hexl-mode")
+(defadvice ediff-files-internal (around ediff-files-internal-for-binary-files activate)
+  "catch the condition when the binary files differ
+
+the reason for catching the error out here (when re-thrown from the inner advice)
+is to let the stack continue to unwind before we start the new diff
+otherwise some code in the middle of the stack expects some output that
+isn't there and triggers an error"
+  (let ((file-A (ad-get-arg 0))
+        (file-B (ad-get-arg 1))
+        ediff-do-hexl-diff)
+    (condition-case err
+        (progn
+          ad-do-it)
+      (error
+       (if ediff-do-hexl-diff 
+           (let ((buf-A (find-file-noselect file-A))
+                 (buf-B (find-file-noselect file-B)))
+             (with-current-buffer buf-A
+               (hexl-mode 1))
+             (with-current-buffer buf-B
+               (hexl-mode 1))
+             (ediff-buffers buf-A buf-B))
+         (error (error-message-string err)))))))
+
+(defadvice ediff-setup-diff-regions (around ediff-setup-diff-regions-for-binary-files activate)
+  "when binary files differ, set the variable "
+  (condition-case err
+      (progn
+        ad-do-it)
+    (error
+     (setq ediff-do-hexl-diff
+           (and (string-match-p "^Errors in diff output.  Diff output is in.*"
+                                (error-message-string err))
+                (string-match-p "^\\(Binary \\)?[fF]iles .* and .* differ"
+                                (buffer-substring-no-properties
+                                 (line-beginning-position)
+                                 (line-end-position)))
+                (y-or-n-p "The binary files differ, look at the differences in hexl-mode? ")))
+     (error (error-message-string err)))))
+
+;; Plato Wu,2011/04/09: use smart-tab instead.
+;; (defun my-indent-or-complete ()
+;;   ;;   "If cursor is at the end of word then hippie-expand, else indent"
+;;    "If cursor is at the end of word then call M-TAB's function, else call
+;;    TAB's function."
+;;   (interactive)
+;;   ;; C-TAB has been binded to tab key's function in mode-hook.
+;;   (let ((TAB-func (key-binding '[C-tab]))
+;; 	(M-TAB-func (key-binding "\M-\t")))
+;;    (if (looking-at "\\>") 
+;;        ;;       (hippie-expand nil)
+;;        (call-interactively M-TAB-func)
+;;      ;;       (indent-for-tab-command)
+;;      (call-interactively TAB-func))))
+
+;; some useful fuction
+;; (make-variable-buffer-local 'M-TAB-func)
+;; (kill-local-variable 'buffer-file-coding-system)
+;; (buffer-local-variables)
+
+;; (defun define-my-indent () 
+;;   ;; Plato Wu,2008/11/28 latex-mode and LaTeX-mode-map is inconsistent
+;;   (let (;; Plato Wu,2008/11/19, it seems in X window & eshell mode [tab] is not "\t"
+;; 	;; is (quote [tab]) but this does not work for other modes.
+;; 	;(tab-key (quote [tab]))
+;; 	(tab-key "\t")
+;; 	)
+;;     (when (current-local-map)
+;;       (let ((TAB-func (key-binding tab-key)))
+;; 	(unless (or (eq (key-binding tab-key) 'my-indent-or-complete)
+;;                     ;; Plato Wu,2010/01/26: tab in shell and eshell don't have completion-at-point
+;;                     ;; function.
+;; 		    (string-match "^eshell-mode\\|^shell-mode" (symbol-name major-mode)))
+;; 	  ;; Plato Wu,2008/09/24
+;; 	  ;; if use string to represent key sequence, it will meet some problem
+;; 	  ;; like ^ have been defined in gnus-*-mode, so "^C\t" is NG. Besides,
+;; 	  ;; it seems \ can not occur twice in string, so "\C\t" is NG.
+;; 	  (define-key (current-local-map) '[C-tab] TAB-func)
+;; 	  (define-key (current-local-map) tab-key 'my-indent-or-complete))))))
+
+;; (add-hook 'after-change-major-mode-hook 'define-my-indent)
+
+;; emacs 22 has this function
+(if (is-version 21)
+ (defadvice comment-or-uncomment-region (before slickcomment activate compile)
+   "When called interactively with no active region, toggle comment on current line instead."
+   (interactive
+    (if mark-active (list (region-beginning) (region-end))
+      (list (line-beginning-position)
+            (line-beginning-position 2)))))) 
 
 
 (provide 'my-utility)
