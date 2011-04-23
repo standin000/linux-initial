@@ -339,3 +339,11 @@
 ;; or
 ;; C-x RET f undecided-dos C-x C-f
 
+;; Plato Wu,2011/04/15: after add XTerm*allowSendEvents: True into .Xresourcs
+;; (frame-parameter (selected-frame) 'background-color) is unspecified-bg in
+;; xterm, why? urxvt is OK.
+
+;(set-background-color "darkslategrey")
+
+
+
