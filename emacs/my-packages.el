@@ -173,7 +173,8 @@
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
   ;; emms-shuffle will shuffle the playlist for mpd don't support random play
-  (emms-history-load)) 
+  (emms-history-load)
+  ) 
 
 (defvar my-authinfo "~/.authinfo")
 
@@ -677,6 +678,11 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;                                  "xelatex -output-directory  public_pdf/ %s"))
   (setq org-latex-to-pdf-process '("xelatex %s" "xelatex %s")))
 (org-configuration)
+
+(defun sawfish-configuration ()
+  (setq auto-mode-alist (cons '("\\.sawfishrc$"  . sawfish-mode) auto-mode-alist)
+        auto-mode-alist (cons '("\\.jl$"         . sawfish-mode) auto-mode-alist)
+        auto-mode-alist (cons '("\\.sawfish/rc$" . sawfish-mode) auto-mode-alist)))
 
 (provide 'my-packages)
 
