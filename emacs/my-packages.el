@@ -79,8 +79,8 @@
 	("ll" "ls -l $*")
 	("la" "ls -A $*")
 	("l" "ls -CF $*")
-	("ls" "ls -hF $*")
-;	("ls" "ls -hF --color=auto $*")
+;	("ls" "ls -hF $*")
+	("ls" "ls -hF --color=auto $*")
 	("mv" "mv -i $1 $2")
 	("free" "free -m")
 	("vi" "emacs $*")
@@ -674,9 +674,13 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;            )
   ;;           ;; ... add all the components here (see below)...
   ;;           ))
-  ;; (setq org-latex-to-pdf-process '("xelatex -output-directory  public_pdf/ %s" 
-  ;;                                  "xelatex -output-directory  public_pdf/ %s"))
-  (setq org-latex-to-pdf-process '("xelatex %s" "xelatex %s")))
+  ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
+  (setq org-latex-to-pdf-process '("xelatex -output-directory  log/ %s" 
+                                   ;; moving intermediate tex file
+                                   "mv `basename %b`.tex log/"
+                                   ;; moving pdf for meeting org-export-as-pdf
+                                   "mv log/`basename %b`.pdf ."))
+  )
 (org-configuration)
 
 (defun sawfish-configuration ()
