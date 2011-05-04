@@ -319,15 +319,28 @@
 
 (provide 'my-interface)
 
+;; (defun my-search (regexp)
+;;   (interactive
+;;    (let ((regexp (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+;;      (grep-compute-defaults)
+;;      (list regexp)))
+;;   (rgrep regexp "*.el" "~/linux-initial/emacs/" nil))
 
-(defun my-search (regexp)
-  (interactive
-   (let ((regexp (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-     (grep-compute-defaults)
-     (list regexp)))
-  (rgrep regexp "*.el" "~/linux-initial/emacs/" nil))
-
-(global-set-key [f9] 'my-search)
+;; (global-set-key [f9] 'my-search)
+(setq grep-files-aliases
+      '(("asm" .    "*.[sS]")
+        ;; Plato Wu,2010/02/27: Let ch match .c file first!
+        ("ch" .    "*.[ch]")
+        ("c" .     "*.c")
+        ("cc" .    "*.cc *.cxx *.cpp *.C *.CC *.c++")
+        ("cchh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
+        ("hh" .    "*.hxx *.hpp *.[Hh] *.HH *.h++")
+        ("el" .    "*.el")
+        ("h" .     "*.h")
+        ("l" .      "[Cc]hange[Ll]og*")
+        ("m" .     "[Mm]akefile*")
+        ("tex" .    "*.tex")
+        ("texi" .   "*.texi")))
 
 ;;C-x ( start-kbd-macro; C-x ) end-kbd-macro; C-x e call-last-kbd-macro
 ;; Dos to unix
@@ -343,7 +356,20 @@
 ;; (frame-parameter (selected-frame) 'background-color) is unspecified-bg in
 ;; xterm, why? urxvt is OK.
 
-;(set-background-color "darkslategrey")
+
+;; (set-face-foreground 'default "wheat")
+;; (set-face-background 'default "darkslategrey")
+;; (set-foreground-color "wheat")
+
+
+
+;; Plato Wu,2011/04/27: use black like ssh tools: kitty, so red comment is OK.
+(set-background-color "darkslategrey")
+
+; show the current function when possible; it need cedet to know function'name
+(which-func-mode 1)
+
+
 
 
 
