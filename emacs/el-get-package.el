@@ -62,9 +62,7 @@
       '(nxhtml 
         vkill 
         (:name emacs-w3m :features w3m
-               :after (lambda ()
-                        (setq w3m-default-coding-system 'utf-8)
-                        (setq browse-url-browser-function 'w3m-browse-url))) 
+               :after w3m-configuration) 
         ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
         ;; which cause error, so must use features.
         (:name ido-hacks :features ido-hacks :after ido-configuration) 

@@ -173,7 +173,7 @@
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
   ;; emms-shuffle will shuffle the playlist for mpd don't support random play
-  (emms-history-load)
+;  (emms-history-load)
   ) 
 
 (defvar my-authinfo "~/.authinfo")
@@ -621,7 +621,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (global-set-key "\C-cl" 'org-store-link)
   (global-set-key "\C-ca" 'org-agenda)
   (global-set-key "\C-cb" 'org-iswitchb)
-  (setq w3m-default-coding-system 'utf-8)
   (setq org-return-follows-link t)
 
   (setq org-default-notes-file "~/org/todo.org")
@@ -684,9 +683,59 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 (org-configuration)
 
 (defun sawfish-configuration ()
-  (setq auto-mode-alist (cons '("\\.sawfishrc$"  . sawfish-mode) auto-mode-alist)
-        auto-mode-alist (cons '("\\.jl$"         . sawfish-mode) auto-mode-alist)
-        auto-mode-alist (cons '("\\.sawfish/rc$" . sawfish-mode) auto-mode-alist)))
+  (setq auto-mode-alist
+      (append '(("\\.jl$" . sawfish-mode)
+		("\\.sawfishrc$" . sawfish-mode)
+		("\\.sawfish/rc$" . sawfish-mode))
+	    auto-mode-alist)))
+;; (define-key scheme-mode-map [f9] 'gds-show-last-stack)
+;; (add-hook 'c-mode-hook '(lambda ()
+;;                           (c-set-style "stroustrup")
+;;                           (c-toggle-auto-hungry-state nil)))
+
+(defun compile-configuration ()
+  (global-set-key [f7] 'compile)
+  ;;for waring from smart-compile
+  (setq compilation-scroll-output t)
+  (setq compilation-ask-about-save nil))
+
+(compile-configuration)
+
+(defun slime-configuaration ()
+  (setq auto-mode-alist
+      (append '(("\\.sbclrc$" . lisp-mode))
+	    auto-mode-alist)))
+
+(defun w3m-configuration ()
+  (setq w3m-default-coding-system 'utf-8)
+  (setq browse-url-browser-function 'w3m-browse-url)
+  ;; Plato Wu,2010/01/26: supress message: ImageMagick's `convert' program is not available
+  (setq w3m-use-favicon nil)
+  (setq w3m-imagick-convert-program nil)
+  (setq w3m-use-cookies t)
+   ;; Plato Wu,2010/03/28: google.com is censored, disable this function for
+   ;; w3m-goto-url
+  (setq w3m-enable-google-feeling-lucky nil)
+  (add-hook 'w3m-mode-hook 
+             '(lambda ()
+                (w3m-link-numbering-mode t)))
+  
+  (defun my-w3m-href-text (&optional position)
+     "Return text linked up with the href anchor at the given POSITION.
+NOTE: If POSITION is omitted, it searches for the property in one
+character before and behind the current position, and point will move
+to the position where the property exists."
+     (when (if position
+	       (get-text-property position 'w3m-href-anchor)
+	     (w3m-get-text-property-around 'w3m-href-anchor))
+       (w3m-replace-in-string
+	(buffer-substring-no-properties
+	 (if (or (bobp)
+		 (not (get-text-property (1- (point)) 'w3m-href-anchor)))
+	     (point)
+	   (previous-single-property-change (point) 'w3m-href-anchor))
+	 (next-single-property-change (point) 'w3m-href-anchor))
+	" +\\'" ""))))
 
 (provide 'my-packages)
 
