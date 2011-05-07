@@ -73,16 +73,18 @@
   "Offer to save each buffer, if there is only client,
    kill Emacs itself, otherwise kill the current connection"
   (interactive "P")
-  (if (> (length server-clients) 1)
-      (server-save-buffers-kill-terminal arg)
-    (progn 
-      (remove-hook 'kill-emacs-query-functions 'server-kill-emacs-query-function)
-      (if (functionp 'quit-slime)
-          (quit-slime))
-      (if (and (functionp 'gnus-alive-p)
-               (gnus-alive-p))
-          (gnus-group-exit))
-      (save-buffers-kill-emacs arg))))
+  (if (boundp 'server-clients)
+      (if (> (length server-clients) 1)
+          (server-save-buffers-kill-terminal arg)
+        (progn 
+          (remove-hook 'kill-emacs-query-functions 'server-kill-emacs-query-function)
+          (if (functionp 'quit-slime)
+              (quit-slime))
+          (if (and (functionp 'gnus-alive-p)
+                   (gnus-alive-p))
+              (gnus-group-exit))
+          (save-buffers-kill-emacs arg)))
+    (save-buffers-kill-emacs arg)))
 
 ;; Plato Wu,2008/10/08 "^X^C" is not "" which is inputed by C-q C-x C-q C-c
 (unless (or (is-system "cygwin") window-system)
@@ -431,9 +433,10 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
     (interactive) 
     (server-edit)
     (make-frame-invisible nil t))
-  (if (is-system "windows-nt")
-      (global-set-key (kbd "C-z") 'my-done)
-    (global-set-key "\C-z" 'delete-frame)))
+  (cond 
+   ((is-system "windows-nt")
+    (global-set-key (kbd "C-z") 'my-done))
+   (t (global-set-key "\C-z" 'delete-frame))))
 
 ;; Plato Wu,2010/09/30: revert-buffer will throw a error when the buffer is not modifed
 ;; it cause revert-buffer-with-coding-system also works weirdly.
