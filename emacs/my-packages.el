@@ -118,6 +118,7 @@
 
 (defun ido-configuration ()
   (setq ido-enable-tramp-completion nil) 
+;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history 
   (setq ido-ignore-buffers
 	'("^ .*"
 	;; ignore *eshell*, *svn-status*, a awkward regular expression
@@ -173,7 +174,7 @@
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
   ;; emms-shuffle will shuffle the playlist for mpd don't support random play
-;  (emms-history-load)
+  (emms-history-load)
   ) 
 
 (defvar my-authinfo "~/.authinfo")
@@ -697,9 +698,127 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (global-set-key [f7] 'compile)
   ;;for waring from smart-compile
   (setq compilation-scroll-output t)
-  (setq compilation-ask-about-save nil))
+  (setq compilation-ask-about-save nil)
+  (require 'gud)
+  (gud-def gud-run "run" nil "start debug program")
+  (gud-def gud-kill "kill" nil "kill debug program")
+  (gud-def gud-y "y\n" nil "answer y for gdb")
+  (defvar gdb-state nil "present gdb's state:nil, Start, Running, Stop")
+  (defun gud-clear-break-list ()
+    "Clear break point list"
+    (interactive)
+    (setq break-list nil))
+  (defun gud-kill-9 ()
+    "force to kill program which is debugging"
+    (interactive)
+    (let ((process-id
+	   (string-to-int
+	    (shell-command-to-string
+	     (concat "ps -u $USER | grep " gdb-executable
+		     " | gawk '{print $1}'")))))
+      (if (and (equal gdb-state "Running")
+	       (and  gud-last-last-frame
+		     (not (eq gud-last-last-frame gdb-stop-p))))
+	  (prog1
+	      (gud-kill 1)
+	    ;;must wait command's reponse
+	    (sleep-for 1)
+	    (gud-y 1))
+	(if (= process-id 0)
+	    (message "Program are not running")
+	  (signal-process process-id 'SIGKILL)))
+      (setq gdb-state nil
+	    gdb-stop-p gud-last-last-frame)))
+  (global-set-key (quote [27 f5]) (quote gud-kill-9))
+  ;;judge whether gdb state is stop by gud-last-last-frame's change
+  ;;but for gud-last-last-frame is also used by gud-refresh, so if user
+  ;;run gud-refresh, the gdb's state will be confused
+  (defvar gdb-stop-p nil "whether gdb's state is stop")
+  (defvar gdb-executable nil "exetuable file for gdb")
+  (defun onekey-debug ()
+    "Save buffers and start debug"
+    (interactive)
+    (save-some-buffers t)
+    (cond ((equal gdb-state nil)
+	   (setq gdb-state "Start")
+	   ;;delete compilation window
+	   (delete-other-windows)
+	   (split-window-vertically)
+	   (other-window 1)
+	   ;;use specified project
+					;	 (gdb "gdb --cd=~/PMP/UI/Build PMP")
+	   (find-file "Makefile")
+	   ;;	 (set-buffer "Makefile")
+	   (setq gdb-executable
+		 (shell-command-to-string
+		  "gawk '/^EXECUTABLE/{print $3}' Makefile"))
+	   (gdb (concat "gdb " gdb-executable))
+	   ;;return source window
+	   (other-window 1))
+
+	  ((equal gdb-state "Start")
+	   (setq gdb-state "Running"
+		 gdb-stop-p gud-last-last-frame)
+	   (gud-run 1))
+	  ((equal gdb-state "Running")
+	   (if (and gud-last-last-frame
+		    (not (eq gud-last-last-frame gdb-stop-p)))
+	       (progn (gud-cont 1)
+		      (setq gdb-stop-p gud-last-last-frame))
+;;;To Debug
+	     (let ((process-id
+		    (string-to-int
+		     (shell-command-to-string
+		      (concat "ps -u $USER | grep " gdb-executable
+			      " | gawk '{print $1}'")))))
+	       (if (= process-id 0)
+		   (message "Program are not running")
+		 (signal-process process-id 'SIGINT))
+	       (if gud-last-last-frame (setq gdb-stop-p nil)))))))
+  (defvar break-list nil "a list which stores break lines")
+					;use memq instead of element-in-list-p?
+  (defun element-in-list-p (element list)
+    "judge whether element is in the list"
+    (if list
+	(if (equal element (car list))
+	    element
+	  (element-in-list-p element (cdr list)))
+      nil))
+
+  (defun gud-break-remove ()
+    "set breakpoint or remove a existed one"
+    (interactive)
+    (if gdb-state
+	(let ((element (list buffer-file-name (what-line))))
+	  (if (element-in-list-p element break-list)
+					;delq use eq so it can not be used here. we must use delete
+	      (progn (setq break-list (delete element break-list))
+		     (gud-remove 1))
+	    (progn (setq break-list (cons element break-list))
+		   (gud-break 1))))
+      (gud-break 1)))
+  (defun gud-evaluation ()
+    "if emacs is at debug state, then evaluation C expression at point,
+else evaluate sexp"
+    (interactive)
+    (if gdb-state
+	(gud-print 1)
+      (eval-last-sexp nil)))
+  ;;overload C-x C-e
+  (global-set-key "" 'gud-evaluation)
+  ;;overload "C-x "
+  (global-set-key " "  'gud-break-remove)
+  (global-set-key [f5] 'onekey-debug)
+  ;;(global-set-key [f9] 'gud-break)
+  ;; f10 is menu key but M-` is also menu key
+  (global-set-key [f10] 'gud-next)
+  (global-set-key [f11] 'gud-step)
+  (setq gdb-many-windows t))
 
 (compile-configuration)
+
+(defun session-configuration ()
+  (add-hook 'after-init-hook 'session-initialize))
 
 (defun slime-configuaration ()
   (setq auto-mode-alist
@@ -718,7 +837,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (setq w3m-enable-google-feeling-lucky nil)
   (add-hook 'w3m-mode-hook 
              '(lambda ()
-                (w3m-link-numbering-mode t)))
+                (w3m-link-numbering-mode 1)))
   
   (defun my-w3m-href-text (&optional position)
      "Return text linked up with the href anchor at the given POSITION.

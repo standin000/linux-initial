@@ -55,11 +55,16 @@
 (setq el-get-recipe-path 
       (cons "~/linux-initial/emacs/recipes/" el-get-recipe-path))
 
+;; Plato Wu,2011/05/07: remove it for require will search it first for package,
+;; and the recipe file name is the same as package file name
+(setq load-path 
+      (remove "/home/plato/.emacs.d/el-get/el-get/recipes" load-path))
+
 ;; Plato Wu,2010/12/26: features don't works for elpa type
 (setq el-get-sources
       ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
       ;; so remove el-get from el-get-sources
-      '(nxhtml 
+      '(nxhtml
         vkill 
         (:name emacs-w3m :features w3m
                :after w3m-configuration) 
@@ -82,8 +87,10 @@
         (:name weblogger :type elpa :features weblogger :after blogger-configuration)
         (:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
         (:name smart-tab :features smart-tab :after smart-tab-configuration)
-        (:name sawfish :features sawfish :after sawfish-configuration)))
+        (:name sawfish :features sawfish :after sawfish-configuration)
+        (:name session :features session :after session-configuration)))
         
 (el-get 'sync)
+
 
 (provide 'el-get-package)
