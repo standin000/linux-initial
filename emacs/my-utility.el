@@ -173,8 +173,10 @@ do kill lines as `dd' in vim."
 
 (defun view-msn-log ()
   (interactive)
-  (let* ((filename (file-name-nondirectory (buffer-file-name)))
-        (output-buffer (get-buffer-create (concat filename ".html"))))
+  (let ((filename (file-name-nondirectory (buffer-file-name)))
+        ;; Plato Wu,2011/05/08: there maybe files which has the same name,
+        ;; use buffer-name instead
+        (output-buffer (get-buffer-create (concat (buffer-name) ".html"))))
     (with-current-buffer output-buffer
       (call-process "xsltproc" nil t t filename)
       (browse-url-of-buffer))))
