@@ -131,7 +131,46 @@
 ;; Plato Wu,2009/06/04: let ido-work-directory-list not record /sudo
 ;; so that ido do not need wait 60s for visit /sudo
   (setq ido-work-directory-list-ignore-regexps '("/sudo:"))
+  ;; Plato Wu,2008/12/09: remarks for key is conflict with redshank mode
+  (define-key ctl-x-map "\C-r" nil)
+
   (ido-mode t))
+
+(defun psvn-configuration ()
+  ;; Plato Wu,2009/03/31: This code is used in PMP project in Kinpo
+;; to handle svn user name which includes blanks
+;; (setq svn-user-names-including-blanks
+;;      '("elan zhou" "mike ma" "plato wu" "howardkoo gu"))
+;; (add-hook 'svn-pre-parse-status-hook
+;; 	  'svn-status-parse-fixup-user-names-including-blanks)
+  (setq svn-log-edit-show-diff-for-commit t
+        svn-status-hide-unmodified t
+        ;; Plato Wu,2009/07/27: disable modeline mark display for there
+        ;; is not image for console emacs.
+        svn-status-state-mark-modeline nil))
+
+(defun dired-single-configuration ()
+;  (require 'dired)
+  (define-key dired-mode-map (kbd "RET") 'joc-dired-single-buffer)
+  (define-key dired-mode-map 
+    (kbd ".")
+    '(lambda ()
+       (interactive)
+       (joc-dired-single-buffer ".."))))
+
+(defun wdired-configuration ()  
+  (require 'wdired)
+  (setq wdired-allow-to-change-permissions t)
+  (define-key dired-mode-map "r"
+    'wdired-change-to-wdired-mode))
+
+(wdired-configuration)
+
+;; use h show help
+(require 'ibuffer)
+;; Plato Wu,2011/05/08: ibuffer is a part of Emacs 22 and there is no 
+;; ibuffer-and-update now and ibuffer update automatically
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 
 (defun emms-configuration ()
   (require 'emms-setup)

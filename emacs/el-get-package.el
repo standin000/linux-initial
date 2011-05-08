@@ -88,7 +88,10 @@
         (:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
         (:name smart-tab :features smart-tab :after smart-tab-configuration)
         (:name sawfish :features sawfish :after sawfish-configuration)
-        (:name session :features session :after session-configuration)))
+        (:name session :features session :after session-configuration)
+        (:name psvn :features psvn :after psvn-configuration)
+        (:name dired-single :features dired-single :after dired-single-configuration)
+        ))
         
 (el-get 'sync)
 
