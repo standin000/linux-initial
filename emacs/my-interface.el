@@ -77,16 +77,18 @@
 
 (setq vc-follow-symlinks t)
 
+(setq scroll-margin 3
+       scroll-conservatively 10000)
+
+
 ;; Plato Wu,2008/11/20, It is not good for I use desktop for save all buffers;
 ;; it will update all buffer's visit date when open emacs.so it need modify
 ;; this variables
 ;; Plato Wu,2010/07/27: Add tags-file-name
 (setq desktop-locals-to-save (append desktop-locals-to-save '(buffer-display-time tags-file-name)))
 
-(setq desktop-buffers-not-to-save '("*Music*"))
-
-(setq scroll-margin 3
-       scroll-conservatively 10000)
+;; Plato Wu,2011/05/14: avoid saving *Music*
+(setq desktop-buffers-not-to-save "^*.*")
 
 (cond 
  ((is-version 21)
@@ -369,7 +371,17 @@
 ; show the current function when possible; it need cedet to know function'name
 (which-func-mode 1)
 
+;; Plato Wu,2009/11/26: get rid of warning for not safe variables
+(setq enable-local-variables :safe)
 
+;; Plato Wu,2009/04/06: add-change-log-entry-other-window
+;; find-change-log only use parent directory's ChangeLog, I need use C-u
+;; to set a ChangLog, it stores in local variable change-log-default-name
+(setq change-log-version-info-enabled t)
+
+;; Plato Wu,2009/05/08: .ml is Ocaml file, lisp-mode can not support it
+;; so use text-mode temporally
+(add-to-list 'auto-mode-alist '("\\.ml$" . text-mode))
 
 
 
