@@ -117,6 +117,9 @@
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode))
 
 (defun ido-configuration ()
+  ;; Plato Wu,2011/05/14: there is /sudo items in list and I can not know how to
+ ;; get rid of it, so try to disable the whole list
+  (setq ido-enable-last-directory-history nil)
   (setq ido-enable-tramp-completion nil) 
 ;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history 
   (setq ido-ignore-buffers
@@ -218,6 +221,67 @@
 
 (defvar my-authinfo "~/.authinfo")
 
+(defun muse-configuration ()
+  (require 'muse-mode)
+  (define-key muse-mode-map "u" 'muse-insert-url)
+  (define-key muse-mode-map "l"
+    '(lambda ()
+       (interactive)
+       (insert "<literal style=\"blogger\">\n\n</img>\n</a>\n</literal>")
+       (previous-line 3))))
+
+(defun auctex-configuration ()
+  (require 'preview-latex)
+  (setq TeX-auto-save t)
+  (setq Te-parse-self t)
+  (setq-default TeX-master nil)
+  (setq TeX-save-query nil)
+  ;; (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode) ;turn on pdf-mode
+  ;; (remove-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+  ;;Plato 2008/3/10》 : write a procedure like C-c C-c but no need press enter key ; be testing.
+  ;; Plato Wu,2008/11/26, it just works for compiling not for viewing, use C-c C-v for viewing.
+  (defun Test-command-master (&optional override-confirm)
+    "Run command on the current document.
+    If a prefix argument OVERRIDE-CONFIRM is given, confirmation will
+    depend on it being positive instead of the entry in `TeX-command-list'."
+    (interactive "P")
+    (TeX-command (Test-command-query (TeX-master-file)) 'TeX-master-file
+		 override-confirm))
+
+  (defun Test-command-query (name)
+    "Query the user for what TeX command to use."
+    (let* ((default (cond ((if (string-equal name TeX-region)
+			       (TeX-check-files (concat name "." (TeX-output-extension))
+						(list name)
+						TeX-file-extensions)
+			     (TeX-save-document (TeX-master-file)))
+			   TeX-command-default)
+			  ((and (memq major-mode '(doctex-mode latex-mode))
+				(TeX-check-files (concat name ".bbl")
+						 (mapcar 'car
+							 (LaTeX-bibliography-list))
+						 BibTeX-file-extensions))
+			   ;; We should check for bst files here as well.
+			   TeX-command-BibTeX)
+			  ((TeX-process-get-variable name
+						     'TeX-command-next
+						     TeX-command-Show))
+			  (TeX-command-Show)))
+	   (completion-ignore-case t)
+	   ;; 	 (answer (or TeX-command-force
+	   ;; 		     (completing-read
+	   ;; 		      (concat "Command: (default " default ") ")
+	   ;; 		      (TeX-mode-specific-command-list major-mode) nil t
+	   ;; 		      nil 'TeX-command-history)))
+	   )
+      ;; If the answer "latex" it will not be expanded to "LaTeX"
+      ;;    (setq answer (car-safe (TeX-assoc answer TeX-command-list)))
+      ;;    (if (and answer
+      ;;	     (not (string-equal answer "")))
+      ;;	answer
+      default))
+;  (global-set-key [f9] 'Test-command-master)
+  )
 
 (defun blogger-configuration ()
   (require 'muse) 
@@ -894,6 +958,9 @@ to the position where the property exists."
 	   (previous-single-property-change (point) 'w3m-href-anchor))
 	 (next-single-property-change (point) 'w3m-href-anchor))
 	" +\\'" ""))))
+
+(defun ascii-configuration ()
+  (autoload 'ascii-on "ascii" "Turn on ASCII code display." t))
 
 (provide 'my-packages)
 

@@ -78,7 +78,7 @@
         (:name htmlize :type elpa :features htmlize)
         ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
         ;; get installed to pass error.
-        (:name muse :type elpa :features muse)
+        (:name muse :type elpa :features muse :after muse-configuration)
 ;        (:name xml-rpc :type elpa)
         ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
         ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
@@ -92,7 +92,9 @@
                :after (lambda () (add-hook 'c-mode-common-hook 'google-set-c-style)))
         (:name session :features session :after session-configuration)
         (:name psvn :features psvn :after psvn-configuration)
-        (:name dired-single :features dired-single :after dired-single-configuration)))
+        (:name dired-single :features dired-single :after dired-single-configuration)
+        (:name auctex :features auctex :after auctex-configuration)
+        (:name ascii :after ascii-configuration)))
         
 (el-get 'sync)
 

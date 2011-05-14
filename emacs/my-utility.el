@@ -536,5 +536,35 @@ isn't there and triggers an error"
       (list (line-beginning-position)
             (line-beginning-position 2)))))) 
 
+;; Plato Wu,2010/03/08: use F9 instead of C-x `
+(defun next-error-cycle ()
+  "cycle next error"
+  (interactive)
+    (condition-case nil
+      (next-error)
+    (error 
+     (message "Reach the end!!!")
+     (next-error 1 t))))
+
+(global-set-key [f9] 'next-error-cycle)
+
+(if (is-system "cygwin")
+    (require 'grep))
+
+(defun project-grep (regexp &optional files)
+  "grep files in project directory recursively no matter the sub directory the visited
+   stay. get direcotry from tag-file-name"
+  (interactive
+   (let ((regexp (grep-read-regexp)))
+     (grep-compute-defaults)
+     (list regexp (grep-read-files regexp))))
+  (if tags-file-name
+      (rgrep regexp files (file-name-directory tags-file-name))
+    (rgrep regexp files ".")))
+
+(defun stumpwm ()
+  (interactive)
+  (slime-connect "localhost" 4005))
+
 
 (provide 'my-utility)
