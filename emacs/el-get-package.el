@@ -94,7 +94,9 @@
         (:name psvn :features psvn :after psvn-configuration)
         (:name dired-single :features dired-single :after dired-single-configuration)
         (:name auctex :features auctex :after auctex-configuration)
-        (:name ascii :after ascii-configuration)))
+        (:name ascii :after ascii-configuration)
+        ;; Plato Wu,2011/05/15: vi can be used in it.
+        (:name multi-term :features multi-term)))
         
 (el-get 'sync)
 

@@ -566,5 +566,125 @@ isn't there and triggers an error"
   (interactive)
   (slime-connect "localhost" 4005))
 
+(require 'icalendar)
+;; Plato Wu,2010/10/02: I don't know why \r can not be found by re-search-forward
+;; in a file which has 0x0d. Another problem is there is not \t in p1i's task file
+(defadvice icalendar--get-unfolded-buffer (after remove-LF-symbole activate)
+  (save-current-buffer
+      (set-buffer ad-return-value)
+      (goto-char (point-min))
+      (while (re-search-forward "=\r?\n" nil t)
+        (replace-match "" nil nil)))
+  ad-return-value)
+
+(setq icalendar-debug t)
+
+(defun icalenar-convert-date (e symbol zone-map)
+  (let* ((symbol-value (icalendar--get-event-property e symbol))
+       (symbol-zone (icalendar--find-time-zone
+                  (icalendar--get-event-property-attributes
+                   e symbol)
+                  zone-map))
+       (symbol-dec (icalendar--decode-isodatetime symbol-value nil
+                                               symbol-zone)))
+    (if symbol-dec
+;         (icalendar--datetime-to-diary-date symbol-dec)
+        ;(icalendar--datetime-to-colontime symbol-dec)
+        (apply 'encode-time symbol-dec)
+      nil)))
+
+(defun org-import-p1i-task ()
+  (interactive)
+  (mapcar 
+  '(lambda (ics-filename)
+     (org-import-p1i-task-internal ics-filename "~/tmp.org"))
+  (file-expand-wildcards "/opt/Funambol/ds-server/db/vtask/plato.wu/*"))
+  (set-file-times "~/.import_p1i_task_done"))
+
+(defun org-import-p1i-task-internal (ical-filename org-filename) 
+  (progn ;save-current-buffer
+    (set-buffer (find-file ical-filename))
+    ;; prepare ical
+    (message "Preparing icalendar...")
+    (set-buffer (icalendar--get-unfolded-buffer (current-buffer)))
+    (goto-char (point-min))
+    (message "Preparing icalendar...done")
+    (if (re-search-forward "^BEGIN:VCALENDAR\\s-*$" nil t)
+        (let (ical-contents)
+          ;; read ical
+          (message "Reading icalendar...")
+          (beginning-of-line)
+          (setq ical-contents (icalendar--read-element nil nil))
+          (message "Reading icalendar...done")
+          ;; convert ical
+          (message "Converting icalendar...")
+          (let* ((ev (icalendar--get-children (car ical-contents) 'VTODO))
+                 (zone-map (icalendar--convert-all-timezones ical-contents))
+                 (error-string "")
+                 (found-error t)
+                    e)
+            ;; Plato Wu,2010/10/05: only one VTODO in one file
+            (if ev
+              (progn
+               (setq e (car ev))
+               (setq ev (cdr ev))
+               (condition-case error-val
+                   (let* ((start-d (icalenar-convert-date e 'DTSTART zone-map))
+                          (due-d (icalenar-convert-date e 'DUE zone-map))
+                          (complete-d (icalenar-convert-date e 'COMPLETED zone-map))
+                          (summary 
+                           (w3m-url-decode-string 
+                            (replace-regexp-in-string 
+                             "=" "%" 
+                             (icalendar--convert-string-for-import
+                              (or (icalendar--get-event-property e 'SUMMARY)
+                                  "No summary")))))
+                          (description 
+                           (w3m-url-decode-string 
+                            (replace-regexp-in-string 
+                             "=" "%" 
+                             (icalendar--convert-string-for-import
+                              (or (icalendar--get-event-property e 'DESCRIPTION)
+                                  "No description"))))))
+                     (icalendar--dmsg "complete-d %s: `%s'" complete-d summary)
+                     ;; check whether start-time is missing
+                     (icalendar--dmsg "start-d: %s, due-d: %s" start-d due-d)
+                     ;; add all other elements unless the user doesn't want to have
+                     ;; them
+                     (icalendar--dmsg "dscription is %s" description)
+                     ;; Plato Wu,2010/10/05: only backup completed task which date is
+                     ;; later than ~/.import_p1i_task_done
+                     (when (and complete-d 
+                                (time-less-p 
+                                 (fifth (file-attributes  "~/.import_p1i_task_done"))
+                                 complete-d))
+                       (set-buffer (find-file org-filename))
+                       (goto-char (point-min))
+                       (org-end-of-subtree)
+                       (insert "\n** TODO " summary "\n" description)
+                       (fill-paragraph)
+                       (if start-d (org-schedule nil start-d))
+                       (if due-d (org-deadline nil due-d))
+                       (let ((org-log-done nil)) 
+                         (org-todo))
+                       (org-add-planning-info 'closed complete-d)
+                       (org-toodledo-sync-task)))
+                
+                 ;; FIXME: inform user about ignored event properties
+                 ;; handle errors
+                 (error
+                  (message "Ignoring event \"%s\"" e)
+                  (setq found-error nil)
+                  (setq error-string (format "%s\n%s\nCannot handle this event: %s"
+                                             error-val error-string e))
+                  (message "%s" error-string)))))
+          ;; return t if no error occurred            
+          (not found-error)))
+      (message
+       "Current buffer does not contain icalendar contents!")
+      ;; return nil, i.e. import did not work
+      nil)
+    (kill-buffer (find-file ical-filename))))
+
 
 (provide 'my-utility)

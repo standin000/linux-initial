@@ -182,6 +182,7 @@
   (require 'emms-score)
   (require 'emms-i18n)
   (require 'emms-volume)
+  ;; Plato Wu,2011/05/15: emms-standard will require emms-source-file and emms-source-playlist.
   (emms-standard)
   (emms-default-players)
   (add-to-list 'emms-player-list 'emms-player-mpd)
@@ -196,10 +197,22 @@
   (add-hook 'emms-player-started-hook 'emms-show)
   (setq emms-volume-change-function 'emms-volume-mpd-change)
   (setq emms-show-format "%s")
-  (setq emms-player-next-function 'emms-random)
+  ;; Plato Wu,2011/05/15: it seems mpd doesn't support emms-random
+  ;; use emms-shuffle instead which  will shuffle the playlist
+;;  (add-hook 'emms-player-finished-hook 'emms-random)
+;;  (setq emms-player-next-function 'emms-random)
   (setq emms-playlist-buffer-name "*Music*")
   (setq emms-player-mpd-music-directory "~/Music")
   (setq emms-player-next-function 'emms-next-noerror)
+  (when (is-system "windows-nt")
+    (add-to-list 'exec-path "d:/Tools/MPlayer/")
+    (custom-set-variables
+     '(emacsw32-style-frame-title t)
+     '(w32shell-cygwin-bin "d:\\Tools\\Cygwin\\bin")
+     '(w32shell-shell (quote cygwin)))
+    ;; Plato Wu,2010/04/07: make sure default-file-name-coding-system  and default-process-coding-system is OK
+    (setq default-process-coding-system (cons 'cp936 'cp936)))
+
   (emms-score 1)
   (defun my-stop-player ()
     "Stop emms player."
@@ -215,7 +228,6 @@
     (emms-player-mpd-connect)
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
-  ;; emms-shuffle will shuffle the playlist for mpd don't support random play
   (emms-history-load)
   ) 
 
@@ -719,9 +731,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
   (setq org-use-speed-commands t)
 
-
-
-
   (global-set-key "\C-cl" 'org-store-link)
   (global-set-key "\C-ca" 'org-agenda)
   (global-set-key "\C-cb" 'org-iswitchb)
@@ -742,7 +751,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (setq org-special-ctrl-k t)
   (setq org-yank-adjusted-subtrees t)
 
-                                        ;Non-nil means insert new headings after the current subtree.
+  ;Non-nil means insert new headings after the current subtree.
   (setq org-insert-heading-respect-content t)
 
   ;; capture templates for TODO tasks
@@ -961,6 +970,15 @@ to the position where the property exists."
 
 (defun ascii-configuration ()
   (autoload 'ascii-on "ascii" "Turn on ASCII code display." t))
+
+;; (if (try-require 'jabber)
+;;     (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "talk.google.com" "ssl")))
+;;         (setq jabber-account-list
+;;               `((,(cdr (assoc "login" netrc-data)) 
+;;                  (:network-server . "talk.google.com")
+;;                  (:password . ,(cdr (assoc "password" netrc-data)))
+;;                  (:connection-type . ssl))))
+;;         (define-key jabber-chat-mode-map (kbd "M-RET") 'newline)))
 
 (provide 'my-packages)
 
