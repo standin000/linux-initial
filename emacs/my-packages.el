@@ -294,6 +294,10 @@
       default))
 ;  (global-set-key [f9] 'Test-command-master)
   )
+;; Plato Wu,2011/05/19: we must change the usage of el-get, don't use :after option to
+;; call package configuration, but run it after el-get finished its task. since el-get
+;; use eval-after-load to call :after function, it is annoy style.
+;(auctex-configuration)
 
 (defun blogger-configuration ()
   (require 'muse) 
