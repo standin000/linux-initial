@@ -116,6 +116,13 @@
   ;; Plato Wu,2009/12/09: enable eldoc mode.
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode))
 
+;; (load "dictionary-init.el")
+;; ;; Plato Wu,2010/05/29: '[C-M-z]
+;; (global-set-key "" 'dictionary-search)
+;; (setq dictionary-use-single-buffer t)
+;; ;; Plato Wu,2010/10/17: this site use international phonetic alphabet
+;; (setq dictionary-server "dict.hewgill.com")
+
 (defun ido-configuration ()
   ;; Plato Wu,2011/05/14: there is /sudo items in list and I can not know how to
  ;; get rid of it, so try to disable the whole list
@@ -161,6 +168,8 @@
        (interactive)
        (joc-dired-single-buffer ".."))))
 
+;; use "r" to modify file name in dired mode, It need
+;; C-c C-c to commit final name.
 (defun wdired-configuration ()  
   (require 'wdired)
   (setq wdired-allow-to-change-permissions t)
@@ -234,13 +243,7 @@
 (defvar my-authinfo "~/.authinfo")
 
 (defun muse-configuration ()
-  (require 'muse-mode)
-  (define-key muse-mode-map "u" 'muse-insert-url)
-  (define-key muse-mode-map "l"
-    '(lambda ()
-       (interactive)
-       (insert "<literal style=\"blogger\">\n\n</img>\n</a>\n</literal>")
-       (previous-line 3))))
+)
 
 (defun auctex-configuration ()
   (require 'preview-latex)
@@ -305,6 +308,13 @@
   (require 'muse-publish) 
   (require 'muse-html)
   (require 'weblogger)
+  (add-to-list 'auto-mode-alist '("\\.muse$" . muse-mode))
+  (define-key muse-mode-map "u" 'muse-insert-url)
+  (define-key muse-mode-map "l"
+    '(lambda ()
+       (interactive)
+       (insert "<literal style=\"blogger\">\n\n</img>\n</a>\n</literal>")
+       (previous-line 3)))
   (setq muse-insert-url-initial-input nil)
   (add-hook 'muse-mode-hook 
             '(lambda ()
@@ -805,6 +815,13 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 		("\\.sawfishrc$" . sawfish-mode)
 		("\\.sawfish/rc$" . sawfish-mode))
 	    auto-mode-alist)))
+;; (when window-system
+;;   (unless (or (string= system-type "darwin") (string= system-type "windows-nt"))
+;;     (add-hook 
+;;      'kill-emacs-hook 
+;;      '(lambda ()
+;; 	(sawfish-eval "(quit)"))
+;;      t)))
 ;; (define-key scheme-mode-map [f9] 'gds-show-last-stack)
 ;; (add-hook 'c-mode-hook '(lambda ()
 ;;                           (c-set-style "stroustrup")
@@ -936,10 +953,164 @@ else evaluate sexp"
 (defun session-configuration ()
   (add-hook 'after-init-hook 'session-initialize))
 
-(defun slime-configuaration ()
+(defun slime-configuration ()
+  (load (expand-file-name "~/quicklisp/slime-helper.el"))
+  ;; Replace "sbcl" with the path to your implementation
+  (setq inferior-lisp-program "sbcl")
+  ;; Plato Wu,2011/05/16: it will report different version between slime and
+  ;; swank when slime get install after swank. it seems as a bug.
+  (setq slime-protocol-version 'ignore)
   (setq auto-mode-alist
-      (append '(("\\.sbclrc$" . lisp-mode))
-	    auto-mode-alist)))
+        (append '(("\\.sbclrc$" . lisp-mode))
+                auto-mode-alist))
+  (setq slime-net-coding-system 'utf-8-unix)
+  ;; slime-fancy is the meta contrib that will enable all sorts of advanced features.
+  ;; Plato Wu,2008/10/28, slime-highlight-edits cause a non-convenient color in text-mode.
+  ;; Plato Wu,2008/10/17, slime-typeout-frame will cause new frame for typeout
+  ;; Plato Wu,2008/12/18: it seems I have not slime-indent contrib
+  ;; which can resolve emacs loop indent problem.
+
+  (slime-setup '(slime-fancy slime-tramp slime-asdf slime-repl
+                             slime-fancy-inspector slime-autodoc slime-fuzzy slime-presentation-streams))
+  (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+  ;; Plato Wu,2009/12/12: temperate clear lisp connection closed unexpectedly
+  ;; problem
+  (defun load-swank-dont-close (port-filename encoding)
+  (format "%S\n\n"
+	  `(progn
+	     (load ,(expand-file-name slime-backend slime-path) :verbose t)
+	     (funcall (read-from-string "swank-loader:init"))
+	     (funcall (read-from-string "swank:start-server")
+		      ,port-filename
+		      :coding-system ,(slime-coding-system-cl-name encoding)
+		      :dont-close t))))
+  ;; Plato Wu,2009/12/09: clear content at the bottom of the screen
+(defun slime-quit-sentinel (process message)
+  (assert (process-status process) 'closed)
+  (let* ((inferior (slime-inferior-process process))
+         (inferior-buffer (if inferior (process-buffer inferior))))
+    (when inferior (delete-process inferior))
+    (when inferior-buffer (kill-buffer inferior-buffer))
+    (slime-net-close process)
+;;    (message "Connection closed.")
+    ))
+
+   (setq slime-lisp-implementations
+       '((sbcl-noclose ("sbcl" "-quiet") :init load-swank-dont-close)))
+
+   ;; Plato Wu,2009/11/05: TO DO, assign a proper key binding to slime-repl-backward-input
+;;   (define-key slime-repl-mode-map (kbd "M-<up>") 'slime-repl-backward-input)
+   ;; Plato Wu,2009/05/27: C-c C-k will show compliation log
+   (setq slime-compilation-finished-hook 'slime-show-compilation-log)
+   (defun slime-repl-history-pattern (&optional use-current-input)
+     "Return the regexp for the navigation commands."
+     (cond ((slime-repl-history-search-in-progress-p)
+	    slime-repl-history-pattern)
+	   (use-current-input
+	    (let ((str (slime-repl-current-input)))
+	      (cond ((string-match "^[ \n]*$" str) nil)
+					;(t (concat "^" (regexp-quote str)))
+		    ;; Plato Wu,2009/03/25: because I used paredit so if I
+		    ;; enter '(', ')' will entered automatically, so the partial
+		    ;; search fail, if I do not enter '(', '^' also cause it fail.
+		    (t (regexp-quote str))
+		    )))
+	   (t nil)))
+  (setq slime-startup-animation nil)
+  ;; Plato Wu,2008/10/17, It will cause new frame for sldb
+  ;; (setq special-display-regexps
+  ;;       (quote (("slime-repl" (height . 40) (width . 80) (top . 85) (left . 50))
+  ;; 	      ("sldb" (height . 30) (width . 50) (left . 10) (top . 25)))))
+  ;; Plato Wu,2011/05/18: it will run slime-load-hook which contain slime-setup-contribs.
+  (require 'info-look)
+  (mapc (lambda (mode) 
+          (info-lookup-add-help
+           :mode mode
+           :regexp "[^][()'\" \t\n]+"
+           :ignore-case t
+           :doc-spec '(("(ansicl)Symbol Index" nil nil nil))))
+        '(lisp-mode slime-repl-mode))
+  (defun cl-info (symbol-name)
+    (interactive
+     ;; Plato Wu,2009/03/29: new slime.el rename `slime-symbol-name-at-point' to
+     ;; `slime-symbol-at-point',
+     (list (let* ((symbol-at-point (slime-symbol-at-point))
+                  (stripped-symbol 
+                   (and symbol-at-point
+                        (downcase
+                         (common-lisp-hyperspec-strip-cl-package 
+                          symbol-at-point)))))
+             (if (and stripped-symbol
+                      (intern-soft stripped-symbol
+                                   common-lisp-hyperspec-symbols))
+                 stripped-symbol
+               (completing-read
+                "Look up symbol in Common Lisp HyperSpec: "
+                common-lisp-hyperspec-symbols #'boundp
+                t stripped-symbol
+                'common-lisp-hyperspec-history)))))
+    (info-lookup 'symbol symbol-name nil)
+    (other-window 1))
+  (eval-after-load "lisp-mode"
+    '(progn
+       (define-key 
+         lisp-mode-map 
+         [(control ?h) (control ?i)] 
+         'cl-info)))
+  ;; Plato Wu,2008/12/18: reslove loop indent'problem. 
+  (setq lisp-simple-loop-indentation 1
+	lisp-loop-keyword-indentation 6
+	lisp-loop-forms-indentation 6)
+  (defun isearch-yank-symbolic-word-or-char ()
+    (interactive)
+  (isearch-yank-internal
+   (lambda ()
+     (let ((distance (skip-syntax-forward "w_")))
+       (when (zerop distance) (forward-char 1))
+       (point)))))
+
+(add-hook 'lisp-mode-hook
+	  (lambda ()
+	    (make-local-variable 'isearch-mode-map)
+	    (define-key isearch-mode-map "\C-w" 'isearch-yank-symbolic-word-or-char)
+	    	  ;The Emacs default indentation for some forms such as `if' is likely to make CommonLisp hackers unhappy. Emacs also provides a `common-lisp-indent-function', but it's not enabled by default.
+	    (set (make-local-variable 'lisp-indent-function)
+		 'common-lisp-indent-function)))
+  (require 'slime)
+  (defun quit-slime ()
+     (interactive)
+     (when (slime-connected-p)
+       (if (buffer-exist-p "*inferior-lisp*")
+           (progn 
+             (slime-quit-lisp t)
+             (sleep-for 6))
+         ;; Plato Wu,2010/08/19: if it is stumpwm, then disconnect it.
+         (slime-disconnect-all))
+       (slime-kill-all-buffers)))
+    (define-key slime-mode-map "\M-*" 'slime-pop-find-definition-stack)
+     ;; Plato Wu,2009/07/03: redefine it to quit and kill the buffer!
+  (define-key slime-popup-buffer-mode-map "q" #'(lambda () (interactive) (slime-popup-buffer-quit-function t)))
+   ;; Plato Wu,2009/05/26: use slime-fuzzy-complete-symbol instead
+   ;; normal C-tab function.
+  (define-key slime-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol)
+  (define-key slime-repl-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol))
+
+(defun cldoc-configuration ()
+  (autoload 'turn-on-cldoc-mode "cldoc" nil t)
+  (add-hook 'lisp-mode-hook 'turn-on-cldoc-mode)
+  ;;
+  ;; ;; ilisp users
+  ;; (add-hook 'ilisp-mode-hook 'turn-on-cldoc-mode)
+  ;; (setq ilisp-bindings-*bind-space-p* nil)
+  ;; 
+  ;; slime users
+  (add-hook 'slime-repl-mode-hook
+            #'(lambda ()
+                (turn-on-cldoc-mode)
+                (define-key slime-repl-mode-map " " nil)))
+  (add-hook 'slime-mode-hook
+            #'(lambda () (define-key slime-mode-map " " nil)))
+  (setq slime-use-autodoc-mode nil))
 
 (defun w3m-configuration ()
   (setq w3m-default-coding-system 'utf-8)
@@ -984,6 +1155,9 @@ to the position where the property exists."
 ;;                  (:connection-type . ssl))))
 ;;         (define-key jabber-chat-mode-map (kbd "M-RET") 'newline)))
 
+;; (redshank-setup '(lisp-mode-hook
+;;                         slime-repl-mode-hook
+;; 			emacs-lisp-mode-hook) t)
 (provide 'my-packages)
 
   

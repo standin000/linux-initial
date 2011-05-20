@@ -329,6 +329,7 @@
 ;;   (rgrep regexp "*.el" "~/linux-initial/emacs/" nil))
 
 ;; (global-set-key [f9] 'my-search)
+
 (setq grep-files-aliases
       '(("asm" .    "*.[sS]")
         ;; Plato Wu,2010/02/27: Let ch match .c file first!
