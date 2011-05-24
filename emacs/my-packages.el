@@ -959,7 +959,8 @@ else evaluate sexp"
   (setq inferior-lisp-program "sbcl")
   ;; Plato Wu,2011/05/16: it will report different version between slime and
   ;; swank when slime get install after swank. it seems as a bug.
-  (setq slime-protocol-version 'ignore)
+  ;; Plato Wu,2011/05/24: it seems I use two slime of different version
+;  (setq slime-protocol-version 'ignore)
   (setq auto-mode-alist
         (append '(("\\.sbclrc$" . lisp-mode))
                 auto-mode-alist))
@@ -976,46 +977,46 @@ else evaluate sexp"
   ;; Plato Wu,2009/12/12: temperate clear lisp connection closed unexpectedly
   ;; problem
   (defun load-swank-dont-close (port-filename encoding)
-  (format "%S\n\n"
-	  `(progn
-	     (load ,(expand-file-name slime-backend slime-path) :verbose t)
-	     (funcall (read-from-string "swank-loader:init"))
-	     (funcall (read-from-string "swank:start-server")
-		      ,port-filename
-		      :coding-system ,(slime-coding-system-cl-name encoding)
-		      :dont-close t))))
+    (format "%S\n\n"
+            `(progn
+               (load ,(expand-file-name slime-backend slime-path) :verbose t)
+               (funcall (read-from-string "swank-loader:init"))
+               (funcall (read-from-string "swank:start-server")
+                        ,port-filename
+                        :coding-system ,(slime-coding-system-cl-name encoding)
+                        :dont-close t))))
   ;; Plato Wu,2009/12/09: clear content at the bottom of the screen
-(defun slime-quit-sentinel (process message)
-  (assert (process-status process) 'closed)
-  (let* ((inferior (slime-inferior-process process))
-         (inferior-buffer (if inferior (process-buffer inferior))))
-    (when inferior (delete-process inferior))
-    (when inferior-buffer (kill-buffer inferior-buffer))
-    (slime-net-close process)
-;;    (message "Connection closed.")
-    ))
+  (defun slime-quit-sentinel (process message)
+    (assert (process-status process) 'closed)
+    (let* ((inferior (slime-inferior-process process))
+           (inferior-buffer (if inferior (process-buffer inferior))))
+      (when inferior (delete-process inferior))
+      (when inferior-buffer (kill-buffer inferior-buffer))
+      (slime-net-close process)
+      ;;    (message "Connection closed.")
+      ))
 
-   (setq slime-lisp-implementations
-       '((sbcl-noclose ("sbcl" "-quiet") :init load-swank-dont-close)))
+  (setq slime-lisp-implementations
+        '((sbcl-noclose ("sbcl" "-quiet") :init load-swank-dont-close)))
 
-   ;; Plato Wu,2009/11/05: TO DO, assign a proper key binding to slime-repl-backward-input
-;;   (define-key slime-repl-mode-map (kbd "M-<up>") 'slime-repl-backward-input)
-   ;; Plato Wu,2009/05/27: C-c C-k will show compliation log
-   (setq slime-compilation-finished-hook 'slime-show-compilation-log)
-   (defun slime-repl-history-pattern (&optional use-current-input)
-     "Return the regexp for the navigation commands."
-     (cond ((slime-repl-history-search-in-progress-p)
-	    slime-repl-history-pattern)
-	   (use-current-input
-	    (let ((str (slime-repl-current-input)))
-	      (cond ((string-match "^[ \n]*$" str) nil)
+  ;; Plato Wu,2009/11/05: TO DO, assign a proper key binding to slime-repl-backward-input
+  ;;   (define-key slime-repl-mode-map (kbd "M-<up>") 'slime-repl-backward-input)
+  ;; Plato Wu,2009/05/27: C-c C-k will show compliation log
+  (setq slime-compilation-finished-hook 'slime-show-compilation-log)
+  (defun slime-repl-history-pattern (&optional use-current-input)
+    "Return the regexp for the navigation commands."
+    (cond ((slime-repl-history-search-in-progress-p)
+           slime-repl-history-pattern)
+          (use-current-input
+           (let ((str (slime-repl-current-input)))
+             (cond ((string-match "^[ \n]*$" str) nil)
 					;(t (concat "^" (regexp-quote str)))
-		    ;; Plato Wu,2009/03/25: because I used paredit so if I
-		    ;; enter '(', ')' will entered automatically, so the partial
-		    ;; search fail, if I do not enter '(', '^' also cause it fail.
-		    (t (regexp-quote str))
-		    )))
-	   (t nil)))
+                   ;; Plato Wu,2009/03/25: because I used paredit so if I
+                   ;; enter '(', ')' will entered automatically, so the partial
+                   ;; search fail, if I do not enter '(', '^' also cause it fail.
+                   (t (regexp-quote str))
+                   )))
+          (t nil)))
   (setq slime-startup-animation nil)
   ;; Plato Wu,2008/10/17, It will cause new frame for sldb
   ;; (setq special-display-regexps
@@ -1063,37 +1064,39 @@ else evaluate sexp"
 	lisp-loop-forms-indentation 6)
   (defun isearch-yank-symbolic-word-or-char ()
     (interactive)
-  (isearch-yank-internal
-   (lambda ()
-     (let ((distance (skip-syntax-forward "w_")))
-       (when (zerop distance) (forward-char 1))
-       (point)))))
+    (isearch-yank-internal
+     (lambda ()
+       (let ((distance (skip-syntax-forward "w_")))
+         (when (zerop distance) (forward-char 1))
+         (point)))))
 
-(add-hook 'lisp-mode-hook
-	  (lambda ()
-	    (make-local-variable 'isearch-mode-map)
-	    (define-key isearch-mode-map "\C-w" 'isearch-yank-symbolic-word-or-char)
-	    	  ;The Emacs default indentation for some forms such as `if' is likely to make CommonLisp hackers unhappy. Emacs also provides a `common-lisp-indent-function', but it's not enabled by default.
-	    (set (make-local-variable 'lisp-indent-function)
-		 'common-lisp-indent-function)))
+  (add-hook 'lisp-mode-hook
+            (lambda ()
+              (make-local-variable 'isearch-mode-map)
+              (define-key isearch-mode-map "\C-w" 'isearch-yank-symbolic-word-or-char)
+                                        ;The Emacs default indentation for some forms such as `if' is likely to make CommonLisp hackers unhappy. Emacs also provides a `common-lisp-indent-function', but it's not enabled by default.
+              (set (make-local-variable 'lisp-indent-function)
+                   'common-lisp-indent-function)))
   (require 'slime)
   (defun quit-slime ()
-     (interactive)
-     (when (slime-connected-p)
-       (if (buffer-exist-p "*inferior-lisp*")
-           (progn 
-             (slime-quit-lisp t)
-             (sleep-for 6))
-         ;; Plato Wu,2010/08/19: if it is stumpwm, then disconnect it.
-         (slime-disconnect-all))
-       (slime-kill-all-buffers)))
-    (define-key slime-mode-map "\M-*" 'slime-pop-find-definition-stack)
-     ;; Plato Wu,2009/07/03: redefine it to quit and kill the buffer!
+    (interactive)
+    (when (slime-connected-p)
+      (if (buffer-exist-p "*inferior-lisp*")
+          (progn 
+            (slime-quit-lisp t)
+            (sleep-for 6))
+        ;; Plato Wu,2010/08/19: if it is stumpwm, then disconnect it.
+        (slime-disconnect-all))
+      (slime-kill-all-buffers)))
+  (define-key slime-mode-map "\M-*" 'slime-pop-find-definition-stack)
+  ;; Plato Wu,2009/07/03: redefine it to quit and kill the buffer!
   (define-key slime-popup-buffer-mode-map "q" #'(lambda () (interactive) (slime-popup-buffer-quit-function t)))
-   ;; Plato Wu,2009/05/26: use slime-fuzzy-complete-symbol instead
-   ;; normal C-tab function.
+  ;; Plato Wu,2009/05/26: use slime-fuzzy-complete-symbol instead
+  ;; normal C-tab function.
   (define-key slime-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol)
   (define-key slime-repl-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol))
+
+(slime-configuration)
 
 (defun cldoc-configuration ()
   (autoload 'turn-on-cldoc-mode "cldoc" nil t)

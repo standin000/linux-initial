@@ -97,7 +97,8 @@
         (:name ascii :after ascii-configuration)
         ;; Plato Wu,2011/05/15: vi can be used in it.
         (:name multi-term :features multi-term)
-        (:name slime :after slime-configuration)
+        ;; Plato Wu,2011/05/23: quicklisp will install slime
+;        (:name slime :after slime-configuration)
         (:name cldoc :features cldoc :after cldoc-configuration)
         redshank
         dpans2texi))
