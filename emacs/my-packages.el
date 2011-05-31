@@ -184,6 +184,37 @@
 ;; ibuffer-and-update now and ibuffer update automatically
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
+(setq ibuffer-default-sorting-mode 'major-mode)
+
+(setq ibuffer-saved-filter-groups
+      (quote (("default"
+               ("dired" (mode . dired-mode))
+               ("perl" (mode . cperl-mode))
+               ("erc" (mode . erc-mode))
+               ("emacs" (or
+                         (name . "^\\*scratch\\*$")
+                         (name . "^\\*Messages\\*$")))
+               ("gnus" (or
+                        (mode . message-mode)
+                        (mode . bbdb-mode)
+                        (mode . mail-mode)
+                        (mode . gnus-group-mode)
+                        (mode . gnus-summary-mode)
+                        (mode . gnus-article-mode)
+                        (name . "^\\.bbdb$")
+                        (name . "^\\.newsrc-dribble")))))))
+
+(add-hook 'ibuffer-mode-hook
+          (lambda ()
+            (ibuffer-switch-to-saved-filter-groups "default")))
+
+(setq ibuffer-maybe-show-predicates 
+      `(,(lambda (buf)
+           (and (and (string-match "^ " (buffer-name buf))
+                 (null buffer-file-name))
+               ;; Plato Wu,2011/05/22: show http buffer of url-request-data for debug syncml
+               (not (string-match "^ \\*http" (buffer-name buf)))))))
+
 (defun emms-configuration ()
   (require 'emms-setup)
   (require 'emms-player-mpd)
@@ -237,7 +268,7 @@
     (emms-player-mpd-connect)
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
-  (emms-history-load)
+;  (emms-history-load)
   ) 
 
 (defvar my-authinfo "~/.authinfo")
