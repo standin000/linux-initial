@@ -1,0 +1,10 @@
+*.fasl
+*~
+*.dll
+*.bin
+*.scc
+*.axf
+*.tdt
+*.o
+*.via
+*.stg

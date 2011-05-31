@@ -1,0 +1,19 @@
+#escape ^Zz #use C-z instead of C-a which is used in emacs as escape command.
+escape ^Ll #use C-l instead of C-a which is used in emacs as escape command.
+startup_message off
+#caption always
+# Plato Wu,2009/06/04: k5 is F5, and F1~F4 is NG in screen, I don't know why
+#bindkey -k k5 split
+bind o focus
+bind 2 split
+bind 1 only
+# bind 0 remove
+hardstatus alwayslastline "%{=b}%{G} Screen(s): %{b}%w %=%{kG}%C%A  %D, %M/%d/%Y "
+# Plato Wu,2009/06/04: prevent slash screen
+vbell off
+# Plato Wu,2009/06/04: let screen use .bash_profile
+shell -$SHELL
+screen -t emacs
+screen -t bash
+select 0
+scrollback 1000
