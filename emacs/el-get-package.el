@@ -64,7 +64,7 @@
 (setq el-get-sources
       ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
       ;; so remove el-get from el-get-sources
-      '(nxhtml
+      '(;nxhtml
         vkill 
         (:name emacs-w3m :features w3m
                :after w3m-configuration) 

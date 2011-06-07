@@ -1,6 +1,6 @@
 #!/bin/sh
 
-linkfiles=".bash_profile .sbclrc .bash_logout .gnus.el
+linkfiles="emacs/.emacs .bash_profile .sbclrc .bash_logout .gnus.el
  .ssh .subversion/config .sawfishrc .screenrc .hgrc .hgignore 
 .gitconfig .gitignore .inputrc .bashrc .stumpwmrc .Xresources"
 #linkfiles="test test1 test2/test2"
