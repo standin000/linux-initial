@@ -150,7 +150,8 @@
         (setq default-frame-alist
               (append
                '((font . "fontset-courier")) default-frame-alist))))))
-
+;Plato Wu,2011/06/12: debug-on-entry invoke the debugger each time the function is called
+; and cancel-debug-on-entry will undo the effect
 (setq debug-on-error t)
 
 (require 'savehist)
@@ -360,14 +361,21 @@
 ;; xterm, why? urxvt is OK.
 
 
-;; (set-face-foreground 'default "wheat")
-;; (set-face-background 'default "darkslategrey")
+;; (set-face-foreground 'default "white")
+;; (set-face-background 'default "black")
 ;; (set-foreground-color "wheat")
 
-
-
 ;; Plato Wu,2011/04/27: use black like ssh tools: kitty, so red comment is OK.
-(set-background-color "darkslategrey")
+;(set-background-color "darkslategrey")
+
+;; Plato Wu,2011/06/12: only this combination can cause black background and
+;; green comment.
+(setq default-frame-alist
+      (append default-frame-alist
+              '((background-color . "darkslategrey"))))
+
+(set-face-background 'default "black")
+
 
 ; show the current function when possible; it need cedet to know function'name
 (which-func-mode 1)

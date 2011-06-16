@@ -83,31 +83,41 @@ The default display-message don't close the message window automatically"
     ("C-i e" "emacs" "emacs &")
     ("C-i p" "PDF" "epdfview &")
     ("C-i u" "urxvt" "urxvt &")
-    ("C-i f" "Gran Paradiso" "firefox &")
-    ))
+    ("C-i f" "Gran Paradiso" "firefox &")))
 
 (defvar *emacs-style-keys*
-  '(
-    ;; ("C-a" move-beginning-of-line  "Home")
-    ;; (move-end-of-line "C-e" "End")
-    ;; (forward-char "C-f" "Right")
-    ;; (backward-char "C-b" "Left")
-    ("C-n" . "Down"); next-line
-    ;; (previous-line "C-p" "Up")
-    ;; (delete-char "C-d" "Delete")
-    ;; (kill-region "C-w" "C-x")
-    ;; (copy-region "M-w" "C-c")
-    ;; (yank "C-y" "C-v")
-    ))
+  '(("C-d" . "Delete")
+    ("C-n" . "Down")
+    ("C-a" . "Home")
+    ("C-e" . "End")
+    ("C-f" . "Right")
+    ("C-b" . "Left")
+    ("C-p" . "Up")
+    ("C-w" . "C-x")
+    ("M-w" . "C-c")
+    ("C-y" . "C-v")
+    ("C-s" . "C-f")))
 
-(mapc (lambda (program)
+(mapcar (lambda (program)
 	(plato-bind-keys 
 	 global-keymap
 	 (car program)
-	 '(lambda ()
-            (synthesize-event (cdr program) )
-            )))
+	 (lambda ()
+            (interactive)
+            (if (string= (window-class (input-focus)) "XTerm") 
+                (synthesize-event (lookup-event (car program)) (input-focus))
+              (synthesize-event (lookup-event (cdr program)) (input-focus))))))
       *emacs-style-keys*)
+
+;; (plato-bind-keys 
+;; 	 global-keymap
+;;          "C-d"
+;; 	 (lambda ()
+;;            (interactive)
+;;            (if (string= (window-class (input-focus)) "XTerm") 
+;;                (synthesize-event (lookup-event "C-d") (input-focus))
+;;                (synthesize-event (lookup-event "Delete") (input-focus)))))
+
 
 ;; This code uses Sawfish's synthesize-event function, which in turn uses
 ;; XSendEvent to pass the event to the window.  These synthetic events are
@@ -163,17 +173,6 @@ b\" without losing PRESERVE-PREFIX. "
           (ungrab-keyboard))))))
 
 (setq play-sample-program "/usr/bin/aplay")
-
-(plato-bind-keys 
-	 global-keymap
-         "C-n"
-	 (lambda ()
-           (interactive)
-           (if (string= (window-class (input-focus)) "XTerm") 
-               (synthesize-event (lookup-event "C-n") (input-focus))
-               (synthesize-event (lookup-event "Down") (input-focus)))))
-
-
 
 (mapc (lambda (program)
 	(plato-bind-keys 
@@ -244,3 +243,10 @@ b\" without losing PRESERVE-PREFIX. "
 (plato-bind-keys global-keymap "C-i 3" 'evm-tile-windows-vertically)
 (require 'sawfish.wm.state.maximize)
 (plato-bind-keys global-keymap "C-i 1" '(maximize-window (current-event-window)))
+;; Plato Wu,2011/06/06: freerdp resolve M-tab conflict between sawfish and rdesktop
+(plato-bind-keys global-keymap "M-Tab" 'cycle-windows)
+;; Plato Wu,2011/06/16: scot -s require interactive select a window or retangle with mouse
+(plato-bind-keys global-keymap "Print" '(run-shell-command "scrot "))
+
+
+(lookup-event "M-Print")
