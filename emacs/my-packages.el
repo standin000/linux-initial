@@ -137,6 +137,10 @@
 	  "^\\*[^es].\\{3\\}[^s].*"
 	  "TAGS"))
   (setq ido-record-ftp-work-directories nil)
+  ;; Plato Wu,2011/06/08: ignore Too big for folder whose size >116k
+  ;; since folder size expand when number of files increase but
+  ;; don't shrink after delete file.
+  (setq ido-max-directory-size 118785)
 
 ;; Plato Wu,2009/06/04: let ido-work-directory-list not record /sudo
 ;; so that ido do not need wait 60s for visit /sudo
