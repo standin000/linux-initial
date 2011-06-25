@@ -26,7 +26,7 @@ fi
 
 # User specific aliases and functions
 # alias rm='mv --target-directory ~/Trash'
- alias rm='~/linux-backup/movetotrash.sh'
+ alias rm='~/linux-initial/shell/movetotrash.sh'
  alias del='/bin/rm -i -f'
  alias cp='cp -i'
  alias mv='mv -i'
@@ -168,8 +168,6 @@ export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
 # connect to it if one is not found running
 export ALTERNATE_EDITOR=
 
-# Plato Wu,2010/02/25: Only myserver use emacs daemon
-# Plato Wu,2010/08/23: myshost use emacs 23.2, It seems this method don't works
 if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ]); then
  alias emacs='emacsclient -t'
 fi
@@ -184,3 +182,11 @@ export XMODIFIERS=@im=ibus
 export QT_IM_MODULE=ibus
 # Plato Wu,2010/10/24: enable xterm-256color
 export TERM=xterm-256color
+
+alias c:='cd /cygdrive/c/'
+alias d:='cd /cygdrive/d/'
+alias e:='cd /cygdrive/e/'
+alias f:='cd /cygdrive/f/'
+alias g:='cd /cygdrive/g/'
+alias y:='cd /cygdrive/y/'
+alias z:='cd /cygdrive/z/'
