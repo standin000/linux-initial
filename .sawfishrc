@@ -65,6 +65,7 @@ The default display-message don't close the message window automatically"
 ;;                                            (cdar (setq kid-keymap-alist
 ;;                                                        (cons (cons key (make-keymap))
 ;;                                                              kid-keymap-alist))))))))))
+;; Plato Wu,2011/06/21: unbind-keys can be used unbind key
 (defun plato-bind-keys (keymap key action)
   (do ((last-keymap keymap)
        (keys (string-split key " ") (cdr keys)))
@@ -96,8 +97,15 @@ The default display-message don't close the message window automatically"
     ("C-w" . "C-x")
     ("M-w" . "C-c")
     ("C-y" . "C-v")
-    ("C-s" . "C-f")))
-
+    ("C-s" . "C-f")
+    ("C-v" . "Next")
+    ("M-v" . "Prior")
+    ("M->" . "C-Home")
+    ("M-<" . "C-End")
+    ))
+;(lookup-event  "C-Next")
+;(last-event )
+;(event-name '(101 . 65540))
 (mapcar (lambda (program)
 	(plato-bind-keys 
 	 global-keymap
@@ -245,8 +253,9 @@ b\" without losing PRESERVE-PREFIX. "
 (plato-bind-keys global-keymap "C-i 1" '(maximize-window (current-event-window)))
 ;; Plato Wu,2011/06/06: freerdp resolve M-tab conflict between sawfish and rdesktop
 (plato-bind-keys global-keymap "M-Tab" 'cycle-windows)
+(plato-bind-keys global-keymap "M-ISO_Left_Tab" 'cycle-windows-backwards)
+
 ;; Plato Wu,2011/06/16: scot -s require interactive select a window or retangle with mouse
 (plato-bind-keys global-keymap "Print" '(run-shell-command "scrot "))
 
 
-(lookup-event "M-Print")
