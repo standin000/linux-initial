@@ -7,7 +7,7 @@ linkfiles=".emacs .bash_profile .sbclrc .bash_logout .gnus.el
 .gitconfig .gitignore .inputrc .bashrc .Xresources .stumwprc"
 #linkfiles="test test1 test2/test2"
 #echo $linkfiles
-filehome=linux-initial
+filehome=~/linux-initial
 
 linkfile(){
     if [ $2 ]; then
