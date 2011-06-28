@@ -62,7 +62,7 @@
 	  (insert-and-inherit "dangeours!"))))
   ;; Plato Wu,2010/07/06: It seems eshell in Windoes will use alias in .bash_profile first.
   (setq eshell-command-aliases-list 
-      '(("rm" "~/linux-backup/movetotrash.sh $*")
+      '(("rm" "~/linux-initial/shell/movetotrash.sh $*")
         ;; Plato Wu,2010/06/23: /bin don't work for Emacs in Windows
 	("del" "/bin/rm -i -f $*")
 ;	("cp" "/bin/cp -i $*")
