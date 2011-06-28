@@ -1131,7 +1131,8 @@ else evaluate sexp"
   (define-key slime-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol)
   (define-key slime-repl-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol))
 
-(slime-configuration)
+(when (file-exists-p "~/quicklisp/slime-helper.el")
+    (slime-configuration)) 
 
 (defun cldoc-configuration ()
   (autoload 'turn-on-cldoc-mode "cldoc" nil t)

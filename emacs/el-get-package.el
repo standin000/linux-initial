@@ -58,7 +58,7 @@
 ;; Plato Wu,2011/05/07: remove it for require will search it first for package,
 ;; and the recipe file name is the same as package file name
 (setq load-path 
-      (remove "/home/plato/.emacs.d/el-get/el-get/recipes" load-path))
+      (remove "~/.emacs.d/el-get/el-get/recipes" load-path))
 
 ;; Plato Wu,2010/12/26: features don't works for elpa type
 (setq el-get-sources

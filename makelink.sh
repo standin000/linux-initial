@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Plato Wu,2011/06/11: TODO use dirname of link file to decide if link is OK instead of
 # link file judgement
 
