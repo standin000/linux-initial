@@ -58,16 +58,13 @@
 ;; Plato Wu,2011/05/07: remove it for require will search it first for package,
 ;; and the recipe file name is the same as package file name
 (setq load-path 
-      (remove "~/.emacs.d/el-get/el-get/recipes" load-path))
-
+      (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
 ;; Plato Wu,2010/12/26: features don't works for elpa type
 (setq el-get-sources
       ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
       ;; so remove el-get from el-get-sources
       '(;nxhtml
         vkill 
-        (:name emacs-w3m :features w3m
-               :after w3m-configuration) 
         ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
         ;; which cause error, so must use features.
         (:name ido-hacks :features ido-hacks :after ido-configuration) 
@@ -84,8 +81,6 @@
         ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
         ;; lisppaste, so disable lisppaste first, it is not useful for me.
 ;	(:name lisppaste :type elpa)        
-        (:name weblogger :type elpa :features weblogger :after blogger-configuration)
-        (:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
         (:name smart-tab :features smart-tab :after smart-tab-configuration)
         (:name sawfish :features sawfish :after sawfish-configuration)
         (:name google-c-style :features google-c-style
@@ -102,6 +97,14 @@
         (:name cldoc :features cldoc :after cldoc-configuration)
         redshank
         dpans2texi))
+
+(when (executable-find "w3m")
+  (setq el-get-sources
+        (append el-get-sources
+                '((:name emacs-w3m :features w3m
+                         :after w3m-configuration) 
+                  (:name weblogger :type elpa :features weblogger :after blogger-configuration)
+                  (:name org-toodledo :features org-toodledo :after org-toodledo-configuration)))))
         
 (el-get 'sync)
 
