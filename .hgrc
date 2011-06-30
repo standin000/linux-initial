@@ -16,3 +16,6 @@ hgext.mq =
 [alias]
 qstatus = status --rev -2:.
 %include .hgauth
+[web]
+# Plato Wu,2011/06/25: To silence the warning: certificate not verified
+cacerts = /etc/ssl/certs/ca-certificates.crt
