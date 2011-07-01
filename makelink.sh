@@ -4,7 +4,7 @@
 
 linkfiles=".emacs .bash_profile .sbclrc .bash_logout .gnus.el
 .ssh .subversion/config .sawfishrc .screenrc .hgrc .hgignore 
-.gitconfig .gitignore .inputrc .bashrc .Xresources .stumwprc"
+.gitconfig .gitignore .inputrc .bashrc .Xresources .stumpwmrc"
 #linkfiles="test test1 test2/test2"
 #echo $linkfiles
 filehome=~/linux-initial
