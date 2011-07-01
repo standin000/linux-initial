@@ -18,4 +18,5 @@ qstatus = status --rev -2:.
 %include .hgauth
 [web]
 # Plato Wu,2011/06/25: To silence the warning: certificate not verified
-cacerts = /etc/ssl/certs/ca-certificates.crt
+# Plato Wu,2011/07/01: it don't work for cygwin
+# cacerts = /etc/ssl/certs/ca-certificates.crt
