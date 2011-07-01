@@ -102,8 +102,10 @@ The default display-message don't close the message window automatically"
     ("M-v" . "Prior")
     ("M->" . "C-Home")
     ("M-<" . "C-End")
+    ;; Plato Wu,2011/06/27: I doesn't know how to bind "C-x h" in global
+    ("C-A" . "C-a")
     ))
-;(lookup-event  "C-Next")
+;(lookup-event  "C-xh")
 ;(last-event )
 ;(event-name '(101 . 65540))
 (mapcar (lambda (program)
