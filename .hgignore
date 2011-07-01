@@ -1,0 +1,6 @@
+# use glob syntax.
+syntax: glob
+*.fasl
+*~
+id_rsa
+known_hosts

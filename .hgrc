@@ -1,0 +1,18 @@
+[ui]
+username = Plato Wu <gtalk000@gmail.com>
+verbose = True
+ignore = ~/.hgignore
+[trusted]
+# it is needed by get source code from mystic
+users = *
+groups = *
+[diff]
+git = True
+[extensions]
+hgext.mq =
+# Plato Wu,2010/10/14: remove alias sentence for it don't work in latest mercurial and
+# it seems alias works without it.
+# alias =
+[alias]
+qstatus = status --rev -2:.
+%include .hgauth
