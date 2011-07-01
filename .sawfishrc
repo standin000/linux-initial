@@ -1,0 +1,263 @@
+(require 'jump-or-exec)
+
+(require 'sawfish.wm.ext.window-history)
+(custom-set-typed-variable (quote window-history-auto-save-state) (quote t) (quote boolean) (quote sawfish.wm.ext.window-history))
+
+(define kid-startup-programs
+          '(("ibus-daemon -d -x")
+            ("xterm")
+            ("xterm")
+;            ("urxvt")
+            ))
+; Plato Wu,2008/10/13; expression below is invalid.
+;(apply start-process (make-process standard-output) '("export LC_CTYPE=en_US.UTF-8 ; urxvt"))
+
+(mapc (lambda (program)
+        (apply start-process (make-process standard-output) program))
+      kid-startup-programs)
+
+;; 08/08/01, Plato: it seems not work for exiting emacs.
+(add-hook 'before-exit-hook
+           (lambda ()
+             (mapc stop-process (active-processes))))
+;; (add-hook 'before-exit-hook
+;; 	  (lambda ()
+;; 	    (synthesize-event "C-x" (get-window-by-name-re "emacs"))
+;; 	    (synthesize-event "C-c" (get-window-by-name-re "emacs"))))
+
+(defun kid-show-key ()
+  (interactive)
+  (require 'keymap)
+  (kid-display-message 
+   (concat "You input \""
+           (event-name (read-event "Please input the key: "))
+           "\"")))
+
+(require 'rep.io.timers)
+(defun kid-display-message (message #!optional seconds)
+  "display MESSAGE for SECONDS seconds and make the message disappeared.
+The default display-message don't close the message window automatically"
+  (interactive)
+  (display-message message)
+  (make-timer
+   (lambda ()
+     (display-message))                 ; close message window
+   (or seconds 3)))
+
+(defun string-split (string regex #!optional (align 0) (n 0))
+  (if (string-match regex string n)
+      (append (list (substring string n (+ align (match-start))))
+              (string-split string regex align (match-end)))
+    (list (substring string n))))
+
+;; (define kid-keymap-alist ())
+
+;; (defun kid-bind-keys (keymap key action)
+;;   (do ((last-keymap keymap)
+;;        (keys (string-split key " ") (cdr keys)))
+;;       ((null keys))
+;;     (bind-keys last-keymap
+;;                (car keys)
+;;                (if (null (cdr keys))
+;;                    action
+;;                    (let ((current-keymap (assoc key kid-keymap-alist)))
+;;                      (setq last-keymap (or current-keymap
+;;                                            (cdar (setq kid-keymap-alist
+;;                                                        (cons (cons key (make-keymap))
+;;                                                              kid-keymap-alist))))))))))
+;; Plato Wu,2011/06/21: unbind-keys can be used unbind key
+(defun plato-bind-keys (keymap key action)
+  (do ((last-keymap keymap)
+       (keys (string-split key " ") (cdr keys)))
+      ((null keys))
+    (let ((bind (car (search-keymap (lookup-event (car keys)) keymap))))
+      (if (and bind (keymapp bind))
+	  (setq last-keymap bind)
+	  (bind-keys last-keymap
+               (car keys)
+               (if (null (cdr keys))
+                   action
+                   (setq last-keymap (make-keymap))))))))
+
+(defvar kid-jump-or-exec-list
+  '(("C-i g" "GTK" "gtk-demo &")
+    ("C-i e" "emacs" "emacs &")
+    ("C-i p" "PDF" "epdfview &")
+    ("C-i u" "urxvt" "urxvt &")
+    ("C-i f" "Gran Paradiso" "firefox &")))
+
+(defvar *emacs-style-keys*
+  '(("C-d" . "Delete")
+    ("C-n" . "Down")
+    ("C-a" . "Home")
+    ("C-e" . "End")
+    ("C-f" . "Right")
+    ("C-b" . "Left")
+    ("C-p" . "Up")
+    ("C-w" . "C-x")
+    ("M-w" . "C-c")
+    ("C-y" . "C-v")
+    ("C-s" . "C-f")
+    ("C-v" . "Next")
+    ("M-v" . "Prior")
+    ("M->" . "C-Home")
+    ("M-<" . "C-End")
+    ;; Plato Wu,2011/06/27: I doesn't know how to bind "C-x h" in global
+    ("C-A" . "C-a")
+    ))
+;(lookup-event  "C-xh")
+;(last-event )
+;(event-name '(101 . 65540))
+(mapcar (lambda (program)
+	(plato-bind-keys 
+	 global-keymap
+	 (car program)
+	 (lambda ()
+            (interactive)
+            (if (string= (window-class (input-focus)) "XTerm") 
+                (synthesize-event (lookup-event (car program)) (input-focus))
+              (synthesize-event (lookup-event (cdr program)) (input-focus))))))
+      *emacs-style-keys*)
+
+;; (plato-bind-keys 
+;; 	 global-keymap
+;;          "C-d"
+;; 	 (lambda ()
+;;            (interactive)
+;;            (if (string= (window-class (input-focus)) "XTerm") 
+;;                (synthesize-event (lookup-event "C-d") (input-focus))
+;;                (synthesize-event (lookup-event "Delete") (input-focus)))))
+
+
+;; This code uses Sawfish's synthesize-event function, which in turn uses
+;; XSendEvent to pass the event to the window.  These synthetic events are
+;; deliberately ignored by xterms and XEmacs, for security reasons.  To work
+;; around this problem, start the terminal with
+
+;; xterm -xrm 'xterm*allowSendEvents: True'
+
+;; The analogous hack for XEmacs (not needed if you set
+;; *keyboard-paste-use-gnuclient*) is to use
+
+;; (setq x-allow-sendevents t)
+
+;; These hacks open a fairly serious security hole, though, so only do this if
+;; you know what you are doing.
+
+;; If you have gnuclient available with your XEmacs installation, this module
+;; can use that instead.  Just make sure that *keyboard-paste-use-gnuclient* is
+;; set and there should be no need to allow send-events to XEmacs.
+
+
+;; aterm honours XSendEvent as long as the mouse is over the terminal window,
+;; which means that keyboard-paste works in that situation.
+
+
+;; In order to fix this properly, Sawfish will need to be patched to use
+;; XTestFakeKeyEvent in the XTest extension rather than XSendEvent, as suggested
+;; at <http://www.handhelds.org:8080/wiki/GeneratingSyntheticEvents> (or possibly
+;; by other means, such as using the XInputExtension; I don't know a great deal
+;; about this area).
+
+(defun my-bind-keys (char function &optional preserve-prefix)
+  "If optional PRESERVE-PREFIX t, keep prefix untouched in Emacs.
+an e.g,(bind-keys global-keymap \"C-c\" '(my-bind-keys \"b\" popup-window-list \"C-c\"))
+
+This will bind \"C-c b\" to popup-window-list, but not in
+Emacs. And in Emacs, you could bind it to call \"sawfish-client
+-f popup-window-list\", thus you get the same behaviour of \"C-c
+b\" without losing PRESERVE-PREFIX. "
+  (if (and preserve-prefix
+           (string= (window-class (input-focus)) "Emacs "))
+      (synthesize-event preserve-prefix (input-focus))
+    (when (grab-keyboard)
+      (let ((read-event
+             (lambda ()
+               (throw 'read (event-name (current-event))))))
+        (unwind-protect
+            (progn
+              (add-hook 'unbound-key-hook read-event)
+              (when (string= (catch 'read (recursive-edit)) char)
+                (funcall function)))
+          (remove-hook 'unbound-key-hook read-event)
+          (ungrab-keyboard))))))
+
+(setq play-sample-program "/usr/bin/aplay")
+
+(mapc (lambda (program)
+	(plato-bind-keys 
+	 global-keymap
+	 (car program)
+         `(jump-or-exec
+           ,(cadr program)
+           ,(lambda () (system (caddr program)))
+           ,(lambda (wind) (display-window wind)))))
+      kid-jump-or-exec-list)
+
+(defun kid-display ()
+;; it need by interactive for this bind-keys form
+;; (bind-keys global-keymap "C-m" '(kid-display))
+;; (unbind-keys global-keymap (lookup-event "C-m"))
+   (interactive)
+   (kid-display-message "bind-keys"))
+
+(defun evm-tile-windows-horizontally ()
+  "Tile windows horizontally"
+  (interactive)
+  (let ((wins (workspace-windows current-workspace))
+                (calculated-width 0)
+                (x 0)
+                (border-width 0)
+                (borders-width 0))
+        ;; Calculate width of the window border
+        (setq border-width (- (car (window-frame-dimensions (car wins))) 
+                                                  (car (window-dimensions (car wins)))))
+        ;; Calculate width of borders of all windows on current viewport
+        (setq borders-width 
+                  (* (length wins) border-width))
+        (setq calculated-width 
+                  (ceiling (/ (- (screen-width) borders-width) 
+                                          (length wins))))
+        (while wins
+          (resize-window-to (car wins) calculated-width (- (screen-height) (- 54 28)))
+          ;54))
+          (move-window-to (car wins) x 0)
+          (setq x (+ x calculated-width border-width))
+          (setq wins (cdr wins)))))
+
+(defun evm-tile-windows-vertically ()
+  "Tile windows vertically"
+  (interactive)
+  (let ((wins (workspace-windows current-workspace))
+                (calculated-height 0)
+                (y 0)
+                (border-height 0)
+                (borders-height 0))
+        ;; Calculate height of the window border
+        (setq border-height (- (cdr (window-frame-dimensions (car wins))) 
+                                                   (cdr (window-dimensions (car wins)))))
+        ;; Calculate height of borders of all windows on current viewport
+        (setq borders-height 
+                  (* (length wins) border-height))
+        (setq calculated-height 
+                  (ceiling (/ (- (screen-height) borders-height)
+			    ;(- (screen-height) borders-height 28) 
+                                          (length wins))))
+        (while wins
+          (resize-window-to (car wins) (- (screen-width) 18) calculated-height)
+          (move-window-to (car wins) 0 y)
+          (setq y (+ y calculated-height border-height))
+          (setq wins (cdr wins)))))
+
+(plato-bind-keys global-keymap "C-i 2" 'evm-tile-windows-horizontally)
+(plato-bind-keys global-keymap "C-i 3" 'evm-tile-windows-vertically)
+(require 'sawfish.wm.state.maximize)
+(plato-bind-keys global-keymap "C-i 1" '(maximize-window (current-event-window)))
+;; Plato Wu,2011/06/06: freerdp resolve M-tab conflict between sawfish and rdesktop
+(plato-bind-keys global-keymap "M-Tab" 'cycle-windows)
+(plato-bind-keys global-keymap "M-ISO_Left_Tab" 'cycle-windows-backwards)
+
+;; Plato Wu,2011/06/16: scot -s require interactive select a window or retangle with mouse
+(plato-bind-keys global-keymap "Print" '(run-shell-command "scrot "))
+
+
