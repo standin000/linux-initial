@@ -1,0 +1,176 @@
+!! for screen scroll
+URxvt.secondaryScroll:true
+
+URxvt.scrollTtyOutput:False
+URxvt.scrollTtyKeypress:True
+URxvt.scrollWithBuffer:True
+
+URxvt.background:grey30
+URxvt.foreground:white
+URxvt.colorBD:yellow
+URxvt.colorUL:green
+URxvt.scrollBar:True
+URxvt.scrollBar_right:True
+URxvt.scrollBar_floating:False
+URxvt.scrollstyle:next
+!! scrollback buffer lines - 65535 is max (64 is default)
+URxvt.saveLines:10000
+URxvt.color12:DodgerBlue
+URxvt.color10:SteelBlue4
+
+!URxvt.geometry: 90x25+180+200
+
+
+!! enable tabbed
+URxvt.perl-ext-common:default,tabbed
+!, url-select
+
+!URxvt.font:9*15,xft:WenQuanYi Zen Hei:size=12
+!:charwidth=9
+!! The default is M-s, which is conflict with paredit key in emacs
+URxvt.searchable-scrollback: CM-s
+!urxvt*font: xft:terminus: pixelsize=16:antialias=true,\
+!xft:SimSun: pixelsize=14:antialias=true,\xft:MingLiU: pixelsize=14:antialias=true
+URxvt.font:-misc-fixed-medium-r-normal--18-*-*-*-*-*-iso10646-1,xft:WenQuanYi Bitmap Song:size=20 
+
+!URxvt.font:12x20,xft:WenQuanYi Bitmap Song-16
+!Rxvt.boldFont:12x20,xft:WenQuanYi Bitmap Song-16
+
+! ! author: jianingy.yang at gmail dot com
+! ! Xft Font Settings
+! Xft.dpi:               96
+! Xft.rgba:              rgb
+! Xft.hinting:           true
+! ! If BCI enabled, there is no need to use autohint
+! Xft.autohint:          false
+! Xft.hintstyle:         hintmedium
+! Xft.antialias:         true
+! Xft.rh_prefer_bitmaps: true
+! Xft.lcdfilter:         lcddefault
+
+! ! URxvt Settings
+
+! ! 24 for pesudo transparent, 32 for real transparent
+! URxvt.depth:                         32
+! URxvt.saveLines:                                512
+! URxvt.geometry:                     80x24
+! URxvt.termName:           xterm-256color
+! URxvt.loginShell:         true
+
+
+! ! Transparent
+! URxvt.transparent:      True
+! ! Uncomment the following comments if you wanna use 24bits pesudo transparent
+! !URxvt.inheritPixmap:    True
+! !URxvt.shading:          5
+! !URxvt.tintColor:        black
+! !URxvt.fading:           50
+
+! ! Scrollbar
+! URxvt.scrollBar:          False
+! URxvt.scrollBar_right:    yes
+! URxvt.scrollBar_floating: False
+! URxvt.scrollstyle:        Next
+
+! ! VisualBell
+! URxvt.visualBell:        false 
+
+! ! Commands
+! !! ---- ctrl+F12 --> clean screen and scroll-bar
+! URxvt.keysym.Control-F12: command:\033c
+
+! ! Remote Clipboard
+! !URxvt.remote-selection.store: ssh remote 'cat >/tmp/clip'
+! !URxvt.remote-selection.fetch: ssh remote 'cat /tmp/clip'
+! URxvt.mapAlert:           true
+! URxvt.print-pipe:         cat > $(echo urxvt.dump.`date +'%Y%M%d%H%m%S'`)
+
+! ! Font
+! URxvt.font:xft:Monaco:size=11:bold,xft:STHeiTi:pixelsize=17
+! URxvt.boldfont:xft:Monaco:size=11:bold,xft:STHeiTi:pixelsize=17
+
+! ! Input Method
+! ! URxvt.preeditType: Root
+! ! URxvt.inputMethod: ibus
+
+! ! Padding
+! URxvt.internalBorder:5
+! URxvt.externalBorder:0
+
+! ! Extensions
+! URxvt.perl-lib:           /usr/lib/urxvt/perl
+! URxvt.perl-ext-common:    default,matcher
+! URxvt.matcher.launcher:   x-www-browser
+! URxvt.matcher.button:     1
+! URxvt.matcher.pattern.1:  \\bwww\\.[\\w-]+\\.[\\w./?&@#-=]*[\\w/-]
+
+! ! Colors
+! URxvt.cursorColor:              green
+! ! 32-bit true transparent, If you want black background, 
+! ! change this to #000000
+! URxvt.background:       rgba:0000/0000/0000/dddd
+! URxvt.foreground:               #cccccc
+! URxvt.color0:                                   #000000
+! URxvt.color1:                                                   #aa0000
+! URxvt.color2:                                                                   #00aa00
+! URxvt.color3:                                       #aaaa00
+! URxvt.color4:                      #0000aa
+! URxvt.color5:                                                      #aa00aa
+! URxvt.color6:                         #00aaaa
+! URxvt.color7:                                   #aaaaaa
+! URxvt.color8:                              #555555
+! URxvt.color9:                      #ff5555
+! URxvt.color10:                 #55ff55
+! URxvt.color11:                #ffff55
+! URxvt.color12:             #5555ff
+! URxvt.color13:             #ff55ff
+! URxvt.color14:          #55ffff
+! URxvt.color15:            #ffffff
+
+! ! vim: ts=4 sw=4 et ai
+
+!font and locale
+xterm*locale: true
+xterm*utf8: 1
+xterm*utf8Title: true
+xterm*fontMenu*fontdefault*Label: Default
+!xterm*faceName: Monaco:antialias=True:pixelsize=15
+xterm*faceName:simsun:antialias=true:pixelsize=18:charwidth=10
+!xterm*faceName: monofur:antialias=True:pixelsize=20
+!xter*boldFont: DejaVu Sans Mono:style=Bold:pixelsize=15
+!xterm*faceNameDoublesize: wenquanyi bitmap song:pixelsize=16:antialias=True
+xterm*xftAntialias: true
+xterm*cjkWidth:false 
+XTerm*background: black
+!XTerm*background: grey30
+XTerm*foreground: white
+!XTerm*background: blue
+!XTerm*foreground: yellow
+! Plato Wu,2010/10/24: enable Alt key for emacs 
+! Plato Wu,2010/10/24: these two option is NG for Alt key
+!XTerm*eightBitInput: false
+!XTerm.VT100.eightBitInput: false
+XTerm*altSendsEscape: true
+XTerm*metaSendsEscape: true
+! Plato Wu,2010/10/24: enable C-h key for emacs
+XTerm*backarrowKey: false
+XTerm*ttyModes: erase ^?
+!Plato Wu,2011/04/14: make xterm receive XSendEvent, so my sawfish hack works
+XTerm.VT100.allowSendEvents: True
+! Emacs.Foreground: wheat
+! Emacs.Background: darkslategrey
+XTerm*allowSendEvents: True
+! Xterm*allowColorOps: false
+! Xterm*allowFontOps: false
+! Xterm*allowTcapOps: false
+! Xterm*allowTitleOps: false
+! Xterm*allowWindowOps: false
+
+*VT100*translations: #override 
+! Plato Wu,2011/04/13: shift + insert will paste content from clipboard
+Shift <KeyPress> Insert:insert-selection(CLIPBOARD, CUT_BUFFER1)
+! Plato Wu,2011/04/13: middle mouse key will paste content from clipboard
+~Shift~Ctrl<Btn2Up>: insert-selection(CLIPBOARD, CUT_BUFFER1)
+! Plato Wu,2011/04/13: left click will copy content to clipboard
+~Shift~Ctrl<BtnUp>: select-end(CLIPBOARD, CUT_BUFFER1)
+
