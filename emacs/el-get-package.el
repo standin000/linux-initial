@@ -73,7 +73,9 @@
           (progn (setq el-get-sources
                        (append el-get-sources
                                '((:name auctex :after auctex-configuration)
-                                 (:name session :features session :after session-configuration)
+                                 ;; Plato Wu,2011/07/02: it seems there is a problem with session
+                                 ;; recipe in el-get
+;                                 (:name session :features session :after session-configuration)
                                  redshank dpans2texi)))
                  (when (executable-find "w3m") 
                    (setq el-get-sources
