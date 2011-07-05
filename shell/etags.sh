@@ -3,4 +3,12 @@
 # -print0 and -0 let find and xargs handle file name which contain space.
 # Plato Wu,2010/01/03: * must be escaped for it is used by Shell first.
 # Plato Wu,2011/06/28: archlinux provides etags.emacs, don't create link
+if [ "$OSTYPE" = "cygwin" ]; then
+
+find . -iname \*.[chs] -print0 | xargs -0 etags
+
+else
+
 find . -iname \*.[chs] -print0 | xargs -0 etags.emacs
+
+fi
