@@ -183,10 +183,11 @@ export QT_IM_MODULE=ibus
 # Plato Wu,2010/10/24: enable xterm-256color
 export TERM=xterm-256color
 
-alias c:='cd /cygdrive/c/'
-alias d:='cd /cygdrive/d/'
-alias e:='cd /cygdrive/e/'
-alias f:='cd /cygdrive/f/'
-alias g:='cd /cygdrive/g/'
-alias y:='cd /cygdrive/y/'
-alias z:='cd /cygdrive/z/'
+# Plato Wu,2011/07/08: cd z: is OK in cygwin
+# alias c:='cd /cygdrive/c/'
+# alias d:='cd /cygdrive/d/'
+# alias e:='cd /cygdrive/e/'
+# alias f:='cd /cygdrive/f/'
+# alias g:='cd /cygdrive/g/'
+# alias y:='cd /cygdrive/y/'
+# alias z:='cd /cygdrive/z/'
