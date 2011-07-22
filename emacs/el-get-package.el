@@ -71,7 +71,8 @@
       (if (not (is-system "cygwin"))
           (progn (setq el-get-sources
                        (append el-get-sources
-                               '((:name auctex :after auctex-configuration)
+                               '(
+                                ; (:name auctex :after auctex-configuration)
                                  (:name emms :type elpa :features emms :after emms-configuration)
                                  ;; Plato Wu,2011/07/02: it seems there is a problem with session
                                  ;; recipe in el-get

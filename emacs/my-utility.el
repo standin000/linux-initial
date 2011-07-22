@@ -548,8 +548,7 @@ isn't there and triggers an error"
 
 (global-set-key [f9] 'next-error-cycle)
 
-(if (is-system "cygwin")
-    (require 'grep))
+(require 'grep)
 
 (defun project-grep (regexp &optional files)
   "grep files in project directory recursively no matter the sub directory the visited
