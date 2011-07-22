@@ -17,6 +17,6 @@ hgext.mq =
 qstatus = status --rev -2:.
 %include .hgauth
 [web]
-# Plato Wu,2011/06/25: To silence the warning: certificate not verified
-# Plato Wu,2011/07/01: it don't work for cygwin
-# cacerts = /etc/ssl/certs/ca-certificates.crt
+# Plato Wu,2011/06/25: To silence the warning: certificate not verified, hg 1.8 will report it.
+# Plato Wu,2011/07/05: need copy it into cygwin.
+cacerts = /etc/ssl/certs/ca-certificates.crt
