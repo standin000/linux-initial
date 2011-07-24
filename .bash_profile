@@ -171,8 +171,7 @@ export ALTERNATE_EDITOR=
 if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ]); then
  alias emacs='emacsclient -t'
 fi
- # Plato Wu,2010/02/21: proxy setting for chromium
-# Plato Wu,2010/08/01: Don't use it now
+# Plato Wu,2010/02/21: proxy setting for chromium
 export auto_proxy="http://users.ninthfloor.org/~plato/localautoproxy.pac"
 
 export GIT_EDITOR=emacs

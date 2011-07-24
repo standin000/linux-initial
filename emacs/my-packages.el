@@ -124,9 +124,6 @@
 ;; (setq dictionary-server "dict.hewgill.com")
 
 (defun ido-configuration ()
-  ;; Plato Wu,2011/05/14: there is /sudo items in list and I can not know how to
- ;; get rid of it, so try to disable the whole list
-  (setq ido-enable-last-directory-history nil)
   (setq ido-enable-tramp-completion nil) 
 ;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history 
   (setq ido-ignore-buffers
@@ -143,8 +140,8 @@
   (setq ido-max-directory-size 118785)
 
 ;; Plato Wu,2009/06/04: let ido-work-directory-list not record /sudo
-;; so that ido do not need wait 60s for visit /sudo
-  (setq ido-work-directory-list-ignore-regexps '("/sudo:"))
+;; and /ssh so that ido do not need wait 60s for visit /sudo or /ssh
+  (setq ido-work-directory-list-ignore-regexps '("/sudo:" "/ssh:"))
   ;; Plato Wu,2008/12/09: remarks for key is conflict with redshank mode
   (define-key ctl-x-map "\C-r" nil)
 
