@@ -166,11 +166,16 @@ XTerm*allowSendEvents: True
 ! Xterm*allowTitleOps: false
 ! Xterm*allowWindowOps: false
 
-*VT100*translations: #override 
+
 ! Plato Wu,2011/04/13: shift + insert will paste content from clipboard
-Shift <KeyPress> Insert:insert-selection(CLIPBOARD, CUT_BUFFER1)
 ! Plato Wu,2011/04/13: middle mouse key will paste content from clipboard
-~Shift~Ctrl<Btn2Up>: insert-selection(CLIPBOARD, CUT_BUFFER1)
 ! Plato Wu,2011/04/13: left click will copy content to clipboard
-~Shift~Ctrl<BtnUp>: select-end(CLIPBOARD, CUT_BUFFER1)
+! Plato Wu,2011/07/09: keep snippet blew integrality or it don't works
+
+*VT100*translations: #override \n\
+Shift <KeyPress> Insert:insert-selection(CLIPBOARD, CUT_BUFFER1) \n\
+~Shift~Ctrl<Btn2Up>: insert-selection(CLIPBOARD, CUT_BUFFER1) \n\
+~Shift<BtnUp>: select-end(CLIPBOARD, CUT_BUFFER1) \n\
+~Shift<BtnUp>: select-end(PRIMARY, CUT_BUFFER0)
+
 
