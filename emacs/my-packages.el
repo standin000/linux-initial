@@ -144,8 +144,9 @@
   (setq ido-work-directory-list-ignore-regexps '("/sudo:" "/ssh:"))
   ;; Plato Wu,2008/12/09: remarks for key is conflict with redshank mode
   (define-key ctl-x-map "\C-r" nil)
-
-  (ido-mode t))
+  (ido-mode t)
+  (ido-hacks-mode t)
+  )
 
 (defun psvn-configuration ()
   ;; Plato Wu,2009/03/31: This code is used in PMP project in Kinpo
