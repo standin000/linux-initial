@@ -259,6 +259,9 @@ b\" without losing PRESERVE-PREFIX. "
 
 ;; Plato Wu,2011/06/16: scot -s require interactive select a window or retangle with mouse
 (plato-bind-keys global-keymap "Print" '(run-shell-command "scrot "))
+
+(plato-bind-keys global-keymap "M-F4" 'delete-window)
+
 ;; Plato Wu,2011/07/17: in order to show Chinese title
 (custom-set-typed-variable (quote default-font) (quote ("Xft" . "SimHei-12")) (quote font))
 
