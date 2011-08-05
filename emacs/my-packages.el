@@ -862,6 +862,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
 (defun compile-configuration ()
   (global-set-key [f7] 'compile)
+  (setq compilation-read-command nil)
   ;;for waring from smart-compile
   (setq compilation-scroll-output t)
   (setq compilation-ask-about-save nil)
