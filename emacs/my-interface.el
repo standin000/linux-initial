@@ -269,7 +269,9 @@
 (make-variable-buffer-local 'tags-table-list)
 ;;add a new tags table to the current list.
 (setq tags-add-tables t)
+;; Plato Wu,2011/07/29: make these file local variable safe.
 (put 'tags-file-name 'safe-local-variable 'stringp)
+(put 'compile-command 'safe-local-variable 'stringp)
 
 ; prevent emacs from truncating  message in the echo area.
 (setq eval-expression-print-length nil)
