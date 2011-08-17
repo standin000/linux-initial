@@ -124,7 +124,8 @@
 ;; (setq dictionary-server "dict.hewgill.com")
 
 (defun ido-configuration ()
-  (setq ido-enable-tramp-completion nil) 
+  ;; Plato Wu,2011/08/13: 
+  (setq ido-enable-tramp-completion t) 
 ;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history 
   (setq ido-ignore-buffers
 	'("^ .*"
@@ -495,7 +496,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
          (let ((content (cdr (assoc "content" entry))))
            ;; (insert (substring content 0 
            ;;                    (+ 4 (string-match "</p>" content))))
-           (insert (format "<p>....</p><p>请移步<a href=\"http://platowu.info\">恒永之地</a>查看<a href=\"http://platowu.info/%s\">点我</a>，评论也在那边留哦，:)</p>" 
+           (insert (format "<p>....</p><p>请移步<a href=\"http://platowu.info\">恒永之地</a>查看<a href=\"http://platowu.info/%s\"><font size = 6 color=\"#FF0000\">点我</font></a>，评论也在那边留哦，:)</p>" 
                            (w3m-url-encode-string 
                             (cdr (assoc "title" entry)) 'utf-8))))
          (mail-send-and-exit)))))
