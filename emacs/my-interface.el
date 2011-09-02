@@ -394,5 +394,8 @@
 ;; so use text-mode temporally
 (add-to-list 'auto-mode-alist '("\\.ml$" . text-mode))
 
+;; Plato Wu,2011/09/02: support End key in emacs of myhost
+(global-set-key (quote [select]) 'move-end-of-line)
+
 ;; Plato Wu,2011/06/03: auto insert content for .h, .el and so on.
 (auto-insert-mode 1)

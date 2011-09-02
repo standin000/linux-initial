@@ -28,7 +28,7 @@ fi
 # alias rm='mv --target-directory ~/Trash'
  alias rm='~/linux-initial/shell/movetotrash.sh'
  alias del='/bin/rm -i -f'
- alias cp='cp -i'
+ alias cp='cp -p -i'
  alias mv='mv -i'
  
 # # Don't put continuous duplicate lines in the history.
@@ -179,7 +179,7 @@ export GIT_EDITOR=emacs
 export GTK_IM_MODULE=ibus
 export XMODIFIERS=@im=ibus   
 export QT_IM_MODULE=ibus
-# Plato Wu,2010/10/24: enable xterm-256color
+# Plato Wu,2010/10/24: xterm-256color can't support End key in emacs of myhost, so define it in .emacs
 export TERM=xterm-256color
 
 # Plato Wu,2011/07/08: cd z: is OK in cygwin

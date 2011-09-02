@@ -68,7 +68,7 @@
 ;	("cp" "/bin/cp -i $*")
         ;; Plato Wu,2010/09/13: rm -i cp -i don't work for Emacs in Linux
 ;	
-	("cp" "/bin/cp -i $*")
+	("cp" "/bin/cp -p -i $*")
 	("df" "df -h $* ")
 	("du" "du -h $*")
 	("less" "less -r $*")
@@ -1197,6 +1197,7 @@ to the position where the property exists."
 ;; (redshank-setup '(lisp-mode-hook
 ;;                         slime-repl-mode-hook
 ;; 			emacs-lisp-mode-hook) t)
+
 (provide 'my-packages)
 
   
