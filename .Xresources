@@ -170,7 +170,7 @@ XTerm*allowSendEvents: True
 ! Plato Wu,2011/04/13: shift + insert will paste content from clipboard
 ! Plato Wu,2011/04/13: middle mouse key will paste content from clipboard
 ! Plato Wu,2011/04/13: left click will copy content to clipboard
-! Plato Wu,2011/07/09: keep snippet blew integrality or it don't works
+! Plato Wu,2011/07/09: keep snippet blew integrality or it dont works
 
 *VT100*translations: #override \n\
 Shift <KeyPress> Insert:insert-selection(CLIPBOARD, CUT_BUFFER1) \n\

@@ -8,3 +8,5 @@
 *.o
 *.via
 *.stg
+*.obj
+TAGS

@@ -8,7 +8,7 @@ if [ "$OSTYPE" = "cygwin" ]; then
 find . -iname \*.[chs] -print0 | xargs -0 etags
 
 else
-
-find . -iname \*.[chs] -print0 | xargs -0 etags.emacs
+# Plato Wu,2011/08/31: emacs 23.3.a-2 use etags intead etags.emacs
+find . -iname \*.[chs] -print0 | xargs -0 etags
 
 fi
