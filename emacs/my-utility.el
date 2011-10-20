@@ -414,7 +414,13 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 (require 'etags)
 ;; Plato Wu,2009/04/07: In order to support lookup elisp function.
 (defun find-tag-also-for-elisp (tagname &optional next-p regexp-p)
-  (interactive (find-tag-interactive "Find tag: "))
+  (interactive 
+   ;; Plato Wu,2011/10/19: find-tag-interactive call find-tag-tag call tags-lazy-completion-table
+   ;; which require a valid tags table.
+   ;; (find-tag-interactive "Find tag: ")
+   (list (completing-read "Find tags:"
+                     nil
+                     nil nil (funcall 'find-tag-default)))) 
    (let ((tagsymbol (intern tagname)))
     (cond
      ((fboundp tagsymbol) 
@@ -685,5 +691,17 @@ isn't there and triggers an error"
       nil)
     (kill-buffer (find-file ical-filename))))
 
+(defun ielm2 nil
+  "Interactively evaluate Emacs Lisp expressions.
+Switches to the buffer `*ielm*' in other window, or creates it if it does not exist."
+  (interactive)
+  (load "ielm")
+  (let (old-point)
+    (unless (comint-check-proc "*ielm*")
+      (with-current-buffer (get-buffer-create "*ielm*")
+	(unless (zerop (buffer-size)) (setq old-point (point)))
+	(inferior-emacs-lisp-mode)))
+    (pop-to-buffer "*ielm*" t)
+    (when old-point (push-mark old-point))))
 
 (provide 'my-utility)
