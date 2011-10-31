@@ -183,10 +183,7 @@ export QT_IM_MODULE=ibus
 export TERM=xterm-256color
 
 # Plato Wu,2011/07/08: cd z: is OK in cygwin
-# alias c:='cd /cygdrive/c/'
-# alias d:='cd /cygdrive/d/'
-# alias e:='cd /cygdrive/e/'
-# alias f:='cd /cygdrive/f/'
-# alias g:='cd /cygdrive/g/'
-# alias y:='cd /cygdrive/y/'
-# alias z:='cd /cygdrive/z/'
+# Plato Wu,2011/10/31: special for cygwin environment
+if [ "$OSTYPE" = "cygwin" ] ; then
+    export LANG=en_US.UTF-8
+fi
