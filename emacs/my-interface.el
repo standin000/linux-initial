@@ -399,3 +399,6 @@
 
 ;; Plato Wu,2011/06/03: auto insert content for .h, .el and so on.
 (auto-insert-mode 1)
+
+;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
+(global-set-key (kbd "C-^") 'cua-set-rectangle-mark)
