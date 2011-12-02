@@ -32,7 +32,8 @@
 	    '(;; (nnfolder "") ;you want to read your mail with the nnfolder back end,
               ;; ;set how to store email
               ;; ;(setq pop3-leave-mail-on-server t)
-              (nntp "news.cn99.com")
+              ;; Plato Wu,2011/10/29: it is broken.
+;              (nntp "news.cn99.com")
               ;(nntp "news.yaako.com")
 	      (nntp "news.newsfan.net")
 	      (nntp "news.gmane.org")
@@ -98,16 +99,17 @@
 ;;     )) ;; 
 
 ;(set-language-environment 'Chinese-GB)
+;; Plato Wu,2011/10/29: Enable it
 ;this setting will enable guns can view gbk.
-;; (setq gnus-default-charset 'chinese-iso-8bit
-;;    gnus-group-name-charset-group-alist '((".*" . chinese-iso-8bit))
-;;    gnus-summary-show-article-charset-alist
-;;        '((1 . chinese-iso-8bit)
-;;          (2 . gbk)
-;;          (3 . big5)
-;;          (4 . utf-8))
-;;    gnus-newsgroup-ignored-charsets
-;;        '(unknown-8bit x-unknown iso-8859-1))
+(setq gnus-default-charset 'chinese-iso-8bit
+   gnus-group-name-charset-group-alist '((".*" . chinese-iso-8bit))
+   gnus-summary-show-article-charset-alist
+       '((1 . chinese-iso-8bit)
+         (2 . gbk)
+         (3 . big5)
+         (4 . utf-8))
+   gnus-newsgroup-ignored-charsets
+       '(unknown-8bit x-unknown iso-8859-1))
 
 ;;; set for using GBK in emacs 21/22 with mule-gbk
 (unless (string= (substring emacs-version 0 2) "23")

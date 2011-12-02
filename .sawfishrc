@@ -66,7 +66,7 @@ The default display-message don't close the message window automatically"
 ;;                                                        (cons (cons key (make-keymap))
 ;;                                                              kid-keymap-alist))))))))))
 ;; Plato Wu,2011/06/21: unbind-keys can be used unbind key
-(defun plato-bind-keys (keymap key action)
+(defun plato-bind-keys (keymap key action &optional docs)
   (do ((last-keymap keymap)
        (keys (string-split key " ") (cdr keys)))
       ((null keys))
@@ -108,13 +108,17 @@ The default display-message don't close the message window automatically"
 ;(lookup-event  "C-xh")
 ;(last-event )
 ;(event-name '(101 . 65540))
+(define (is-also-emacs-style) 
+  (or (string= (window-class (input-focus)) "XTerm")
+      (string= (window-class (input-focus)) "URxvt")))
+
 (mapcar (lambda (program)
 	(plato-bind-keys 
 	 global-keymap
 	 (car program)
 	 (lambda ()
             (interactive)
-            (if (string= (window-class (input-focus)) "XTerm") 
+            (if (is-also-emacs-style)
                 (synthesize-event (lookup-event (car program)) (input-focus))
               (synthesize-event (lookup-event (cdr program)) (input-focus))))))
       *emacs-style-keys*)
@@ -258,7 +262,7 @@ b\" without losing PRESERVE-PREFIX. "
 (plato-bind-keys global-keymap "M-ISO_Left_Tab" 'cycle-windows-backwards)
 
 ;; Plato Wu,2011/06/16: scot -s require interactive select a window or retangle with mouse
-(plato-bind-keys global-keymap "Print" '(run-shell-command "scrot "))
+(plato-bind-keys global-keymap "Print" '(run-shell-command "scrot ") "Take a screenshot")
 
 (plato-bind-keys global-keymap "M-F4" 'delete-window)
 

@@ -119,6 +119,9 @@
 ;; (push #p"/home/plato/lisp-study/standin000s-cl-yacc-ebnf/src/" asdf:*central-registry*)
 ;; (push #p"/home/plato/stumpwm-build/" asdf:*central-registry*)
 ;; (push #p"/home/plato/clbuild/systems/" asdf:*central-registry*)
+
+;;(ql:update-client) will update quicklisp
+; (ql:update-dist "quicklisp") will update dist of quicklisp
 ;;The following lines added by ql:add-to-init-file:
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
