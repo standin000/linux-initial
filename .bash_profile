@@ -60,6 +60,8 @@ fi
  alias la='ls -A'                              # all but . and ..
  alias l='ls -CF'                              #
  alias free='free -m'                          # show output in MB
+ # Plato Wu,2011/11/21: curl -O 127.0.0.1:8888 will return Remote file name has no length!
+ alias curl='curl -C - -O'                     # resume download and use remote file name
 
  # Plato Wu,2009/06/07: use ssh's X11 forwarding
 # if [ -z "$DISPLAY" ]; then

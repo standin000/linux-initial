@@ -84,6 +84,7 @@
 	("mv" "mv -i $1 $2")
 	("free" "free -m")
 	("vi" "emacs $*")
+        ("curl" "curl -C - -O $*")   ;resume download and use remote file name
 	("nano" "emacs $*")))
   (when (is-system "windows-nt")
       (setcdr (assoc "ls" eshell-command-aliases-list) '("ls -h $*"))
@@ -225,6 +226,7 @@
   (require 'emms-score)
   (require 'emms-i18n)
   (require 'emms-volume)
+  (require 'emms-lyrics)
   ;; Plato Wu,2011/05/15: emms-standard will require emms-source-file and emms-source-playlist.
   (emms-standard)
   (emms-default-players)
@@ -272,6 +274,19 @@
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
 ;  (emms-history-load)
+    (setq emms-lyrics-dir "~/Music/Lyrics")
+    (setq emms-lyrics-coding-system 'gbk-dos)
+;    (setq emms-lyrics-display-on-minibuffer t)
+    (emms-lyrics 1)
+    (defadvice gnus-group-get-new-news (around pause-emms)
+      "Pause emms while Gnus is fetching mails or news."
+      (if emms-player-playing-p
+          (progn (emms-pause)
+                 ad-do-it
+                 (emms-pause))
+        ad-do-it))
+
+    (ad-activate 'gnus-group-get-new-news)
   ) 
 
 (defvar my-authinfo "~/.authinfo")
