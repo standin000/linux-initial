@@ -9,4 +9,5 @@
 *.via
 *.stg
 *.obj
+*.so
 TAGS

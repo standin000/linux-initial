@@ -62,6 +62,7 @@ fi
  alias free='free -m'                          # show output in MB
  # Plato Wu,2011/11/21: curl -O 127.0.0.1:8888 will return Remote file name has no length!
  alias curl='curl -C - -O'                     # resume download and use remote file name
+ alias aria2c='aria2c -c --file-allocation=none'
 
  # Plato Wu,2009/06/07: use ssh's X11 forwarding
 # if [ -z "$DISPLAY" ]; then

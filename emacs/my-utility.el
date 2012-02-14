@@ -616,6 +616,7 @@ isn't there and triggers an error"
     (message "Preparing icalendar...done")
     (if (re-search-forward "^BEGIN:VCALENDAR\\s-*$" nil t)
         (let (ical-contents)
+    
           ;; read ical
           (message "Reading icalendar...")
           (beginning-of-line)
@@ -623,12 +624,13 @@ isn't there and triggers an error"
           (message "Reading icalendar...done")
           ;; convert ical
           (message "Converting icalendar...")
-          (let* ((ev (icalendar--get-children (car ical-contents) 'VTODO))
+          (dolist (ical-content ical-contents)
+            (let* ((ev (icalendar--get-children ical-content 'VTODO))
                  (zone-map (icalendar--convert-all-timezones ical-contents))
                  (error-string "")
                  (found-error t)
                     e)
-            ;; Plato Wu,2010/10/05: only one VTODO in one file
+            ;; Plato Wu,2010/10/05: only one VTODO in one VCALENDAR
             (if ev
               (progn
                (setq e (car ev))
@@ -659,10 +661,10 @@ isn't there and triggers an error"
                      (icalendar--dmsg "dscription is %s" description)
                      ;; Plato Wu,2010/10/05: only backup completed task which date is
                      ;; later than ~/.import_p1i_task_done
-                     (when (and complete-d 
-                                (time-less-p 
-                                 (fifth (file-attributes  "~/.import_p1i_task_done"))
-                                 complete-d))
+                     (when t ;; (and complete-d 
+                           ;;      (time-less-p 
+                           ;;       (fifth (file-attributes  "~/.import_p1i_task_done"))
+                           ;;       complete-d))
                        (set-buffer (find-file org-filename))
                        (goto-char (point-min))
                        (org-end-of-subtree)
@@ -673,7 +675,8 @@ isn't there and triggers an error"
                        (let ((org-log-done nil)) 
                          (org-todo))
                        (org-add-planning-info 'closed complete-d)
-                       (org-toodledo-sync-task)))
+                       ;(org-toodledo-sync-task)
+                       ))
                 
                  ;; FIXME: inform user about ignored event properties
                  ;; handle errors
@@ -684,11 +687,12 @@ isn't there and triggers an error"
                                              error-val error-string e))
                   (message "%s" error-string)))))
           ;; return t if no error occurred            
-          (not found-error)))
-      (message
-       "Current buffer does not contain icalendar contents!")
-      ;; return nil, i.e. import did not work
-      nil)
+            (not found-error))))
+      ;; (message
+      ;;  "Current buffer does not contain icalendar contents!")
+      ;; ;; return nil, i.e. import did not work
+      ;; nil
+      )
     (kill-buffer (find-file ical-filename))))
 
 (defun ielm2 nil
