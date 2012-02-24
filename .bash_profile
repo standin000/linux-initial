@@ -186,7 +186,3 @@ export QT_IM_MODULE=ibus
 export TERM=xterm-256color
 
 # Plato Wu,2011/07/08: cd z: is OK in cygwin
-# Plato Wu,2011/10/31: special for cygwin environment
-if [ "$OSTYPE" = "cygwin" ] ; then
-    export LANG=en_US.UTF-8
-fi
