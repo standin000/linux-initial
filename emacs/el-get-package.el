@@ -94,7 +94,8 @@
              (mapcar 'el-get-source-name el-get-sources)))
       (el-get 'wait my-packages))
   (url-retrieve
-   "http://github.com/dimitri/el-get/raw/master/el-get-install.el"
+   ;; Plato Wu,2011/11/15: gnutls must get installed
+   "https://github.com/dimitri/el-get/raw/master/el-get-install.el"
    (lambda (s)
      (end-of-buffer)
      (eval-print-last-sexp))))
