@@ -303,6 +303,9 @@
 ;; Plato Wu,2009/11/23: In Windows, Most of source code file are used with gb2312
 ;; (if (string= system-type "windows-nt")
 ;;     (prefer-coding-system 'gb2312))
+(if (string= system-type "cygwin")
+    (prefer-coding-system 'gbk-dos))
+
 ;;==================
 
 ;; (prefer-coding-system 'utf-8)
