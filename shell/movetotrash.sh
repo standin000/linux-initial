@@ -60,13 +60,13 @@ if [ $error != 0 ]; then
     pause_print_error $error
 fi
 
-newpath=$rootpath/Trash/`basename "$path"`
-while [ -e "$newpath" ]
+newpath=`basename "$path"`
+while [ -e $rootpath/Trash/"$newpath" ]
 do
-    newpath="${newpath}1"
+    newpath="1${newpath}"
 done
 
-mv -i "$path" "${newpath}"
+mv -i "$path" $rootpath/Trash/"${newpath}"
 
 error=$?
 if [ $error != 0 ]; then

@@ -667,7 +667,7 @@ isn't there and triggers an error"
                            ;;       complete-d))
                        (set-buffer (find-file org-filename))
                        (goto-char (point-min))
-                       (org-end-of-subtree)
+                       (org-end-of-subtree) ;; Plato Wu,2012/04/07: it must contain an outline
                        (insert "\n** TODO " summary "\n" description)
                        (fill-paragraph)
                        (if start-d (org-schedule nil start-d))
@@ -693,7 +693,8 @@ isn't there and triggers an error"
       ;; ;; return nil, i.e. import did not work
       ;; nil
       )
-    (kill-buffer (find-file ical-filename))))
+    ;(kill-buffer (find-file ical-filename))
+    ))
 
 (defun ielm2 nil
   "Interactively evaluate Emacs Lisp expressions.

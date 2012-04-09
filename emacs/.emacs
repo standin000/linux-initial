@@ -4,7 +4,9 @@
 (setq load-path (cons "~/linux-initial/emacs/" load-path))
 
 (require 'my-utility)
-(require 'my-interface)
 (require 'my-packages)
 (require 'el-get-package)
+(require 'my-interface)
+
+
 

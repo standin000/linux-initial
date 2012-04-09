@@ -765,6 +765,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;; Plato Wu,2010/08/29: use C-u C-c $ org-archive-subtree to archive DONE items
   (require 'org)
   (require 'org-archive)
+  (require 'org-mobile)
   (setq org-log-done t)
   (setq org-log-into-drawer t)
 
@@ -778,7 +779,9 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                                         ;disable priority commands.
   (setq org-enable-priority-commands nil)
 
-  (setq org-agenda-files '("~/org/todo.org"))
+  (setq org-agenda-files '("~/org/agendas.org"))
+  (setq org-mobile-directory "~/backup/backup/Dropbox/MobileOrg")
+
   (define-key org-mode-map (kbd "C-M-j") 'org-insert-todo-heading)
 
   (setq org-modules 
@@ -856,7 +859,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                                    ;; moving pdf for meeting org-export-as-pdf
                                    "mv log/`basename %b`.pdf ."))
   )
-(org-configuration)
 
 (defun sawfish-configuration ()
   (setq auto-mode-alist
