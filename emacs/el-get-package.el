@@ -40,6 +40,7 @@
                                         ;(:name dictionary-el    :type apt-get)
                                         ;(:name emacs-goodies-el :type apt-get)
               vkill 
+              (:name org-mode :features org :after org-configuration)
               ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
               ;; which cause error, so must use features.
               (:name ido-hacks :features ido-hacks :after ido-configuration) 
@@ -130,3 +131,4 @@
 ;;   (normal-top-level-add-subdirs-to-load-path))
 
 (provide 'el-get-package)
+
