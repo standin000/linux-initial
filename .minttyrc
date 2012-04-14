@@ -1,3 +1,12 @@
-BoldAsFont=no
+UseSystemColours=0
 Font=ÐÂËÎÌå
-FontHeight=14
+FontHeight=16
+AllowBlinking=1
+Columns=80
+Rows=24
+CursorType=1
+Term=xterm-256color
+Locale=zh_CN
+Charset=
+CopyOnSelect=1
+RightClickAction=1
