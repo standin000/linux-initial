@@ -244,8 +244,8 @@
   (setq emms-show-format "%s")
   ;; Plato Wu,2011/05/15: it seems mpd doesn't support emms-random
   ;; use emms-shuffle instead which  will shuffle the playlist
-;;  (add-hook 'emms-player-finished-hook 'emms-random)
-;;  (setq emms-player-next-function 'emms-random)
+  ;;  (add-hook 'emms-player-finished-hook 'emms-random)
+  ;;  (setq emms-player-next-function 'emms-random)
   (setq emms-playlist-buffer-name "*Music*")
   (setq emms-player-mpd-music-directory "~/Music")
   (setq emms-player-next-function 'emms-next-noerror)
@@ -262,32 +262,55 @@
   (defun my-stop-player ()
     "Stop emms player."
     (interactive)
-;    (shell-command "mpd --kill &")
+                                        ;    (shell-command "mpd --kill &")
     (emms-playlist-current-kill)
     (emms-player-mpd-disconnect))
   (defun my-start-player ()
     "Start MPD and sync to its playlistemms player."
     (interactive)
-;    (shell-command "mpd &") ; uses default ~/.mpdconf
-;    (shell-command "sleep 3 ") 
+                                        ;    (shell-command "mpd &") ; uses default ~/.mpdconf
+                                        ;    (shell-command "sleep 3 ") 
     (emms-player-mpd-connect)
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
-;  (emms-history-load)
-    (setq emms-lyrics-dir "~/Music/Lyrics")
-    (setq emms-lyrics-coding-system 'gbk-dos)
-;    (setq emms-lyrics-display-on-minibuffer t)
-    (emms-lyrics 1)
-    (defadvice gnus-group-get-new-news (around pause-emms)
-      "Pause emms while Gnus is fetching mails or news."
-      (if emms-player-playing-p
-          (progn (emms-pause)
-                 ad-do-it
-                 (emms-pause))
-        ad-do-it))
-
-    (ad-activate 'gnus-group-get-new-news)
-  ) 
+                                        ;  (emms-history-load)
+  (setq emms-lyrics-dir "~/Music/Lyrics")
+  (setq emms-lyrics-coding-system 'gbk-dos)
+                                        ;    (setq emms-lyrics-display-on-minibuffer t)
+  (emms-lyrics 1)
+  (defadvice gnus-group-get-new-news (around pause-emms)
+    "Pause emms while Gnus is fetching mails or news."
+    (if emms-player-playing-p
+        (progn (emms-pause)
+               ad-do-it
+               (emms-pause))
+      ad-do-it))
+  (ad-activate 'gnus-group-get-new-news)
+  ;; global key-map
+  ;; all global keys prefix is C-c e
+  ;; compatible with emms-playlist mode keybindings
+  ;; you can view emms-playlist-mode.el to get details about 
+  ;; emms-playlist mode keys map
+  (global-set-key (kbd "C-c e s") 'emms-stop)
+  (global-set-key (kbd "C-c e P") 'emms-pause)
+  (global-set-key (kbd "C-c e n") 'emms-next)
+  (global-set-key (kbd "C-c e p") 'emms-previous)
+  (global-set-key (kbd "C-c e f") 'emms-show)
+  (global-set-key (kbd "C-c e >") 'emms-seek-forward)
+  (global-set-key (kbd "C-c e <") 'emms-seek-backward)
+  ;; these keys maps were derivations of above keybindings
+  (global-set-key (kbd "C-c e S") 'emms-start)
+  (global-set-key (kbd "C-c e g") 'emms-playlist-mode-go)
+  (global-set-key (kbd "C-c e t") 'emms-play-directory-tree)
+  (global-set-key (kbd "C-c e h") 'emms-shuffle)
+  (global-set-key (kbd "C-c e e") 'emms-play-file)
+  (global-set-key (kbd "C-c e l") 'emms-play-playlist)
+  (global-set-key (kbd "C-c e r") 'emms-toggle-repeat-track)
+  (global-set-key (kbd "C-c e R") 'emms-toggle-repeat-playlist)
+  (global-set-key (kbd "C-c e u") 'emms-score-up-playing)
+  (global-set-key (kbd "C-c e d") 'emms-score-down-playing)
+  (global-set-key (kbd "C-c e o") 'emms-score-show-playing)    
+  )
 
 (defvar my-authinfo "~/.authinfo")
 
