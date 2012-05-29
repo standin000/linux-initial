@@ -70,3 +70,5 @@ set output-meta on
 "\e[B": history-search-forward 
 
 set show-all-if-ambiguous on 
+# do not bell on tab-completion
+set bell-style none

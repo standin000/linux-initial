@@ -152,10 +152,11 @@ if [ "$EMACS" != '' ]; then
 elif [ "$SSH_CONNECTION" != '' ]; then
 ## Plato Wu,2009/06/22: For putty windows title, it is identified for login by ssh
    export HOSTIP=`echo $SSH_CONNECTION |awk '{print $3}' |awk -F: '{if ($1 == "") print $4; else print $1}'`
-
-   export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}  \007"'
+    # Plato Wu,2012/04/22: \007 for BEL \033 for ESC
+   export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}"'
 else
-  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
+
+  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}"'
 fi
 
 # Plato Wu,2010/03/14: For command prompt.
@@ -175,7 +176,9 @@ if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ]); then
  alias emacs='emacsclient -t'
 fi
 # Plato Wu,2010/02/21: proxy setting for chromium
-export auto_proxy="http://users.ninthfloor.org/~plato/localautoproxy.pac"
+# Plato Wu,2012/04/11: swtichy sharp instead
+# Plato Wu,2012/04/21: chromium 18.0 don't work for pac
+#export auto_proxy="http://users.ninthfloor.org/~plato/localautoproxy.pac"
 
 export GIT_EDITOR=emacs
 
