@@ -132,8 +132,8 @@
 	'("^ .*"
 	;; ignore *eshell*, *svn-status*, a awkward regular expression
 	;; for I do not know how to perfect match a word which is not "eshell"
-	;; or "svn-status", magit:.
-	  "^\\*[^esm].\\{3\\}[^s].*"
+	;; or "svn-status", magit:. "*terminal" for multi-terminal
+	  "^\\*[^esmt].\\{3\\}[^s].*"
 	  "TAGS"))
   (setq ido-record-ftp-work-directories nil)
   ;; Plato Wu,2011/06/08: ignore Too big for folder whose size >116k
