@@ -37,8 +37,8 @@ fi
 # Don't put duplicate lines in the whole history.
  export HISTCONTROL=erasedups
 
- HISTSIZE=1000
- HISTFILESIZE=1000
+ export HISTSIZE=1000 # .bash_history size.
+ export HISTFILESIZE=1000 # history command size.
 
 # Default to human readable figures
  alias df='df -h'

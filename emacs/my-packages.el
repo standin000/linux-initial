@@ -4,6 +4,9 @@
   (if (is-version 21)
     (setq eshell-ask-to-save-history 'always)
     (setq eshell-save-history-on-exit t))
+  ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
+  (setq eshell-history-size 1000)
+  (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
   (setq eshell-prompt-function 
       (function
        (lambda ()

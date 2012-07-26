@@ -709,4 +709,31 @@ Switches to the buffer `*ielm*' in other window, or creates it if it does not ex
     (pop-to-buffer "*ielm*" t)
     (when old-point (push-mark old-point))))
 
+(defun hex-to-ascii (b e)
+  "Translate the region from hex to ascii and copy it to clipboard."
+  (interactive "r")
+  (save-excursion
+    (let ((i e)
+           (x-select-enable-clipboard t)
+           s)
+      (while (> i b)
+        (setq s (concat (format "%c" (read (concat "#x" (buffer-substring-no-properties (- i 2) i)))) s))
+        ;; Plato Wu,2012/07/26: using 3 to skip space.
+        (setq i (- i 3)))
+      (kill-new s t)
+      (message (format "%s copied to clip board" s)))))
+
+(defun ascii-to-hex (b e)
+  "Translate an ascii string to a hex string and copy it to clipboard"
+  (interactive "r")
+  (save-excursion
+    (let ((i b)
+          (x-select-enable-clipboard t)
+          s)
+      (while (< i e)
+        (setq s (concat s (format "%x " (get-byte i))))
+        (setq i (+ i 1)))
+      (kill-new s t)
+      (message s))))
+
 (provide 'my-utility)
