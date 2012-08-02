@@ -149,9 +149,13 @@
   (setq ido-work-directory-list-ignore-regexps '("/sudo:" "/ssh:"))
   ;; Plato Wu,2008/12/09: remarks for key is conflict with redshank mode
   (define-key ctl-x-map "\C-r" nil)
-  (ido-mode t)
-  (ido-hacks-mode t)
-  )
+  (setq ido-use-virtual-buffers t)
+  (setq ido-enable-flex-matching t)
+  (setq ido-everywhere t)
+  (setq ido-use-filename-at-point 'guess)
+  (ido-mode t))
+
+(ido-configuration)
 
 (defun psvn-configuration ()
   ;; Plato Wu,2009/03/31: This code is used in PMP project in Kinpo
@@ -417,7 +421,7 @@
           (section-other . "<div>")
           (section-other-end . "</div>")
           (begin-example . "<pre class='src'>")
-          (rule . "--------华-------丽-------的-------分-------割-------线-------")
+          (rule . "------华------丽------的------分------割------线------")
           (image . "<img src=\"%s.%s\" width=85%% height=85%% alt=\"\">")))
 
   (muse-derive-style
@@ -851,7 +855,8 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
         (quote (("t" "todo" entry (file+headline "~/org/todo.org" "Toodledo") "** TODO %?"))))
 
   (require 'org-publish)
-  (add-to-list 'org-export-latex-packages-alist '("" "zhfontcfg" ))
+  (require 'org-latex)
+;  (add-to-list 'org-export-latex-packages-alist '("" "zhfontcfg" ))
   ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
   ;; for text which contains number.
   (setq org-export-latex-emphasis-alist
@@ -879,11 +884,14 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;           ;; ... add all the components here (see below)...
   ;;           ))
   ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
-  (setq org-latex-to-pdf-process '("xelatex -output-directory  log/ %s" 
+  (setq org-latex-to-pdf-process '("xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
                                    "mv `basename %b`.tex log/"
                                    ;; moving pdf for meeting org-export-as-pdf
                                    "mv log/`basename %b`.pdf ."))
+  (add-to-list 'org-export-latex-classes
+             '("resume"
+               "\\documentclass{resume}"))
   )
 
 (defun sawfish-configuration ()
