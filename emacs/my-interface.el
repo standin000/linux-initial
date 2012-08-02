@@ -404,4 +404,7 @@
 (auto-insert-mode 1)
 
 ;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
+;; Plato Wu,2012/07/29: start cua-set-rectangle-mark and select the column, then press C-c to
+;; copy the column, C-y will paste the column
 (global-set-key (kbd "C-^") 'cua-set-rectangle-mark)
+;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line

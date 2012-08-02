@@ -43,7 +43,6 @@
               (:name org-mode :features org :after org-configuration)
               ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
               ;; which cause error, so must use features.
-              (:name ido-hacks :features ido-hacks :after ido-configuration) 
               (:name magit :features magit
                      :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
               (:name paredit :features paredit :after paredit-configuration)
