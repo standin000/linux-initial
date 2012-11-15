@@ -84,10 +84,13 @@
                                  '((:name emacs-w3m :features w3m
                                           :after w3m-configuration)
                                    (:name weblogger :type elpa :features weblogger :after blogger-configuration) 
-                                   (:name org-toodledo :features org-toodledo :after org-toodledo-configuration))))))
+                                   ;(:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
+                                   )))))
         (setq el-get-sources
               (append el-get-sources
-                      '((:name org-toodledo :features org-toodledo :after org-toodledo-configuration)))))
+                      '(
+                        ;(:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
+                        ))))
       (setq my-packages
             (append
              '(el-get)

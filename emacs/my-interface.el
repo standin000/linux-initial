@@ -133,8 +133,10 @@
 
 (when window-system 
   ;;auto open & display image
-  (auto-image-file-mode)
-  (pc-selection-mode)			; use shift to select region
+  (auto-image-file-mode)'
+  ;; Plato Wu,2012/10/09: it is void in emacs 24.1.1
+  (unless (is-version "24")
+    (pc-selection-mode))			; use shift to select region
   (setq pc-select-selection-keys-only t)
   (cond 
    ((is-system "darwin")
@@ -272,6 +274,11 @@
 ;; Plato Wu,2011/07/29: make these file local variable safe.
 (put 'tags-file-name 'safe-local-variable 'stringp)
 (put 'compile-command 'safe-local-variable 'stringp)
+
+;; Plato Wu,2012/11/13: .dir-locals doesn't work for coding system of a bunch of text files.
+;; I must use this
+;; (add-to-list 'auto-coding-alist 
+;;      '("di" . chinese-gbk-dos))
 
 ; prevent emacs from truncating  message in the echo area.
 (setq eval-expression-print-length nil)
