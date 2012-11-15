@@ -178,8 +178,8 @@ fi
 # Plato Wu,2010/02/21: proxy setting for chromium
 # Plato Wu,2012/04/11: swtichy sharp instead
 # Plato Wu,2012/04/21: chromium 18.0 don't work for pac
-#export auto_proxy="http://users.ninthfloor.org/~plato/localautoproxy.pac"
-
+#export auto_proxy="http://users.ninthfloor.org/~plato/localautoproxy.pac" or
+#export auto_proxy="http://plato.ninth.su/localautoproxy.pac"
 export GIT_EDITOR=emacs
 
 export GTK_IM_MODULE=ibus

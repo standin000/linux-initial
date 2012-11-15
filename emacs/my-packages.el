@@ -856,19 +856,24 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
   (require 'org-publish)
   (require 'org-latex)
-;  (add-to-list 'org-export-latex-packages-alist '("" "zhfontcfg" ))
   ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
   ;; for text which contains number.
-  (setq org-export-latex-emphasis-alist
-  '(("*" "\\textbf{%s}" t)
-    ("/" "\\emph{%s}" t)
-    ("_" "\\underline{%s}" t)
-    ("+" "\\st{%s}" t)
-    ("=" "\\verb" t)
-;    ("~" "\\verb" t)
-    ;; Plato Wu,2011/02/18: use @ to tag Chinese characters for song font
-    ;; if we use font as main font, the english font is ugly.
-    ("~" "\\song{%s}" t )))
+;;   (setq org-export-latex-emphasis-alist
+;;   '(("*" "\\textbf{%s}" t)
+;;     ("/" "\\emph{%s}" t)
+;;     ("_" "\\underline{%s}" t)
+;;     ("+" "\\st{%s}" t)
+;;     ("=" "\\verb" t)
+;; ;    ("~" "\\verb" t)
+;;     ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
+;;     ;; if we use font as main font, the english font is ugly.
+;;     ("~" "\\song{%s}" t )))
+
+  (add-to-list 'org-export-latex-emphasis-alist
+               ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
+               ;; if we use font as main font, the english font is ugly.
+             ;; Plato Wu,2012/08/28: org-emph-re only support "[*/_=~+]"
+               '("~" "\\kai{%s}" t ))
   ;; Plato Wu,2011/02/18: use org-export-as-pdf instead
   ;; (setq org-publish-project-alist
   ;;       '(  ("CoreBoardTesting"
@@ -891,7 +896,55 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                                    "mv log/`basename %b`.pdf ."))
   (add-to-list 'org-export-latex-classes
              '("resume"
-               "\\documentclass{resume}"))
+               "\\documentclass{resume}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subcvsection{%s}" . "\\subcvsection{%s}")))
+  (add-to-list 'org-export-latex-classes
+             '("CV"
+               "\\documentclass{CV}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subsection{%s}" . "\\subsection{%s}")))
+
+  (defun orgtbl-to-latex (table params)
+  "Convert the orgtbl-mode TABLE to LaTeX.
+TABLE is a list, each entry either the symbol `hline' for a horizontal
+separator line, or a list of fields for that line.
+PARAMS is a property list of parameters that can influence the conversion.
+Supports all parameters from `orgtbl-to-generic'.  Most important for
+LaTeX are:
+
+:splice    When set to t, return only table body lines, don't wrap
+           them into a tabular environment.  Default is nil.
+
+:fmt       A format to be used to wrap the field, should contain %s for the
+           original field value.  For example, to wrap everything in dollars,
+           use :fmt \"$%s$\".  This may also be a property list with column
+           numbers and formats.  For example :fmt (2 \"$%s$\" 4 \"%s%%\")
+           The format may also be a function that formats its one argument.
+
+:efmt      Format for transforming numbers with exponentials.  The format
+           should have %s twice for inserting mantissa and exponent, for
+           example \"%s\\\\times10^{%s}\".  LaTeX default is \"%s\\\\,(%s)\".
+           This may also be a property list with column numbers and formats.
+           The format may also be a function that formats its two arguments.
+
+:llend     If you find too much space below the last line of a table,
+           pass a value of \"\" for :llend to suppress the final \\\\.
+
+The general parameters :skip and :skipcols have already been applied when
+this function is called."
+  (let* ((alignment (mapconcat (lambda (x) (if x "r" "l"))
+			       org-table-last-alignment ""))
+	 (params2
+	  (list
+;	   :tstart (concat "\\begin{tabular}{" alignment "}")
+           :tstart "\\begin{tabular}"
+	   :tend "\\end{tabular}"
+	   :lstart "" :lend " \\tabularnewline" :sep " & "
+	   :efmt "%s\\,(%s)" :hline "\\hline")))
+    (orgtbl-to-generic table (org-combine-plists params2 params))))
   )
 
 (defun sawfish-configuration ()
@@ -1040,6 +1093,12 @@ else evaluate sexp"
   (add-hook 'after-init-hook 'session-initialize))
 
 (defun slime-configuration ()
+;; slime-inspector-mode's quick key
+;; l runs the command slime-inspector-pop, return top level
+;; d runs the command slime-inspector-describe
+;; sldb-mode's quick key
+;; v runs the command sldb-show-source
+;; swank::inspect-function can describe a function
   (load (expand-file-name "~/quicklisp/slime-helper.el"))
   ;; Replace "sbcl" with the path to your implementation
   (setq inferior-lisp-program "sbcl")
@@ -1062,15 +1121,18 @@ else evaluate sexp"
   (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
   ;; Plato Wu,2009/12/12: temperate clear lisp connection closed unexpectedly
   ;; problem
-  (defun load-swank-dont-close (port-filename encoding)
-    (format "%S\n\n"
-            `(progn
-               (load ,(expand-file-name slime-backend slime-path) :verbose t)
-               (funcall (read-from-string "swank-loader:init"))
-               (funcall (read-from-string "swank:start-server")
-                        ,port-filename
-                        :coding-system ,(slime-coding-system-cl-name encoding)
-                        :dont-close t))))
+  ;; Plato Wu,2012/09/15: it will cause problem for latest sbcl & slime
+  ;; (defun load-swank-dont-close (port-filename encoding)
+  ;;   (format "%S\n\n"
+  ;;           `(progn
+  ;;              (load ,(expand-file-name slime-backend slime-path) :verbose t)
+  ;;              (funcall (read-from-string "swank-loader:init"))
+  ;;              (funcall (read-from-string "swank:start-server")
+  ;;                       ,port-filename
+  ;;                       :coding-system ,(slime-coding-system-cl-name encoding)
+  ;;                       :dont-close t))))
+  ;; (setq slime-lisp-implementations
+  ;;       '((sbcl-noclose ("sbcl" "-quiet") :init load-swank-dont-close)))
   ;; Plato Wu,2009/12/09: clear content at the bottom of the screen
   (defun slime-quit-sentinel (process message)
     (assert (process-status process) 'closed)
@@ -1081,9 +1143,6 @@ else evaluate sexp"
       (slime-net-close process)
       ;;    (message "Connection closed.")
       ))
-
-  (setq slime-lisp-implementations
-        '((sbcl-noclose ("sbcl" "-quiet") :init load-swank-dont-close)))
 
   ;; Plato Wu,2009/11/05: TO DO, assign a proper key binding to slime-repl-backward-input
   ;;   (define-key slime-repl-mode-map (kbd "M-<up>") 'slime-repl-backward-input)

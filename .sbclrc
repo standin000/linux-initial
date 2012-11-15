@@ -89,9 +89,7 @@
 ;; (push #p"/home/plato/emacs/elisp/slime/" asdf:*central-registry*)
 
 ;; ; usable REPL
-;; (require :sb-aclrepl)
-;; ;(require :linedit)
-;; ;(funcall (intern "INSTALL-REPL" :linedit) :wrap-current t :eof-quits t)
+(require :sb-aclrepl)
 
 ;; (defmacro loadsys (sys)
 ;;   `(asdf:oos 'asdf:load-op (quote ,sys)))
@@ -129,3 +127,7 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
+;; CL-INTERPOL is a library for Common Lisp which modifies the reader so that you can have interpolation within strings similar to Perl or Unix Shell scripts. 
+;; (cl-interpol:enable-interpol-syntax) first!
+;; You can use #?"\n\r"
+;; flexi-streams:octets-to-string convert sequence of number to string
