@@ -182,9 +182,6 @@ fi
 #export auto_proxy="http://plato.ninth.su/localautoproxy.pac"
 export GIT_EDITOR=emacs
 
-export GTK_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus   
-export QT_IM_MODULE=ibus
 # Plato Wu,2010/10/24: xterm-256color can't support End key in emacs of myhost, so define it in .emacs
 export TERM=xterm-256color
 
@@ -194,3 +191,6 @@ if [ "$OSTYPE" = "cygwin" ] ; then
     export LANG=zh_CN.GBK
 fi
 
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+ exec startx
+fi

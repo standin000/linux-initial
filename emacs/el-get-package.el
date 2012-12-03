@@ -59,7 +59,7 @@
               (:name sawfish :features sawfish :after sawfish-configuration)
               (:name google-c-style :features google-c-style :after c-mode-configuration)
               (:name psvn :features psvn :after psvn-configuration)
-              (:name dired-single :features dired-single :after dired-single-configuration)
+;              (:name dired-single :features dired-single :after dired-single-configuration)
               (:name ascii :after ascii-configuration)
               ;; Plato Wu,2011/05/15: vi can be used in it.
               (:name multi-term :features multi-term)
