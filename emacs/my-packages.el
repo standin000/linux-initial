@@ -6,6 +6,7 @@
     (setq eshell-save-history-on-exit t))
   ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
   (setq eshell-history-size 1000)
+;;(setq eshell-save-history-on-exit nil) to ignore coding system problem
   (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
   (setq eshell-prompt-function 
       (function
@@ -946,6 +947,10 @@ this function is called."
 	   :efmt "%s\\,(%s)" :hline "\\hline")))
     (orgtbl-to-generic table (org-combine-plists params2 params))))
   )
+
+(defun c-mode-configuration () 
+  (add-hook 'c-mode-common-hook 'google-set-c-style)
+  (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'cpp-macro 0))))
 
 (defun sawfish-configuration ()
   (setq auto-mode-alist
