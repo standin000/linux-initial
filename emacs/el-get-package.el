@@ -57,8 +57,7 @@
                                         ;	(:name lisppaste :type elpa)        
               (:name smart-tab :features smart-tab :after smart-tab-configuration)
               (:name sawfish :features sawfish :after sawfish-configuration)
-              (:name google-c-style :features google-c-style
-                     :after (lambda () (add-hook 'c-mode-common-hook 'google-set-c-style)))
+              (:name google-c-style :features google-c-style :after c-mode-configuration)
               (:name psvn :features psvn :after psvn-configuration)
               (:name dired-single :features dired-single :after dired-single-configuration)
               (:name ascii :after ascii-configuration)

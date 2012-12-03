@@ -404,6 +404,8 @@
 ;; so use text-mode temporally
 (add-to-list 'auto-mode-alist '("\\.ml$" . text-mode))
 
+(add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
+
 ;; Plato Wu,2011/09/02: support End key in emacs of myhost
 (global-set-key (quote [select]) 'move-end-of-line)
 
