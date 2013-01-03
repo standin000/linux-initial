@@ -393,7 +393,9 @@
 (which-func-mode 1)
 
 ;; Plato Wu,2009/11/26: get rid of warning for not safe variables
-(setq enable-local-variables :safe)
+;;(setq enable-local-variables :safe)
+;; Plato Wu,2012/12/09: (eval . expression) is not safe in emacs 24.2
+(setq enable-local-variables :all)
 
 ;; Plato Wu,2009/04/06: add-change-log-entry-other-window
 ;; find-change-log only use parent directory's ChangeLog, I need use C-u
