@@ -285,7 +285,7 @@
   (setq emms-lyrics-dir "~/Music/Lyrics")
   (setq emms-lyrics-coding-system 'gbk-dos)
                                         ;    (setq emms-lyrics-display-on-minibuffer t)
-  (emms-lyrics 1)
+;  (emms-lyrics 1)
   (defadvice gnus-group-get-new-news (around pause-emms)
     "Pause emms while Gnus is fetching mails or news."
     (if emms-player-playing-p
@@ -321,9 +321,6 @@
   )
 
 (defvar my-authinfo "~/.authinfo")
-
-(defun muse-configuration ()
-)
 
 (defun auctex-configuration ()
   (require 'preview-latex)
@@ -388,6 +385,28 @@
   (require 'muse-publish) 
   (require 'muse-html)
   (require 'weblogger)
+  (require 'muse-latex2png)
+  (require 'muse-colors)
+;; I also want to use regexp to markup inline latex equations of the
+;; form `$\alpha$' because I'm too lazy to write
+;; <latex inline="t">$\alpha$</latex>
+  (add-to-list 'muse-html-markup-regexps
+               '(1600 "\\$[^$]*\\$" 0 kid-muse-html-latex-inline))
+
+  
+  ;(setq muse-html-markup-regexps '((10000 "\\(\\(\n\\(?:[[:blank:]]*\n\\)*\\([[:blank:]]*\n\\)\\)\\|\\`\\s-*\\|\\s-*\\'\\)" 3 muse-html-markup-paragraph)))
+  (defun kid-muse-html-latex-inline ()
+    (let ((attrs `(("inline" . "true"))))
+      (muse-publish-latex-tag (match-beginning 0) (match-end 0) attrs)
+      ;; Plato Wu,2013/01/03: return string will cause error
+      nil))
+  (setq muse-latex2png-scale-factor 1.5)
+  (add-to-list 'muse-colors-tags
+             '("latex" t t nil muse-colors-example-tag))
+  ;; Plato Wu,2013/01/03: in order to user internet path for latex image, modify this variable
+  ;; and muse-latex2png-region & muse-latex2png-move2pubdir.
+  ;; (setq muse-latex2png-img-dest "http://plato.ninth.su/Photos/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E8%BF%90%E5%8A%A8%E6%8E%A7%E5%88%B6")
+
   (add-to-list 'auto-mode-alist '("\\.muse$" . muse-mode))
   (define-key muse-mode-map "u" 'muse-insert-url)
   (define-key muse-mode-map "l"
@@ -503,7 +522,10 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
         (weblogger-api-send-edits struct t))
       (set-buffer-modified-p nil)
       (kill-buffer)
-      (when new 
+      ;; Plato Wu,2013/01/02: use digest in mail,  don't use duoshuo.
+      ;; Plato Wu,2013/01/02: SMTP will report error, but it is OK, maybe the port is change
+      ;; from 25 to 465
+      (when new
         (let ((entry (ring-ref weblogger-entry-ring
                                weblogger-ring-index)))
          (goto-char (point-min))
@@ -546,7 +568,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                            (w3m-url-encode-string 
                             (cdr (assoc "title" entry)) 'utf-8))))
          (mail-send-and-exit)))))
-
+;; Plato Wu,2013/01/02: refine to support multi footnote for many article in one page.
   (defun muse-html-markup-footnote ()
     (cond
      ((get-text-property (match-beginning 0) 'muse-link)
