@@ -15,7 +15,7 @@
 	   (if (< (length pwd) 30)
 	       (concat pwd
 		       (if (= (user-uid) 0) " # " " $ "))
-	     (concat (concat "..." (subseq pwd 20)) 
+	     (concat (concat "..." (substring pwd 20))
 		     (if (= (user-uid) 0) " # " " $ ")))))))
   ;remove duplicate history items.
   (setq eshell-hist-ignoredups t)

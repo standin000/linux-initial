@@ -410,6 +410,16 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
     ;;(setq erc-autojoin-channels-alist '(("freenode.net" "#symbolicweb")))
     (setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm"))))
 
+(defun vj-find-tag ()
+    "My find-tag wrapper for easy repetition (VJO 2003).
+ Call `find-tag' with current word first time and after that call
+ find-tag with NEXT-P set to t (if called repeatedly)"
+    (interactive)
+    (if (eq last-command 'vj-find-tag)
+        (find-tag nil t)
+        (find-tag (current-word) current-prefix-arg)))
+
+(define-key global-map "\M-." 'vj-find-tag)
 
 (require 'etags)
 ;; Plato Wu,2009/04/07: In order to support lookup elisp function.

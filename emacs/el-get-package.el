@@ -46,32 +46,33 @@
               (:name magit :features magit
                      :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
               (:name paredit :features paredit :after paredit-configuration)
-              (:name htmlize :type elpa :features htmlize)
               ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
               ;; get installed to pass error.
-              (:name muse :type elpa :features muse)
                                         ;        (:name xml-rpc :type elpa)
               ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
               ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
               ;; lisppaste, so disable lisppaste first, it is not useful for me.
                                         ;	(:name lisppaste :type elpa)        
               (:name smart-tab :features smart-tab :after smart-tab-configuration)
-              (:name sawfish :features sawfish :after sawfish-configuration)
               (:name google-c-style :features google-c-style :after c-mode-configuration)
               (:name psvn :features psvn :after psvn-configuration)
-;              (:name dired-single :features dired-single :after dired-single-configuration)
               (:name ascii :after ascii-configuration)
               ;; Plato Wu,2011/05/15: vi can be used in it.
-              (:name multi-term :features multi-term)
               ;; Plato Wu,2011/05/23: quicklisp will install slime
                                         ;        (:name slime :after slime-configuration)
-              (:name cldoc :features cldoc :after cldoc-configuration)))
+              (:name cldoc :features cldoc :after cldoc-configuration)
+	      ))
 
       (if (not (is-system "cygwin"))
           (progn (setq el-get-sources
                        (append el-get-sources
                                '(
                                 ; (:name auctex :after auctex-configuration)
+                                 (:name htmlize :type elpa :features htmlize)
+                                 (:name muse :type elpa :features muse)
+                                 (:name sawfish :features sawfish :after sawfish-configuration)
+                                 (:name dired-single :features dired-single :after dired-single-configuration)
+                                 (:name multi-term :features multi-term)
                                  (:name emms :type elpa :features emms :after emms-configuration)
                                  ;; Plato Wu,2011/07/02: it seems there is a problem with session
                                  ;; recipe in el-get
@@ -94,9 +95,9 @@
             (append
              '(el-get)
              (mapcar 'el-get-source-name el-get-sources)))
-      (el-get 'wait my-packages))
+      (el-get my-packages))
   (url-retrieve
-   ;; Plato Wu,2011/11/15: gnutls must get installed
+   ;; Plato Wu,2011/11/15: gnutls must get installed and make /etc/ssl/certs/ca-certificates.crt readable
    "https://github.com/dimitri/el-get/raw/master/el-get-install.el"
    (lambda (s)
      (end-of-buffer)
