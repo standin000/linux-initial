@@ -59,7 +59,7 @@
               (:name ascii :after (ascii-configuration))
               ;; Plato Wu,2011/05/15: vi can be used in it.
               ;; Plato Wu,2011/05/23: quicklisp will install slime
-                                        ;        (:name slime :after slime-configuration)
+              ;; (:name slime :after slime-configuration)
               (:name cldoc :features cldoc :after (cldoc-configuration))
 	      ))
 
@@ -74,23 +74,13 @@
                                  (:name dired-single :features dired-single :after (dired-single-configuration))
                                  (:name multi-term :features multi-term)
                                  (:name emms :type elpa :features emms :after (emms-configuration))
-                                 ;; Plato Wu,2011/07/02: it seems there is a problem with session
-                                 ;; recipe in el-get
-;                                 (:name session :features session :after session-configuration)
                                  redshank dpans2texi)))
                  (when (executable-find "w3m") 
                    (setq el-get-sources
                          (append el-get-sources
                                  '((:name emacs-w3m :features w3m
                                           :after (w3m-configuration))
-                                   (:name weblogger :type elpa :features weblogger :after (blogger-configuration)) 
-                                   ;(:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
-                                   )))))
-        (setq el-get-sources
-              (append el-get-sources
-                      '(
-                        ;(:name org-toodledo :features org-toodledo :after org-toodledo-configuration)
-                        ))))
+                                   (:name weblogger :type elpa :features weblogger :after (blogger-configuration))))))))
       (setq my-packages
             (append
              '(el-get)

@@ -1,4 +1,4 @@
-(name :dpans2texi
+(:name :dpans2texi
       :type http-tar
       :options ("xzf")
       :module "dpans2texi"
