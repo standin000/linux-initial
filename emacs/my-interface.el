@@ -275,11 +275,6 @@
 (put 'tags-file-name 'safe-local-variable 'stringp)
 (put 'compile-command 'safe-local-variable 'stringp)
 
-;; Plato Wu,2012/11/13: .dir-locals doesn't work for coding system of a bunch of text files.
-;; I must use this
-;; (add-to-list 'auto-coding-alist 
-;;      '("di" . chinese-gbk-dos))
-
 ; prevent emacs from truncating  message in the echo area.
 (setq eval-expression-print-length nil)
 

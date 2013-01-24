@@ -47,7 +47,8 @@
   "Revert buffer using tramp sudo.
     This will also reserve changes already made by a non-root user."
   (interactive)
-  (let ((f (buffer-file-name)))
+  (let ((f (buffer-file-name))
+        (p (point)))
     (when f
       (let ((content (when (buffer-modified-p)
 		       (widen)
@@ -64,7 +65,8 @@
 	  (when content
 	    (let ((buffer-read-only nil))
 	      (erase-buffer)
-	      (insert content)))))))
+	      (insert content)))
+          (goto-char p)))))
 
 (global-set-key (kbd "C-c s") 'xwl-revert-buffer-with-sudo)
 
