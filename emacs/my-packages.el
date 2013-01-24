@@ -8,6 +8,7 @@
   (setq eshell-history-size 1000)
 ;;(setq eshell-save-history-on-exit nil) to ignore coding system problem
   (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
+  (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-unix)
   (setq eshell-prompt-function 
       (function
        (lambda ()

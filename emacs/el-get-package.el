@@ -40,12 +40,12 @@
                                         ;(:name dictionary-el    :type apt-get)
                                         ;(:name emacs-goodies-el :type apt-get)
               vkill 
-              (:name org-mode :features org :after org-configuration)
+              (:name org-mode :features org :after (org-configuration))
               ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
               ;; which cause error, so must use features.
               (:name magit :features magit
-                     :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
-              (:name paredit :features paredit :after paredit-configuration)
+                     :after (progn (global-set-key (kbd "C-x C-z") 'magit-status)))
+              (:name paredit :features paredit :after (paredit-configuration))
               ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
               ;; get installed to pass error.
                                         ;        (:name xml-rpc :type elpa)
@@ -53,14 +53,14 @@
               ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
               ;; lisppaste, so disable lisppaste first, it is not useful for me.
                                         ;	(:name lisppaste :type elpa)        
-              (:name smart-tab :features smart-tab :after smart-tab-configuration)
-              (:name google-c-style :features google-c-style :after c-mode-configuration)
-              (:name psvn :features psvn :after psvn-configuration)
-              (:name ascii :after ascii-configuration)
+              (:name smart-tab :features smart-tab :after (smart-tab-configuration))
+              (:name google-c-style :features google-c-style :after (c-mode-configuration))
+              (:name psvn :features psvn :after (psvn-configuration))
+              (:name ascii :after (ascii-configuration))
               ;; Plato Wu,2011/05/15: vi can be used in it.
               ;; Plato Wu,2011/05/23: quicklisp will install slime
                                         ;        (:name slime :after slime-configuration)
-              (:name cldoc :features cldoc :after cldoc-configuration)
+              (:name cldoc :features cldoc :after (cldoc-configuration))
 	      ))
 
       (if (not (is-system "cygwin"))
