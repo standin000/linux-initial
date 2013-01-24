@@ -1117,9 +1117,6 @@ else evaluate sexp"
 
 (compile-configuration)
 
-(defun session-configuration ()
-  (add-hook 'after-init-hook 'session-initialize))
-
 (defun slime-configuration ()
 ;; slime-inspector-mode's quick key
 ;; l runs the command slime-inspector-pop, return top level

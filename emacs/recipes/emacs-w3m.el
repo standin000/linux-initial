@@ -1,4 +1,4 @@
-(name :emacs-w3m
+(:name :emacs-w3m
       :type http-tar
       :options ("xzf")
       :module "emacs-w3m"
