@@ -7,30 +7,32 @@
   ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
   (setq eshell-history-size 1000)
 ;;(setq eshell-save-history-on-exit nil) to ignore coding system problem
+  ;; Plato Wu,2013/01/25: eshell will overwrite bash command history which is invoked during
+  ;; eshell running timeframe.
   (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
   (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-unix)
   (setq eshell-prompt-function 
-      (function
-       (lambda ()
-	 (let ((pwd (eshell/pwd)))
-	   (if (< (length pwd) 30)
-	       (concat pwd
-		       (if (= (user-uid) 0) " # " " $ "))
-	     (concat (concat "..." (substring pwd 20))
-		     (if (= (user-uid) 0) " # " " $ ")))))))
-  ;remove duplicate history items.
+        (function
+         (lambda ()
+           (let ((pwd (eshell/pwd)))
+             (if (< (length pwd) 30)
+                 (concat pwd
+                         (if (= (user-uid) 0) " # " " $ "))
+               (concat (concat "..." (substring pwd 20))
+                       (if (= (user-uid) 0) " # " " $ ")))))))
+                                        ;remove duplicate history items.
   (setq eshell-hist-ignoredups t)
   ;; ;; Plato Wu,2009/04/10: it seems there is not effect in emacs 22.2.1 To check
   ;; ;; let eshell show color but it is slow.
   ;; (require 'ansi-color)
   ;; (add-hook 'eshell-preoutput-filter-functions
   ;;           'ansi-color-apply)
- ; (autoload 'ansi-color-apply "ansi-color" nil t)
+  ;; (autoload 'ansi-color-apply "ansi-color" nil t)
   ;; Do not let eshell show color
   ;; (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
 
   ;; Dealing With Wildcards and Multiple Files in eshell
- ;; Assume you want to define an alias ‘emacs’ for ‘find-file’. See EshellAlias for a simple alias solution. The problem is that you cannot open multiple files that way. Using wildcards would also be a problem if these expand into multiple filenames. Instead of using an alias, use the following function.
+  ;; Assume you want to define an alias ‘emacs’ for ‘find-file’. See EshellAlias for a simple alias solution. The problem is that you cannot open multiple files that way. Using wildcards would also be a problem if these expand into multiple filenames. Instead of using an alias, use the following function.
   (defun eshell/emacs (&rest args)
     "Open a file in emacs. Some habits die hard."
     (if (null args)
@@ -64,40 +66,37 @@
       ;there may be dangerous command input!
       (if (string= (eshell-get-old-input) "")
 	  (eshell-send-input)
-	  (insert-and-inherit "dangeours!"))))
+        (insert-and-inherit "dangeours!"))))
   ;; Plato Wu,2010/07/06: It seems eshell in Windoes will use alias in .bash_profile first.
   (setq eshell-command-aliases-list 
-      '(("rm" "~/linux-initial/shell/movetotrash.sh $*")
-        ;; Plato Wu,2010/06/23: /bin don't work for Emacs in Windows
-	("del" "/bin/rm -i -f $*")
-;	("cp" "/bin/cp -i $*")
-        ;; Plato Wu,2010/09/13: rm -i cp -i don't work for Emacs in Linux
-;	
-	("cp" "/bin/cp -p -i $*")
-	("df" "df -h $* ")
-	("du" "du -h $*")
-	("less" "less -r $*")
-	("whence" "type -a $*")
-	("grep" "grep --color $*")
-	("dir" "ls --format vertical $*")
-	("vdir" "ls --format=long $*")
-	("ll" "ls -l $*")
-	("la" "ls -A $*")
-	("l" "ls -CF $*")
-;	("ls" "ls -hF $*")
-	("ls" "ls -hF --color=auto $*")
-	("mv" "mv -i $1 $2")
-	("free" "free -m")
-	("vi" "emacs $*")
-        ("curl" "curl -C - -O $*")   ;resume download and use remote file name
-	("nano" "emacs $*")))
+        '(("rm" "~/linux-initial/shell/movetotrash.sh $*")
+          ;; Plato Wu,2010/06/23: /bin don't work for Emacs in Windows
+          ("del" "/bin/rm -i -f $*")
+          ;; Plato Wu,2010/09/13: rm -i cp -i don't work for Emacs in Linux
+          ("cp" "/bin/cp -p -i $*")
+          ("df" "df -h $* ")
+          ("du" "du -h $*")
+          ("less" "less -r $*")
+          ("whence" "type -a $*")
+          ("grep" "grep --color $*")
+          ("dir" "ls --format vertical $*")
+          ("vdir" "ls --format=long $*")
+          ("ll" "ls -l $*")
+          ("la" "ls -A $*")
+          ("l" "ls -CF $*")
+          ("ls" "ls -hF --color=auto $*")
+          ("mv" "mv -i $1 $2")
+          ("free" "free -m")
+          ("vi" "emacs $*")
+          ("curl" "curl -C - -O $*")   ;resume download and use remote file name
+          ("nano" "emacs $*")))
   (when (is-system "windows-nt")
-      (setcdr (assoc "ls" eshell-command-aliases-list) '("ls -h $*"))
-      ;; Plato Wu,2010/11/03: I don't know why $* does work with $*
-      (setcdr (assoc "cp" eshell-command-aliases-list) '("cp $1 $2"))
-      ;; Plato Wu,2010/11/03: Don't active rm command for it could make use of movetotrash.sh
-;;      (setcdr (assoc "rm" eshell-command-aliases-list) '("rm -i -f"))
-      (setcdr (assoc "del" eshell-command-aliases-list) '("rm -i -f $*"))))
+    (setcdr (assoc "ls" eshell-command-aliases-list) '("ls -h $*"))
+    ;; Plato Wu,2010/11/03: I don't know why $* does work with $*
+    (setcdr (assoc "cp" eshell-command-aliases-list) '("cp $1 $2"))
+    ;; Plato Wu,2010/11/03: Don't active rm command for it could make use of movetotrash.sh
+    ;; (setcdr (assoc "rm" eshell-command-aliases-list) '("rm -i -f"))
+    (setcdr (assoc "del" eshell-command-aliases-list) '("rm -i -f $*"))))
 
 (eshell-configuration)
 
@@ -201,12 +200,16 @@
 
 (setq ibuffer-saved-filter-groups
       (quote (("default"
-               ("dired" (mode . dired-mode))
-               ("perl" (mode . cperl-mode))
-               ("erc" (mode . erc-mode))
+;               ("dired" (mode . dired-mode))
+;               ("perl" (mode . perl-mode))
+;               ("erc" (mode . erc-mode))
+               ("elisp" (mode . emacs-lisp-mode))
+               ("C&C++" (or (mode . c-mode)
+                            (mode . c++-mode)))
                ("emacs" (or
                          (name . "^\\*scratch\\*$")
-                         (name . "^\\*Messages\\*$")))
+                         (name . "^\\*Messages\\*$")
+                         (mode . eshell-mode)))
                ("gnus" (or
                         (mode . message-mode)
                         (mode . bbdb-mode)
@@ -215,7 +218,8 @@
                         (mode . gnus-summary-mode)
                         (mode . gnus-article-mode)
                         (name . "^\\.bbdb$")
-                        (name . "^\\.newsrc-dribble")))))))
+                        (name . "^\\.newsrc-dribble")))
+               ))))
 
 (add-hook 'ibuffer-mode-hook
           (lambda ()
@@ -913,11 +917,24 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;           ;; ... add all the components here (see below)...
   ;;           ))
   ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
-  (setq org-latex-to-pdf-process '("xelatex -output-directory  log/ %f" 
+  (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
+                                   "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
                                    "mv `basename %b`.tex log/"
                                    ;; moving pdf for meeting org-export-as-pdf
                                    "mv log/`basename %b`.pdf ."))
+  (setq org-export-copy-to-kill-ring nil)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (ditaa . t)
+     (dot . t)
+     (emacs-lisp . t)
+     (gnuplot . t)
+     (python . t)
+     (perl . t)
+     (sh . t)
+     (sqlite . t)))
   (add-to-list 'org-export-latex-classes
              '("resume"
                "\\documentclass{resume}
@@ -973,7 +990,10 @@ this function is called."
 
 (defun c-mode-configuration () 
   (add-hook 'c-mode-common-hook 'google-set-c-style)
-  (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'cpp-macro 0))))
+  (add-hook 'c-mode-common-hook 
+            (lambda () 
+              (c-set-offset 'cpp-macro 0)
+              (define-key (current-local-map) [f7] 'smart-compile))))
 
 (defun sawfish-configuration ()
   (setq auto-mode-alist
@@ -994,9 +1014,7 @@ this function is called."
 ;;                           (c-toggle-auto-hungry-state nil)))
 
 (defun compile-configuration ()
-  (global-set-key [f7] 'compile)
   (setq compilation-read-command nil)
-  ;;for waring from smart-compile
   (setq compilation-scroll-output t)
   (setq compilation-ask-about-save nil)
   (require 'gud)
@@ -1115,7 +1133,7 @@ else evaluate sexp"
   (global-set-key [f11] 'gud-step)
   (setq gdb-many-windows t))
 
-(compile-configuration)
+;(compile-configuration)
 
 (defun slime-configuration ()
 ;; slime-inspector-mode's quick key

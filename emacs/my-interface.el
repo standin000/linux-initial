@@ -340,12 +340,13 @@
 
 (setq grep-files-aliases
       '(("asm" .    "*.[sS]")
+        ;; Plato Wu,2013/01/25: hh take precdence over items below.
+        ("hh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
         ;; Plato Wu,2010/02/27: Let ch match .c file first!
         ("ch" .    "*.[ch]")
         ("c" .     "*.c")
         ("cc" .    "*.cc *.cxx *.cpp *.C *.CC *.c++")
-        ("cchh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
-        ("hh" .    "*.hxx *.hpp *.[Hh] *.HH *.h++")
+        ("cchh" .  "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
         ("el" .    "*.el")
         ("h" .     "*.h")
         ("l" .      "[Cc]hange[Ll]og*")
@@ -362,6 +363,7 @@
 ;; M-x set-buffer-file-coding-system RET undecided-dos save the file (C-x C-s)
 ;; or
 ;; C-x RET f undecided-dos C-x C-f
+;; C-h C describe-coding-system for current buffer.
 
 ;; Plato Wu,2011/04/15: after add XTerm*allowSendEvents: True into .Xresourcs
 ;; (frame-parameter (selected-frame) 'background-color) is unspecified-bg in
