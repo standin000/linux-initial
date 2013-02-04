@@ -61,7 +61,7 @@
               ;; Plato Wu,2011/05/23: quicklisp will install slime
               ;; (:name slime :after slime-configuration)
               (:name cldoc :features cldoc :after (cldoc-configuration))
-	      ))
+              (:name smart-compile :features smart-compile :after (compile-configuration))))
 
       (if (not (is-system "cygwin"))
           (progn (setq el-get-sources

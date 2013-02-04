@@ -418,8 +418,12 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
  find-tag with NEXT-P set to t (if called repeatedly)"
     (interactive)
     (if (eq last-command 'vj-find-tag)
-        (find-tag nil t)
-        (find-tag (current-word) current-prefix-arg)))
+        (progn
+          (find-tag nil t)
+          (ring-remove find-tag-marker-ring 0))
+      (if (null (current-word)) 
+          (call-interactively 'find-tag)
+          (find-tag (current-word) current-prefix-arg))))
 
 (define-key global-map "\M-." 'vj-find-tag)
 
