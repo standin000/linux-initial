@@ -617,7 +617,7 @@ isn't there and triggers an error"
 (defun org-import-p1i-task ()
   (interactive)
   (mapcar 
-  '(lambda (ics-filename)
+  #'(lambda (ics-filename)
      (org-import-p1i-task-internal ics-filename "~/tmp.org"))
   (file-expand-wildcards "/opt/Funambol/ds-server/db/vtask/plato.wu/*"))
   (set-file-times "~/.import_p1i_task_done"))

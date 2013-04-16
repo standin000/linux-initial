@@ -52,7 +52,7 @@
       (eshell-bol)
       (if (= p (point))
 	  (beginning-of-line))))
-
+  ;; Plato Wu,2013/04/15: TODO move define-key from mode-hook to eval-after-load
   (add-hook 'eshell-mode-hook
 	    '(lambda () 
 	       (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
@@ -994,8 +994,8 @@ this function is called."
   (add-hook 'c-mode-common-hook 'google-set-c-style)
   (add-hook 'c-mode-common-hook 
             (lambda () 
-              (c-set-offset 'cpp-macro 0)
-              (define-key (current-local-map) [f7] 'smart-compile))))
+              (c-set-offset 'cpp-macro 0))))
+              
 
 (defun sawfish-configuration ()
   (setq auto-mode-alist
@@ -1242,6 +1242,7 @@ else evaluate sexp"
                 'common-lisp-hyperspec-history)))))
     (info-lookup 'symbol symbol-name nil)
     (other-window 1))
+  ;; Plato Wu,2013/04/15: TODO to check lisp-mode is OK by symbol-function
   (eval-after-load "lisp-mode"
     '(progn
        (define-key 
