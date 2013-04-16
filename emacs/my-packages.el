@@ -924,6 +924,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                                    ;; moving pdf for meeting org-export-as-pdf
                                    "mv log/`basename %b`.pdf ."))
   (setq org-export-copy-to-kill-ring nil)
+  (setq org-confirm-babel-evaluate nil)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((R . t)
@@ -934,6 +935,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
      (python . t)
      (perl . t)
      (sh . t)
+     (C . t)
      (sqlite . t)))
   (add-to-list 'org-export-latex-classes
              '("resume"

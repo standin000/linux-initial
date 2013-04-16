@@ -1,12 +1,12 @@
-UseSystemColours=0
 Font=ÐÂËÎÌå
 FontHeight=16
-AllowBlinking=1
+AllowBlinking=yes
 Columns=80
 Rows=24
-CursorType=1
+CursorType=underscore
 Term=xterm-256color
 Locale=zh_CN
 Charset=
-CopyOnSelect=1
-RightClickAction=1
+CopyOnSelect=yes
+RightClickAction=paste
+BoldAsFont=no
