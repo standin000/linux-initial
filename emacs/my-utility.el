@@ -410,7 +410,8 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
                          move-to-prompt netsplit networks noncommands readonly
                          ring stamp track)))
     ;;(setq erc-autojoin-channels-alist '(("freenode.net" "#symbolicweb")))
-    (setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm"))))
+    ;(setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm")))
+    )
 
 (defun vj-find-tag ()
     "My find-tag wrapper for easy repetition (VJO 2003).
