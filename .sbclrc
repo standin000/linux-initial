@@ -1,0 +1,131 @@
+;If the first user-processable command-line argument is a filename,
+;disable the debugger, load the file handling shebang-line and quit.
+(let ((script (and (second *posix-argv*)
+		   (probe-file (second *posix-argv*)))))
+  (when script
+    ;; Handle shebang-line
+    (set-dispatch-macro-character #\# #\!
+				  (lambda (stream char arg)
+				    (declare (ignore char arg))
+				    (read-line stream)))
+    ;; Disable debugger
+    (setf *invoke-debugger-hook*
+	  (lambda (condition hook)
+	    (declare (ignore hook))
+	    ;; Uncomment to get backtraces on errors
+	    ;; (sb-debug:backtrace 20)
+	    (format *error-output* "Error: ~A~%" condition)
+	    (quit)))
+    (load script)
+    (quit)))
+
+;SBCL fasl-format is at current stage of development undergoing non-backwards compatible changes fairly often. The following snippet handles recompilation automatically for ASDF-based systems.
+
+(require :asdf)
+
+     ;;; If a fasl was stale, try to recompile and load (once).
+(defmethod asdf:perform :around ((o asdf:load-op)
+				 (c asdf:cl-source-file))
+  (handler-case (call-next-method o c)
+    ;; If a fasl was stale, try to recompile and load (once).
+    (sb-ext:invalid-fasl ()
+      (asdf:perform (make-instance 'asdf:compile-op) c)
+      (call-next-method))))
+;; Plato Wu,2008/10/17, enable stepper of slime.
+(declaim (optimize (speed 0) (space 0) (compilation-speed 0) (debug 3) (safety 3)))
+
+(require 'asdf-install)
+(defmacro load-or-install (package) 
+  `(handler-case (progn (asdf:operate 'asdf:load-op ,package)) 
+     (asdf:missing-component () (asdf-install:install ,package))))
+
+;; Plato Wu,2008/10/17, let original where be slient, it is used to determine where
+;; package install.
+(defun asdf-install::where () 
+  '(#P"/home/plato/.sbcl/site/" #P"/home/plato/.sbcl/systems/"  "Personal installation"))
+
+;; 08/08/04, Plato: Add casually for developping symbolicweb now.
+;; (require :symbolicweb)
+;; (in-package :sw)
+;; (start-sw 8080)
+;; (setf *sw-with-dns-server-p* nil)
+;; (load "/home/plato/symbolicweb/symbolicweb/examples/empty-page-without-dns-server.lisp")
+;; (setf hunchentoot:*catch-errors-p* nil)
+;; (setf hunchentoot:*show-lisp-errors-p* t hunchentoot:*show-lisp-backtraces-p* t)
+
+;; Plato Wu,2009/03/29: configuration for mystic project, remarks for
+;; now developing Weblocks
+;; (require :sb-posix)
+
+;; (push #p"/home/plato/mystic-pub/packages/metacopy/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/alexandria/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-def/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/computed-class/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-syntax-sugar/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-walker/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-yalog/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/defclass-star/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/postmodern/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-rdbms/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-serializer/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/local-time/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/metabang-bind/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-perec/" asdf:*central-registry*)
+
+;; ; mystic
+;; (push #p"/home/plato/mystic-pub/common/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/engine/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/admin/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-i18n/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/trivial-email-utf-8/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/elephant/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/elephant/tests/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/hunchentoot-0.15.6.gzip/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/cl-randist/" asdf:*central-registry*)
+
+;; ; misc
+;; (push #p"/home/plato/mystic-pub/packages/cl-smtp.bknr/" asdf:*central-registry*)
+;; (push #p"/home/plato/mystic-pub/packages/gp-export/" asdf:*central-registry*)
+;; (push #p"/home/plato/emacs/elisp/slime/" asdf:*central-registry*)
+
+;; ; usable REPL
+;; (require :sb-aclrepl)
+;; ;(require :linedit)
+;; ;(funcall (intern "INSTALL-REPL" :linedit) :wrap-current t :eof-quits t)
+
+;; (defmacro loadsys (sys)
+;;   `(asdf:oos 'asdf:load-op (quote ,sys)))
+
+;; (defmacro nostylewarn (&body body)
+;;   `(handler-bind ((style-warning #'muffle-warning))
+;;      ,@body))
+
+;; (defun killthreads ()
+;;   (dolist (thr (sb-thread:list-all-threads))
+;;     (unless (eq thr sb-thread:*current-thread*)
+;;       (sb-thread:terminate-thread thr))))
+
+;; (export '(killthreads loadsys))
+;; Plato Wu,2009/03/29: configuration for mystic project, remarks for
+;; now developing Weblocks
+
+;; (push #p"/home/plato/weblocks-dev-add-demos/" asdf:*central-registry*)
+;; (push #p"/home/plato/weblocks-dev-add-demos/examples/simple-blog/" asdf:*central-registry*)
+;; (push #p"/home/plato/weblocks-dev-add-demos/examples/simple-wiki/" asdf:*central-registry*)
+;; (require :simple-wiki)
+;; (require :simple-blog)
+
+;; (push #p"/home/plato/lisp-study/cl-launchpad/" asdf:*central-registry*)
+;; (push #p"/home/plato/lisp-study/standin000s-cl-yacc-ebnf/src/" asdf:*central-registry*)
+;; (push #p"/home/plato/stumpwm-build/" asdf:*central-registry*)
+;; (push #p"/home/plato/clbuild/systems/" asdf:*central-registry*)
+
+;;(ql:update-client) will update quicklisp
+; (ql:update-dist "quicklisp") will update dist of quicklisp
+;;The following lines added by ql:add-to-init-file:
+#-quicklisp
+(let ((quicklisp-init (merge-pathnames "quicklisp/setup.lisp"
+                                       (user-homedir-pathname))))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
+
