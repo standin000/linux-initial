@@ -4,28 +4,35 @@
   (if (is-version 21)
     (setq eshell-ask-to-save-history 'always)
     (setq eshell-save-history-on-exit t))
+  ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
+  (setq eshell-history-size 1000)
+;;(setq eshell-save-history-on-exit nil) to ignore coding system problem
+  ;; Plato Wu,2013/01/25: eshell will overwrite bash command history which is invoked during
+  ;; eshell running timeframe.
+  (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
+  (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-unix)
   (setq eshell-prompt-function 
-      (function
-       (lambda ()
-	 (let ((pwd (eshell/pwd)))
-	   (if (< (length pwd) 30)
-	       (concat pwd
-		       (if (= (user-uid) 0) " # " " $ "))
-	     (concat (concat "..." (subseq pwd 20)) 
-		     (if (= (user-uid) 0) " # " " $ ")))))))
-  ;remove duplicate history items.
+        (function
+         (lambda ()
+           (let ((pwd (eshell/pwd)))
+             (if (< (length pwd) 30)
+                 (concat pwd
+                         (if (= (user-uid) 0) " # " " $ "))
+               (concat (concat "..." (substring pwd 20))
+                       (if (= (user-uid) 0) " # " " $ ")))))))
+                                        ;remove duplicate history items.
   (setq eshell-hist-ignoredups t)
   ;; ;; Plato Wu,2009/04/10: it seems there is not effect in emacs 22.2.1 To check
   ;; ;; let eshell show color but it is slow.
   ;; (require 'ansi-color)
   ;; (add-hook 'eshell-preoutput-filter-functions
   ;;           'ansi-color-apply)
- ; (autoload 'ansi-color-apply "ansi-color" nil t)
+  ;; (autoload 'ansi-color-apply "ansi-color" nil t)
   ;; Do not let eshell show color
   ;; (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
 
   ;; Dealing With Wildcards and Multiple Files in eshell
- ;; Assume you want to define an alias ‘emacs’ for ‘find-file’. See EshellAlias for a simple alias solution. The problem is that you cannot open multiple files that way. Using wildcards would also be a problem if these expand into multiple filenames. Instead of using an alias, use the following function.
+  ;; Assume you want to define an alias ‘emacs’ for ‘find-file’. See EshellAlias for a simple alias solution. The problem is that you cannot open multiple files that way. Using wildcards would also be a problem if these expand into multiple filenames. Instead of using an alias, use the following function.
   (defun eshell/emacs (&rest args)
     "Open a file in emacs. Some habits die hard."
     (if (null args)
@@ -45,7 +52,7 @@
       (eshell-bol)
       (if (= p (point))
 	  (beginning-of-line))))
-
+  ;; Plato Wu,2013/04/15: TODO move define-key from mode-hook to eval-after-load
   (add-hook 'eshell-mode-hook
 	    '(lambda () 
 	       (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
@@ -59,40 +66,37 @@
       ;there may be dangerous command input!
       (if (string= (eshell-get-old-input) "")
 	  (eshell-send-input)
-	  (insert-and-inherit "dangeours!"))))
+        (insert-and-inherit "dangeours!"))))
   ;; Plato Wu,2010/07/06: It seems eshell in Windoes will use alias in .bash_profile first.
   (setq eshell-command-aliases-list 
-      '(("rm" "~/linux-initial/shell/movetotrash.sh $*")
-        ;; Plato Wu,2010/06/23: /bin don't work for Emacs in Windows
-	("del" "/bin/rm -i -f $*")
-;	("cp" "/bin/cp -i $*")
-        ;; Plato Wu,2010/09/13: rm -i cp -i don't work for Emacs in Linux
-;	
-	("cp" "/bin/cp -p -i $*")
-	("df" "df -h $* ")
-	("du" "du -h $*")
-	("less" "less -r $*")
-	("whence" "type -a $*")
-	("grep" "grep --color $*")
-	("dir" "ls --format vertical $*")
-	("vdir" "ls --format=long $*")
-	("ll" "ls -l $*")
-	("la" "ls -A $*")
-	("l" "ls -CF $*")
-;	("ls" "ls -hF $*")
-	("ls" "ls -hF --color=auto $*")
-	("mv" "mv -i $1 $2")
-	("free" "free -m")
-	("vi" "emacs $*")
-        ("curl" "curl -C - -O $*")   ;resume download and use remote file name
-	("nano" "emacs $*")))
+        '(("rm" "~/linux-initial/shell/movetotrash.sh $*")
+          ;; Plato Wu,2010/06/23: /bin don't work for Emacs in Windows
+          ("del" "/bin/rm -i -f $*")
+          ;; Plato Wu,2010/09/13: rm -i cp -i don't work for Emacs in Linux
+          ("cp" "/bin/cp -p -i $*")
+          ("df" "df -h $* ")
+          ("du" "du -h $*")
+          ("less" "less -r $*")
+          ("whence" "type -a $*")
+          ("grep" "grep --color $*")
+          ("dir" "ls --format vertical $*")
+          ("vdir" "ls --format=long $*")
+          ("ll" "ls -l $*")
+          ("la" "ls -A $*")
+          ("l" "ls -CF $*")
+          ("ls" "ls -hF --color=auto $*")
+          ("mv" "mv -i $1 $2")
+          ("free" "free -m")
+          ("vi" "emacs $*")
+          ("curl" "curl -C - -O $*")   ;resume download and use remote file name
+          ("nano" "emacs $*")))
   (when (is-system "windows-nt")
-      (setcdr (assoc "ls" eshell-command-aliases-list) '("ls -h $*"))
-      ;; Plato Wu,2010/11/03: I don't know why $* does work with $*
-      (setcdr (assoc "cp" eshell-command-aliases-list) '("cp $1 $2"))
-      ;; Plato Wu,2010/11/03: Don't active rm command for it could make use of movetotrash.sh
-;;      (setcdr (assoc "rm" eshell-command-aliases-list) '("rm -i -f"))
-      (setcdr (assoc "del" eshell-command-aliases-list) '("rm -i -f $*"))))
+    (setcdr (assoc "ls" eshell-command-aliases-list) '("ls -h $*"))
+    ;; Plato Wu,2010/11/03: I don't know why $* does work with $*
+    (setcdr (assoc "cp" eshell-command-aliases-list) '("cp $1 $2"))
+    ;; Plato Wu,2010/11/03: Don't active rm command for it could make use of movetotrash.sh
+    ;; (setcdr (assoc "rm" eshell-command-aliases-list) '("rm -i -f"))
+    (setcdr (assoc "del" eshell-command-aliases-list) '("rm -i -f $*"))))
 
 (eshell-configuration)
 
@@ -132,8 +136,8 @@
 	'("^ .*"
 	;; ignore *eshell*, *svn-status*, a awkward regular expression
 	;; for I do not know how to perfect match a word which is not "eshell"
-	;; or "svn-status", magit:.
-	  "^\\*[^esm].\\{3\\}[^s].*"
+	;; or "svn-status", magit:. "*terminal" for multi-terminal
+	  "^\\*[^esmt].\\{3\\}[^s].*"
 	  "TAGS"))
   (setq ido-record-ftp-work-directories nil)
   ;; Plato Wu,2011/06/08: ignore Too big for folder whose size >116k
@@ -146,9 +150,13 @@
   (setq ido-work-directory-list-ignore-regexps '("/sudo:" "/ssh:"))
   ;; Plato Wu,2008/12/09: remarks for key is conflict with redshank mode
   (define-key ctl-x-map "\C-r" nil)
-  (ido-mode t)
-  (ido-hacks-mode t)
-  )
+  (setq ido-use-virtual-buffers t)
+  (setq ido-enable-flex-matching t)
+  (setq ido-everywhere t)
+  (setq ido-use-filename-at-point 'guess)
+  (ido-mode t))
+
+(ido-configuration)
 
 (defun psvn-configuration ()
   ;; Plato Wu,2009/03/31: This code is used in PMP project in Kinpo
@@ -192,12 +200,16 @@
 
 (setq ibuffer-saved-filter-groups
       (quote (("default"
-               ("dired" (mode . dired-mode))
-               ("perl" (mode . cperl-mode))
-               ("erc" (mode . erc-mode))
+;               ("dired" (mode . dired-mode))
+;               ("perl" (mode . perl-mode))
+;               ("erc" (mode . erc-mode))
+               ("elisp" (mode . emacs-lisp-mode))
+               ("C&C++" (or (mode . c-mode)
+                            (mode . c++-mode)))
                ("emacs" (or
                          (name . "^\\*scratch\\*$")
-                         (name . "^\\*Messages\\*$")))
+                         (name . "^\\*Messages\\*$")
+                         (mode . eshell-mode)))
                ("gnus" (or
                         (mode . message-mode)
                         (mode . bbdb-mode)
@@ -206,7 +218,8 @@
                         (mode . gnus-summary-mode)
                         (mode . gnus-article-mode)
                         (name . "^\\.bbdb$")
-                        (name . "^\\.newsrc-dribble")))))))
+                        (name . "^\\.newsrc-dribble")))
+               ))))
 
 (add-hook 'ibuffer-mode-hook
           (lambda ()
@@ -244,8 +257,8 @@
   (setq emms-show-format "%s")
   ;; Plato Wu,2011/05/15: it seems mpd doesn't support emms-random
   ;; use emms-shuffle instead which  will shuffle the playlist
-;;  (add-hook 'emms-player-finished-hook 'emms-random)
-;;  (setq emms-player-next-function 'emms-random)
+  ;;  (add-hook 'emms-player-finished-hook 'emms-random)
+  ;;  (setq emms-player-next-function 'emms-random)
   (setq emms-playlist-buffer-name "*Music*")
   (setq emms-player-mpd-music-directory "~/Music")
   (setq emms-player-next-function 'emms-next-noerror)
@@ -262,37 +275,57 @@
   (defun my-stop-player ()
     "Stop emms player."
     (interactive)
-;    (shell-command "mpd --kill &")
+                                        ;    (shell-command "mpd --kill &")
     (emms-playlist-current-kill)
     (emms-player-mpd-disconnect))
   (defun my-start-player ()
     "Start MPD and sync to its playlistemms player."
     (interactive)
-;    (shell-command "mpd &") ; uses default ~/.mpdconf
-;    (shell-command "sleep 3 ") 
+                                        ;    (shell-command "mpd &") ; uses default ~/.mpdconf
+                                        ;    (shell-command "sleep 3 ") 
     (emms-player-mpd-connect)
     (switch-to-buffer emms-playlist-buffer))
   ;; run (emms-history-save) first
-;  (emms-history-load)
-    (setq emms-lyrics-dir "~/Music/Lyrics")
-    (setq emms-lyrics-coding-system 'gbk-dos)
-;    (setq emms-lyrics-display-on-minibuffer t)
-    (emms-lyrics 1)
-    (defadvice gnus-group-get-new-news (around pause-emms)
-      "Pause emms while Gnus is fetching mails or news."
-      (if emms-player-playing-p
-          (progn (emms-pause)
-                 ad-do-it
-                 (emms-pause))
-        ad-do-it))
-
-    (ad-activate 'gnus-group-get-new-news)
-  ) 
+                                        ;  (emms-history-load)
+  (setq emms-lyrics-dir "~/Music/Lyrics")
+  (setq emms-lyrics-coding-system 'gbk-dos)
+                                        ;    (setq emms-lyrics-display-on-minibuffer t)
+;  (emms-lyrics 1)
+  (defadvice gnus-group-get-new-news (around pause-emms)
+    "Pause emms while Gnus is fetching mails or news."
+    (if emms-player-playing-p
+        (progn (emms-pause)
+               ad-do-it
+               (emms-pause))
+      ad-do-it))
+  (ad-activate 'gnus-group-get-new-news)
+  ;; global key-map
+  ;; all global keys prefix is C-c e
+  ;; compatible with emms-playlist mode keybindings
+  ;; you can view emms-playlist-mode.el to get details about 
+  ;; emms-playlist mode keys map
+  (global-set-key (kbd "C-c e s") 'emms-stop)
+  (global-set-key (kbd "C-c e P") 'emms-pause)
+  (global-set-key (kbd "C-c e n") 'emms-next)
+  (global-set-key (kbd "C-c e p") 'emms-previous)
+  (global-set-key (kbd "C-c e f") 'emms-show)
+  (global-set-key (kbd "C-c e >") 'emms-seek-forward)
+  (global-set-key (kbd "C-c e <") 'emms-seek-backward)
+  ;; these keys maps were derivations of above keybindings
+  (global-set-key (kbd "C-c e S") 'emms-start)
+  (global-set-key (kbd "C-c e g") 'emms-playlist-mode-go)
+  (global-set-key (kbd "C-c e t") 'emms-play-directory-tree)
+  (global-set-key (kbd "C-c e h") 'emms-shuffle)
+  (global-set-key (kbd "C-c e e") 'emms-play-file)
+  (global-set-key (kbd "C-c e l") 'emms-play-playlist)
+  (global-set-key (kbd "C-c e r") 'emms-toggle-repeat-track)
+  (global-set-key (kbd "C-c e R") 'emms-toggle-repeat-playlist)
+  (global-set-key (kbd "C-c e u") 'emms-score-up-playing)
+  (global-set-key (kbd "C-c e d") 'emms-score-down-playing)
+  (global-set-key (kbd "C-c e o") 'emms-score-show-playing)    
+  )
 
 (defvar my-authinfo "~/.authinfo")
-
-(defun muse-configuration ()
-)
 
 (defun auctex-configuration ()
   (require 'preview-latex)
@@ -357,6 +390,28 @@
   (require 'muse-publish) 
   (require 'muse-html)
   (require 'weblogger)
+  (require 'muse-latex2png)
+  (require 'muse-colors)
+;; I also want to use regexp to markup inline latex equations of the
+;; form `$\alpha$' because I'm too lazy to write
+;; <latex inline="t">$\alpha$</latex>
+  (add-to-list 'muse-html-markup-regexps
+               '(1600 "\\$[^$]*\\$" 0 kid-muse-html-latex-inline))
+
+  
+  ;(setq muse-html-markup-regexps '((10000 "\\(\\(\n\\(?:[[:blank:]]*\n\\)*\\([[:blank:]]*\n\\)\\)\\|\\`\\s-*\\|\\s-*\\'\\)" 3 muse-html-markup-paragraph)))
+  (defun kid-muse-html-latex-inline ()
+    (let ((attrs `(("inline" . "true"))))
+      (muse-publish-latex-tag (match-beginning 0) (match-end 0) attrs)
+      ;; Plato Wu,2013/01/03: return string will cause error
+      nil))
+  (setq muse-latex2png-scale-factor 1.5)
+  (add-to-list 'muse-colors-tags
+             '("latex" t t nil muse-colors-example-tag))
+  ;; Plato Wu,2013/01/03: in order to user internet path for latex image, modify this variable
+  ;; and muse-latex2png-region & muse-latex2png-move2pubdir.
+  ;; (setq muse-latex2png-img-dest "http://plato.ninth.su/Photos/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E8%BF%90%E5%8A%A8%E6%8E%A7%E5%88%B6")
+
   (add-to-list 'auto-mode-alist '("\\.muse$" . muse-mode))
   (define-key muse-mode-map "u" 'muse-insert-url)
   (define-key muse-mode-map "l"
@@ -391,7 +446,7 @@
           (section-other . "<div>")
           (section-other-end . "</div>")
           (begin-example . "<pre class='src'>")
-          (rule . "--------华-------丽-------的-------分-------割-------线-------")
+          (rule . "------华------丽------的------分------割------线------")
           (image . "<img src=\"%s.%s\" width=85%% height=85%% alt=\"\">")))
 
   (muse-derive-style
@@ -472,7 +527,10 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
         (weblogger-api-send-edits struct t))
       (set-buffer-modified-p nil)
       (kill-buffer)
-      (when new 
+      ;; Plato Wu,2013/01/02: use digest in mail,  don't use duoshuo.
+      ;; Plato Wu,2013/01/02: SMTP will report error, but it is OK, maybe the port is change
+      ;; from 25 to 465
+      (when new
         (let ((entry (ring-ref weblogger-entry-ring
                                weblogger-ring-index)))
          (goto-char (point-min))
@@ -515,7 +573,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                            (w3m-url-encode-string 
                             (cdr (assoc "title" entry)) 'utf-8))))
          (mail-send-and-exit)))))
-
+;; Plato Wu,2013/01/02: refine to support multi footnote for many article in one page.
   (defun muse-html-markup-footnote ()
     (cond
      ((get-text-property (match-beginning 0) 'muse-link)
@@ -825,19 +883,25 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
         (quote (("t" "todo" entry (file+headline "~/org/todo.org" "Toodledo") "** TODO %?"))))
 
   (require 'org-publish)
-  (add-to-list 'org-export-latex-packages-alist '("" "zhfontcfg" ))
+  (require 'org-latex)
   ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
   ;; for text which contains number.
-  (setq org-export-latex-emphasis-alist
-  '(("*" "\\textbf{%s}" t)
-    ("/" "\\emph{%s}" t)
-    ("_" "\\underline{%s}" t)
-    ("+" "\\st{%s}" t)
-    ("=" "\\verb" t)
-;    ("~" "\\verb" t)
-    ;; Plato Wu,2011/02/18: use @ to tag Chinese characters for song font
-    ;; if we use font as main font, the english font is ugly.
-    ("~" "\\song{%s}" t )))
+;;   (setq org-export-latex-emphasis-alist
+;;   '(("*" "\\textbf{%s}" t)
+;;     ("/" "\\emph{%s}" t)
+;;     ("_" "\\underline{%s}" t)
+;;     ("+" "\\st{%s}" t)
+;;     ("=" "\\verb" t)
+;; ;    ("~" "\\verb" t)
+;;     ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
+;;     ;; if we use font as main font, the english font is ugly.
+;;     ("~" "\\song{%s}" t )))
+
+  (add-to-list 'org-export-latex-emphasis-alist
+               ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
+               ;; if we use font as main font, the english font is ugly.
+             ;; Plato Wu,2012/08/28: org-emph-re only support "[*/_=~+]"
+               '("~" "\\kai{%s}" t ))
   ;; Plato Wu,2011/02/18: use org-export-as-pdf instead
   ;; (setq org-publish-project-alist
   ;;       '(  ("CoreBoardTesting"
@@ -853,12 +917,85 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;           ;; ... add all the components here (see below)...
   ;;           ))
   ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
-  (setq org-latex-to-pdf-process '("xelatex -output-directory  log/ %s" 
+  (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
+                                   "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
                                    "mv `basename %b`.tex log/"
                                    ;; moving pdf for meeting org-export-as-pdf
                                    "mv log/`basename %b`.pdf ."))
+  (setq org-export-copy-to-kill-ring nil)
+  (setq org-confirm-babel-evaluate nil)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (ditaa . t)
+     (dot . t)
+     (emacs-lisp . t)
+     (gnuplot . t)
+     (python . t)
+     (perl . t)
+     (sh . t)
+     (C . t)
+     (sqlite . t)))
+  (add-to-list 'org-export-latex-classes
+             '("resume"
+               "\\documentclass{resume}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subcvsection{%s}" . "\\subcvsection{%s}")))
+  (add-to-list 'org-export-latex-classes
+             '("CV"
+               "\\documentclass{CV}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subsection{%s}" . "\\subsection{%s}")))
+
+  (defun orgtbl-to-latex (table params)
+  "Convert the orgtbl-mode TABLE to LaTeX.
+TABLE is a list, each entry either the symbol `hline' for a horizontal
+separator line, or a list of fields for that line.
+PARAMS is a property list of parameters that can influence the conversion.
+Supports all parameters from `orgtbl-to-generic'.  Most important for
+LaTeX are:
+
+:splice    When set to t, return only table body lines, don't wrap
+           them into a tabular environment.  Default is nil.
+
+:fmt       A format to be used to wrap the field, should contain %s for the
+           original field value.  For example, to wrap everything in dollars,
+           use :fmt \"$%s$\".  This may also be a property list with column
+           numbers and formats.  For example :fmt (2 \"$%s$\" 4 \"%s%%\")
+           The format may also be a function that formats its one argument.
+
+:efmt      Format for transforming numbers with exponentials.  The format
+           should have %s twice for inserting mantissa and exponent, for
+           example \"%s\\\\times10^{%s}\".  LaTeX default is \"%s\\\\,(%s)\".
+           This may also be a property list with column numbers and formats.
+           The format may also be a function that formats its two arguments.
+
+:llend     If you find too much space below the last line of a table,
+           pass a value of \"\" for :llend to suppress the final \\\\.
+
+The general parameters :skip and :skipcols have already been applied when
+this function is called."
+  (let* ((alignment (mapconcat (lambda (x) (if x "r" "l"))
+			       org-table-last-alignment ""))
+	 (params2
+	  (list
+;	   :tstart (concat "\\begin{tabular}{" alignment "}")
+           :tstart "\\begin{tabular}"
+	   :tend "\\end{tabular}"
+	   :lstart "" :lend " \\tabularnewline" :sep " & "
+	   :efmt "%s\\,(%s)" :hline "\\hline")))
+    (orgtbl-to-generic table (org-combine-plists params2 params))))
   )
+
+(defun c-mode-configuration () 
+  (add-hook 'c-mode-common-hook 'google-set-c-style)
+  (add-hook 'c-mode-common-hook 
+            (lambda () 
+              (c-set-offset 'cpp-macro 0))))
+              
 
 (defun sawfish-configuration ()
   (setq auto-mode-alist
@@ -879,9 +1016,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 ;;                           (c-toggle-auto-hungry-state nil)))
 
 (defun compile-configuration ()
-  (global-set-key [f7] 'compile)
   (setq compilation-read-command nil)
-  ;;for waring from smart-compile
   (setq compilation-scroll-output t)
   (setq compilation-ask-about-save nil)
   (require 'gud)
@@ -1000,12 +1135,15 @@ else evaluate sexp"
   (global-set-key [f11] 'gud-step)
   (setq gdb-many-windows t))
 
-(compile-configuration)
-
-(defun session-configuration ()
-  (add-hook 'after-init-hook 'session-initialize))
+;(compile-configuration)
 
 (defun slime-configuration ()
+;; slime-inspector-mode's quick key
+;; l runs the command slime-inspector-pop, return top level
+;; d runs the command slime-inspector-describe
+;; sldb-mode's quick key
+;; v runs the command sldb-show-source
+;; swank::inspect-function can describe a function
   (load (expand-file-name "~/quicklisp/slime-helper.el"))
   ;; Replace "sbcl" with the path to your implementation
   (setq inferior-lisp-program "sbcl")
@@ -1028,15 +1166,18 @@ else evaluate sexp"
   (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
   ;; Plato Wu,2009/12/12: temperate clear lisp connection closed unexpectedly
   ;; problem
-  (defun load-swank-dont-close (port-filename encoding)
-    (format "%S\n\n"
-            `(progn
-               (load ,(expand-file-name slime-backend slime-path) :verbose t)
-               (funcall (read-from-string "swank-loader:init"))
-               (funcall (read-from-string "swank:start-server")
-                        ,port-filename
-                        :coding-system ,(slime-coding-system-cl-name encoding)
-                        :dont-close t))))
+  ;; Plato Wu,2012/09/15: it will cause problem for latest sbcl & slime
+  ;; (defun load-swank-dont-close (port-filename encoding)
+  ;;   (format "%S\n\n"
+  ;;           `(progn
+  ;;              (load ,(expand-file-name slime-backend slime-path) :verbose t)
+  ;;              (funcall (read-from-string "swank-loader:init"))
+  ;;              (funcall (read-from-string "swank:start-server")
+  ;;                       ,port-filename
+  ;;                       :coding-system ,(slime-coding-system-cl-name encoding)
+  ;;                       :dont-close t))))
+  ;; (setq slime-lisp-implementations
+  ;;       '((sbcl-noclose ("sbcl" "-quiet") :init load-swank-dont-close)))
   ;; Plato Wu,2009/12/09: clear content at the bottom of the screen
   (defun slime-quit-sentinel (process message)
     (assert (process-status process) 'closed)
@@ -1047,9 +1188,6 @@ else evaluate sexp"
       (slime-net-close process)
       ;;    (message "Connection closed.")
       ))
-
-  (setq slime-lisp-implementations
-        '((sbcl-noclose ("sbcl" "-quiet") :init load-swank-dont-close)))
 
   ;; Plato Wu,2009/11/05: TO DO, assign a proper key binding to slime-repl-backward-input
   ;;   (define-key slime-repl-mode-map (kbd "M-<up>") 'slime-repl-backward-input)
@@ -1104,6 +1242,7 @@ else evaluate sexp"
                 'common-lisp-hyperspec-history)))))
     (info-lookup 'symbol symbol-name nil)
     (other-window 1))
+  ;; Plato Wu,2013/04/15: TODO to check lisp-mode is OK by symbol-function
   (eval-after-load "lisp-mode"
     '(progn
        (define-key 

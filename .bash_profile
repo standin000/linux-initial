@@ -37,8 +37,8 @@ fi
 # Don't put duplicate lines in the whole history.
  export HISTCONTROL=erasedups
 
- HISTSIZE=1000
- HISTFILESIZE=1000
+ export HISTSIZE=1000 # .bash_history size.
+ export HISTFILESIZE=1000 # history command size.
 
 # Default to human readable figures
  alias df='df -h'
@@ -152,10 +152,11 @@ if [ "$EMACS" != '' ]; then
 elif [ "$SSH_CONNECTION" != '' ]; then
 ## Plato Wu,2009/06/22: For putty windows title, it is identified for login by ssh
    export HOSTIP=`echo $SSH_CONNECTION |awk '{print $3}' |awk -F: '{if ($1 == "") print $4; else print $1}'`
-
-   export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}  \007"'
+    # Plato Wu,2012/04/22: \007 for BEL \033 for ESC
+   export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}"'
 else
-  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
+
+  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}"'
 fi
 
 # Plato Wu,2010/03/14: For command prompt.
@@ -175,19 +176,23 @@ if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ]); then
  alias emacs='emacsclient -t'
 fi
 # Plato Wu,2010/02/21: proxy setting for chromium
-export auto_proxy="http://users.ninthfloor.org/~plato/localautoproxy.pac"
-
+# Plato Wu,2012/04/11: swtichy sharp instead
+# Plato Wu,2012/04/21: chromium 18.0 don't work for pac
+#export auto_proxy="https://users.ninthfloor.org/~plato/localautoproxy.pac" or
+# Plato Wu,2013/01/02: certificate common name ‘*.ninthfloor.org’ doesn't 
+# match requested host name ‘plato.ninth.su, so don't use https for ninth.su
+#export auto_proxy="http://plato.ninth.su/localautoproxy.pac"
 export GIT_EDITOR=emacs
 
-export GTK_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus   
-export QT_IM_MODULE=ibus
 # Plato Wu,2010/10/24: xterm-256color can't support End key in emacs of myhost, so define it in .emacs
 export TERM=xterm-256color
 
 # Plato Wu,2011/07/08: cd z: is OK in cygwin
 # Plato Wu,2011/10/31: special for cygwin environment
-# if [ "$OSTYPE" = "cygwin" ] ; then
-#     export LANG=en_US.UTF-8
-# fi
+if [ "$OSTYPE" = "cygwin" ] ; then
+    export LANG=zh_CN.GBK
+fi
 
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+ exec startx
+fi

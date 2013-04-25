@@ -5,8 +5,7 @@
 
 (require 'my-utility)
 (require 'my-packages)
-(require 'el-get-package)
 (require 'my-interface)
-
+(require 'el-get-package)
 
 
