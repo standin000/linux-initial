@@ -110,7 +110,8 @@ The default display-message don't close the message window automatically"
 ;(event-name '(101 . 65540))
 (define (is-also-emacs-style) 
   (or (string= (window-class (input-focus)) "XTerm")
-      (string= (window-class (input-focus)) "URxvt")))
+      (string= (window-class (input-focus)) "URxvt")
+      (string= (window-class (input-focus)) "Emacs")))
 
 (mapcar (lambda (program)
 	(plato-bind-keys 
@@ -262,7 +263,7 @@ b\" without losing PRESERVE-PREFIX. "
 (plato-bind-keys global-keymap "M-ISO_Left_Tab" 'cycle-windows-backwards)
 
 ;; Plato Wu,2011/06/16: scot -s require interactive select a window or retangle with mouse
-(plato-bind-keys global-keymap "Print" '(run-shell-command "scrot ") "Take a screenshot")
+(plato-bind-keys global-keymap "Print" '(run-shell-command "scrot -e 'mv $f ~/tmp/'") "Take a screenshot")
 
 (plato-bind-keys global-keymap "M-F4" 'delete-window)
 

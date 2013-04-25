@@ -47,7 +47,8 @@
   "Revert buffer using tramp sudo.
     This will also reserve changes already made by a non-root user."
   (interactive)
-  (let ((f (buffer-file-name)))
+  (let ((f (buffer-file-name))
+        (p (point)))
     (when f
       (let ((content (when (buffer-modified-p)
 		       (widen)
@@ -64,7 +65,8 @@
 	  (when content
 	    (let ((buffer-read-only nil))
 	      (erase-buffer)
-	      (insert content)))))))
+	      (insert content)))
+          (goto-char p)))))
 
 (global-set-key (kbd "C-c s") 'xwl-revert-buffer-with-sudo)
 
@@ -408,8 +410,23 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
                          move-to-prompt netsplit networks noncommands readonly
                          ring stamp track)))
     ;;(setq erc-autojoin-channels-alist '(("freenode.net" "#symbolicweb")))
-    (setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm"))))
+    ;(setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm")))
+    )
 
+(defun vj-find-tag ()
+    "My find-tag wrapper for easy repetition (VJO 2003).
+ Call `find-tag' with current word first time and after that call
+ find-tag with NEXT-P set to t (if called repeatedly)"
+    (interactive)
+    (if (eq last-command 'vj-find-tag)
+        (progn
+          (find-tag nil t)
+          (ring-remove find-tag-marker-ring 0))
+      (if (null (current-word)) 
+          (call-interactively 'find-tag)
+          (find-tag (current-word) current-prefix-arg))))
+
+(define-key global-map "\M-." 'vj-find-tag)
 
 (require 'etags)
 ;; Plato Wu,2009/04/07: In order to support lookup elisp function.
@@ -601,7 +618,7 @@ isn't there and triggers an error"
 (defun org-import-p1i-task ()
   (interactive)
   (mapcar 
-  '(lambda (ics-filename)
+  #'(lambda (ics-filename)
      (org-import-p1i-task-internal ics-filename "~/tmp.org"))
   (file-expand-wildcards "/opt/Funambol/ds-server/db/vtask/plato.wu/*"))
   (set-file-times "~/.import_p1i_task_done"))
@@ -708,5 +725,48 @@ Switches to the buffer `*ielm*' in other window, or creates it if it does not ex
 	(inferior-emacs-lisp-mode)))
     (pop-to-buffer "*ielm*" t)
     (when old-point (push-mark old-point))))
+
+(defun hex-to-ascii (b e)
+  "Translate the region from hex to ascii and copy it to clipboard."
+  (interactive "r")
+  (save-excursion
+    (let ((i e)
+           (x-select-enable-clipboard t)
+           s)
+      (while (> i b)
+        (setq s (concat (format "%c" (read (concat "#x" (buffer-substring-no-properties (- i 2) i)))) s))
+        ;; Plato Wu,2012/07/26: using 3 to skip space.
+        (setq i (- i 3)))
+      (kill-new s t)
+      (message (format "%s copied to clip board" s)))))
+
+(defun ascii-to-hex (b e)
+  "Translate an ascii string to a hex string and copy it to clipboard"
+  (interactive "r")
+  (save-excursion
+    (let ((i b)
+          (x-select-enable-clipboard t)
+          s)
+      (while (< i e)
+        (setq s (concat s (format "%x " (get-byte i))))
+        (setq i (+ i 1)))
+      (kill-new s t)
+      (message s))))
+
+;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
+(defun rename-file-and-buffer (new-name)
+  "Renames both current buffer and file it's visiting to NEW-NAME."
+  (interactive "sNew name: ")
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not filename)
+        (message "Buffer '%s' is not visiting a file!" name)
+      (if (get-buffer new-name)
+          (message "A buffer named '%s' already exists!" new-name)
+        (progn
+          (rename-file name new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil))))))
 
 (provide 'my-utility)

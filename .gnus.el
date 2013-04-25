@@ -112,7 +112,7 @@
        '(unknown-8bit x-unknown iso-8859-1))
 
 ;;; set for using GBK in emacs 21/22 with mule-gbk
-(unless (string= (substring emacs-version 0 2) "23")
+(unless (>= (string-to-number (substring emacs-version 0 2)) 23)
  (utf-translate-cjk-load-tables))
 
 (defun prefer-gb2312 ()

@@ -133,8 +133,10 @@
 
 (when window-system 
   ;;auto open & display image
-  (auto-image-file-mode)
-  (pc-selection-mode)			; use shift to select region
+  (auto-image-file-mode)'
+  ;; Plato Wu,2012/10/09: it is void in emacs 24.1.1
+  (unless (is-version "24")
+    (pc-selection-mode))			; use shift to select region
   (setq pc-select-selection-keys-only t)
   (cond 
    ((is-system "darwin")
@@ -338,12 +340,13 @@
 
 (setq grep-files-aliases
       '(("asm" .    "*.[sS]")
+        ;; Plato Wu,2013/01/25: hh take precdence over items below.
+        ("hh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
         ;; Plato Wu,2010/02/27: Let ch match .c file first!
         ("ch" .    "*.[ch]")
         ("c" .     "*.c")
         ("cc" .    "*.cc *.cxx *.cpp *.C *.CC *.c++")
-        ("cchh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
-        ("hh" .    "*.hxx *.hpp *.[Hh] *.HH *.h++")
+        ("cchh" .  "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
         ("el" .    "*.el")
         ("h" .     "*.h")
         ("l" .      "[Cc]hange[Ll]og*")
@@ -360,6 +363,7 @@
 ;; M-x set-buffer-file-coding-system RET undecided-dos save the file (C-x C-s)
 ;; or
 ;; C-x RET f undecided-dos C-x C-f
+;; C-h C describe-coding-system for current buffer.
 
 ;; Plato Wu,2011/04/15: after add XTerm*allowSendEvents: True into .Xresourcs
 ;; (frame-parameter (selected-frame) 'background-color) is unspecified-bg in
@@ -386,7 +390,9 @@
 (which-func-mode 1)
 
 ;; Plato Wu,2009/11/26: get rid of warning for not safe variables
-(setq enable-local-variables :safe)
+;;(setq enable-local-variables :safe)
+;; Plato Wu,2012/12/09: (eval . expression) is not safe in emacs 24.2
+(setq enable-local-variables :all)
 
 ;; Plato Wu,2009/04/06: add-change-log-entry-other-window
 ;; find-change-log only use parent directory's ChangeLog, I need use C-u
@@ -397,15 +403,27 @@
 ;; so use text-mode temporally
 (add-to-list 'auto-mode-alist '("\\.ml$" . text-mode))
 
+(add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
+
 ;; Plato Wu,2011/09/02: support End key in emacs of myhost
 (global-set-key (quote [select]) 'move-end-of-line)
 
 ;; Plato Wu,2011/06/03: auto insert content for .h, .el and so on.
 (auto-insert-mode 1)
 
-;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
-(global-set-key (kbd "C-^") 'cua-set-rectangle-mark)
+;Plato Wu,2013/04/15: use (symbol-function 'c-mode) to get autoload for eval-after-load
+(eval-after-load
+    "cc-mode"
+  '(define-key c-mode-map [f7] 'smart-compile))
 
+(eval-after-load
+    "make-mode"
+  '(define-key makefile-mode-map [f7] 'smart-compile))
+;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
+;; Plato Wu,2012/07/29: start cua-set-rectangle-mark and select the column, then press C-c
+;; copy the column, C-y will paste the column
+(global-set-key (kbd "C-^") 'cua-set-rectangle-mark)
 ;; emacs 24.0.93 will close network driver write-protected problem, now I use fstab method
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
-;; emacs 24.2 don't work for eval in .dir-locals.el 
+;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line
+

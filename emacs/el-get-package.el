@@ -39,42 +39,45 @@
             '(;nxhtml
                                         ;(:name dictionary-el    :type apt-get)
                                         ;(:name emacs-goodies-el :type apt-get)
-              vkill 
-              (:name org-mode :features org :after org-configuration)
+              vkill
+              (:name org-mode :features org :after (org-configuration))
               ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
               ;; which cause error, so must use features.
-              (:name ido-hacks :features ido-hacks :after ido-configuration) 
               (:name magit :features magit
-                     :after (lambda () (global-set-key (kbd "C-x C-z") 'magit-status)))
-              (:name paredit :features paredit :after paredit-configuration)
-              (:name htmlize :type elpa :features htmlize)
+                     :after (progn (global-set-key (kbd "C-x C-z") 'magit-status)))
+              (:name paredit :features paredit :after (paredit-configuration))
               ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
               ;; get installed to pass error.
-              (:name muse :type elpa :features muse :after muse-configuration)
                                         ;        (:name xml-rpc :type elpa)
               ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
               ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
               ;; lisppaste, so disable lisppaste first, it is not useful for me.
                                         ;	(:name lisppaste :type elpa)        
-              (:name smart-tab :features smart-tab :after smart-tab-configuration)
-              (:name sawfish :features sawfish :after sawfish-configuration)
-              (:name google-c-style :features google-c-style
-                     :after (lambda () (add-hook 'c-mode-common-hook 'google-set-c-style)))
-              (:name psvn :features psvn :after psvn-configuration)
-              (:name dired-single :features dired-single :after dired-single-configuration)
-              (:name ascii :after ascii-configuration)
+              (:name smart-tab :features smart-tab :after (smart-tab-configuration))
+              (:name google-c-style :features google-c-style :after (c-mode-configuration))
+              (:name psvn :features psvn :after (psvn-configuration))
+              (:name ascii :after (ascii-configuration))
               ;; Plato Wu,2011/05/15: vi can be used in it.
-              (:name multi-term :features multi-term)
               ;; Plato Wu,2011/05/23: quicklisp will install slime
-                                        ;        (:name slime :after slime-configuration)
-              (:name cldoc :features cldoc :after cldoc-configuration)))
+              ;; (:name slime :after slime-configuration)
+              (:name cldoc :features cldoc :after (cldoc-configuration))
+              (:name smart-compile :features smart-compile :after (compile-configuration))))
 
       (if (not (is-system "cygwin"))
           (progn (setq el-get-sources
                        (append el-get-sources
                                '(
+                                 nrepl
+                                 (:name clojure-mode :type elpa)
+;                                 (:name clojure-test-mode :type elpa)
                                 ; (:name auctex :after auctex-configuration)
-                                 (:name emms :type elpa :features emms :after emms-configuration)
+                                 (:name htmlize :type elpa :features htmlize)
+                                 (:name muse :type elpa :features muse)
+                                 (:name sawfish :features sawfish :after (sawfish-configuration))
+                                 ;(:name dired-single :features dired-single :after (dired-single-configuration))
+                                 dired-single
+                                 (:name multi-term :features multi-term)
+                                 (:name emms :type elpa :features emms :after (emms-configuration))
                                  ;; Plato Wu,2011/07/02: it seems there is a problem with session
                                  ;; recipe in el-get
 ;                                 (:name session :features session :after session-configuration)
@@ -83,23 +86,21 @@
                    (setq el-get-sources
                          (append el-get-sources
                                  '((:name emacs-w3m :features w3m
-                                          :after w3m-configuration)
-                                   (:name weblogger :type elpa :features weblogger :after blogger-configuration) 
-                                   (:name org-toodledo :features org-toodledo :after org-toodledo-configuration))))))
-        (setq el-get-sources
-              (append el-get-sources
-                      '((:name org-toodledo :features org-toodledo :after org-toodledo-configuration)))))
+                                          :after (w3m-configuration))
+                                   (:name weblogger :type elpa :features weblogger :after (blogger-configuration))))))))
       (setq my-packages
             (append
              '(el-get)
              (mapcar 'el-get-source-name el-get-sources)))
-      (el-get 'wait my-packages))
+;      (el-get-cleanup my-packages)
+      (el-get 'sync my-packages))
   (url-retrieve
-   ;; Plato Wu,2011/11/15: gnutls must get installed
-   "https://github.com/dimitri/el-get/raw/master/el-get-install.el"
-   (lambda (s)
-     (end-of-buffer)
-     (eval-print-last-sexp))))
+ ;; Plato Wu,2011/11/15: gnutls must get installed and make /etc/ssl/certs/ca-certificates.crt readable
+      "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
+      (lambda (s)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+  (el-get 'sync))
 
 ;; Plato Wu, 2010/12/17, this function should not use el-get-dir which is conflict with
 ;; el-get package itself
