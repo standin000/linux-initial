@@ -405,3 +405,7 @@
 
 ;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
 (global-set-key (kbd "C-^") 'cua-set-rectangle-mark)
+
+;; emacs 24.0.93 will close network driver write-protected problem, now I use fstab method
+;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
+;; emacs 24.2 don't work for eval in .dir-locals.el 
