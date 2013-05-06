@@ -1,0 +1,40 @@
+[user]
+	name = Plato Wu
+	email = gtalk000@gmail.com
+[core]
+# Plato Wu,2009/05/22: Absolute path is needed with git version 1.6.2.1
+# Plato Wu,2010/06/03: it doesn't work at cywin, have to use .gitignore in project directory.
+excludesfile = /home/plato/.gitignore
+# Plato Wu,2012/09/08: support UTF-8
+quotepath = false
+
+[alias]
+co = checkout
+ci = commit -a
+st = status
+br = branch
+oneline = log --pretty=oneline --since='2 days ago'
+onelog = log -p -1
+
+[color]
+status = auto
+branch = auto
+ui = auto
+
+
+[merge "merge-changelog"]
+name = GNU-style ChangeLog merge driver
+driver = /usr/local/bin/git-merge-changelog %O %A %B
+[http]
+# Plato Wu,2010/10/11: skip it for https clone
+sslVerify = false
+# Plato Wu,2012/03/22: 
+# 1. When you're on the master branch, the default remote is origin.
+# 2. When using git pull on the master branch, with no remote and
+# branch specified, use the default remote (origin) and merge in the
+# changes from the master branch.
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[push]
+	default = matching
