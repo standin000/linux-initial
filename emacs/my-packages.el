@@ -54,7 +54,7 @@
 	  (beginning-of-line))))
   ;; Plato Wu,2013/04/15: TODO move define-key from mode-hook to eval-after-load
   (add-hook 'eshell-mode-hook
-	    '(lambda () 
+	    #'(lambda () 
 	       (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
 
   (defun eshel ()
@@ -102,20 +102,20 @@
 
 (defun paredit-configuration ()
   ;; Plato Wu,2008/09/27, paredit will cause alt-s, ctrl-d can not used in ido mode
-;;  (add-hook 'minibuffer-setup-hook '(lambda () (paredit-mode +1)))
+;;  (add-hook 'minibuffer-setup-hook #'(lambda () (paredit-mode +1)))
 ;; Plato, 08/09/04, fundamental mode is a base mode, so it doesn't have
 ;; a mode hook, it only run change-major-mode-hook but enter others mode
 ;; should enter fundamental mode first, so this hook would be run always.
-  (mapc (lambda (mode)
+  (mapc #'(lambda (mode)
 	  (let ((hook (intern (concat (symbol-name mode)
 				      "-mode-hook"))))
-	    (add-hook hook (lambda () (paredit-mode +1)))))
+	    (add-hook hook #'(lambda () (paredit-mode +1)))))
 	'(emacs-lisp lisp slime-repl scheme ielm))
   (defadvice ielm-eval-input (after ielm-paredit activate)
     "Begin each IELM prompt with a ParEdit parenthesis pair."
     (paredit-open-round))
   (add-hook 'ielm-mode-hook
-            '(lambda () 
+            #'(lambda () 
                (setq comint-input-ring-file-name "~/.ielm.history")
                (turn-on-eldoc-mode)))
   ;; Plato Wu,2009/12/09: enable eldoc mode.
@@ -176,7 +176,7 @@
   (define-key dired-mode-map (kbd "RET") 'joc-dired-single-buffer)
   (define-key dired-mode-map 
     (kbd ".")
-    '(lambda ()
+    #'(lambda ()
        (interactive)
        (joc-dired-single-buffer ".."))))
 
@@ -222,7 +222,7 @@
                ))))
 
 (add-hook 'ibuffer-mode-hook
-          (lambda ()
+          #'(lambda ()
             (ibuffer-switch-to-saved-filter-groups "default")))
 
 (setq ibuffer-maybe-show-predicates 
@@ -415,13 +415,13 @@
   (add-to-list 'auto-mode-alist '("\\.muse$" . muse-mode))
   (define-key muse-mode-map "u" 'muse-insert-url)
   (define-key muse-mode-map "l"
-    '(lambda ()
+    #'(lambda ()
        (interactive)
        (insert "<literal style=\"blogger\">\n\n</img>\n</a>\n</literal>")
        (previous-line 3)))
   (setq muse-insert-url-initial-input nil)
   (add-hook 'muse-mode-hook 
-            '(lambda ()
+            #'(lambda ()
                (flyspell-mode)
                (footnote-mode)          ;C-c ! a Footnote-add-footnote
                (setq case-fold-search t)
@@ -886,17 +886,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (require 'org-latex)
   ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
   ;; for text which contains number.
-;;   (setq org-export-latex-emphasis-alist
-;;   '(("*" "\\textbf{%s}" t)
-;;     ("/" "\\emph{%s}" t)
-;;     ("_" "\\underline{%s}" t)
-;;     ("+" "\\st{%s}" t)
-;;     ("=" "\\verb" t)
-;; ;    ("~" "\\verb" t)
-;;     ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
-;;     ;; if we use font as main font, the english font is ugly.
-;;     ("~" "\\song{%s}" t )))
-
   (add-to-list 'org-export-latex-emphasis-alist
                ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
                ;; if we use font as main font, the english font is ugly.
@@ -938,12 +927,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
      (C . t)
      (sqlite . t)))
   (add-to-list 'org-export-latex-classes
-             '("resume"
-               "\\documentclass{resume}
-                \\title{}"
-               ("\\cvsection{%s}" . "\\cvsection{%s}")
-               ("\\subcvsection{%s}" . "\\subcvsection{%s}")))
-  (add-to-list 'org-export-latex-classes
              '("CV"
                "\\documentclass{CV}
                 \\title{}"
@@ -978,10 +961,11 @@ LaTeX are:
 
 The general parameters :skip and :skipcols have already been applied when
 this function is called."
-  (let* ((alignment (mapconcat (lambda (x) (if x "r" "l"))
+  (let* ((alignment (mapconcat #'(lambda (x) (if x "r" "l"))
 			       org-table-last-alignment ""))
 	 (params2
 	  (list
+           ;; Plato Wu,2013/08/28: remove aligment command
 ;	   :tstart (concat "\\begin{tabular}{" alignment "}")
            :tstart "\\begin{tabular}"
 	   :tend "\\end{tabular}"
@@ -993,7 +977,7 @@ this function is called."
 (defun c-mode-configuration () 
   (add-hook 'c-mode-common-hook 'google-set-c-style)
   (add-hook 'c-mode-common-hook 
-            (lambda () 
+            #'(lambda () 
               (c-set-offset 'cpp-macro 0))))
               
 
@@ -1007,11 +991,11 @@ this function is called."
 ;;   (unless (or (string= system-type "darwin") (string= system-type "windows-nt"))
 ;;     (add-hook 
 ;;      'kill-emacs-hook 
-;;      '(lambda ()
+;;      #'(lambda ()
 ;; 	(sawfish-eval "(quit)"))
 ;;      t)))
 ;; (define-key scheme-mode-map [f9] 'gds-show-last-stack)
-;; (add-hook 'c-mode-hook '(lambda ()
+;; (add-hook 'c-mode-hook #'(lambda ()
 ;;                           (c-set-style "stroustrup")
 ;;                           (c-toggle-auto-hungry-state nil)))
 
@@ -1163,7 +1147,7 @@ else evaluate sexp"
 
   (slime-setup '(slime-fancy slime-tramp slime-asdf slime-repl
                              slime-fancy-inspector slime-autodoc slime-fuzzy slime-presentation-streams))
-  (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+  (add-hook 'lisp-mode-hook #'(lambda () (slime-mode t)))
   ;; Plato Wu,2009/12/12: temperate clear lisp connection closed unexpectedly
   ;; problem
   ;; Plato Wu,2012/09/15: it will cause problem for latest sbcl & slime
@@ -1214,7 +1198,7 @@ else evaluate sexp"
   ;; 	      ("sldb" (height . 30) (width . 50) (left . 10) (top . 25)))))
   ;; Plato Wu,2011/05/18: it will run slime-load-hook which contain slime-setup-contribs.
   (require 'info-look)
-  (mapc (lambda (mode) 
+  (mapc #'(lambda (mode) 
           (info-lookup-add-help
            :mode mode
            :regexp "[^][()'\" \t\n]+"
@@ -1256,13 +1240,13 @@ else evaluate sexp"
   (defun isearch-yank-symbolic-word-or-char ()
     (interactive)
     (isearch-yank-internal
-     (lambda ()
+     #'(lambda ()
        (let ((distance (skip-syntax-forward "w_")))
          (when (zerop distance) (forward-char 1))
          (point)))))
 
   (add-hook 'lisp-mode-hook
-            (lambda ()
+            #'(lambda ()
               (make-local-variable 'isearch-mode-map)
               (define-key isearch-mode-map "\C-w" 'isearch-yank-symbolic-word-or-char)
                                         ;The Emacs default indentation for some forms such as `if' is likely to make CommonLisp hackers unhappy. Emacs also provides a `common-lisp-indent-function', but it's not enabled by default.
@@ -1318,7 +1302,7 @@ else evaluate sexp"
    ;; w3m-goto-url
   (setq w3m-enable-google-feeling-lucky nil)
   (add-hook 'w3m-mode-hook 
-             '(lambda ()
+             #'(lambda ()
                 (w3m-link-numbering-mode 1)))
   
   (defun my-w3m-href-text (&optional position)

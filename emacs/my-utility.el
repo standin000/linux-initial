@@ -6,10 +6,6 @@
 (defmacro try-require (library)
   `(try-function '(require ,library)))
 
-(defmacro try-require (library)
-  (try-function require library))
-
-
 (defun is-system (type)
   (string= system-type type))
 

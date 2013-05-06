@@ -67,7 +67,7 @@
           (progn (setq el-get-sources
                        (append el-get-sources
                                '(
-                                 nrepl
+                                 nrepl xclip
                                  (:name clojure-mode :type elpa)
 ;                                 (:name clojure-test-mode :type elpa)
                                 ; (:name auctex :after auctex-configuration)

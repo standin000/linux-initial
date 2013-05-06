@@ -178,7 +178,7 @@
 ;; (autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 ;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-hook 'shell-mode-hook
-          (lambda ()
+          #'(lambda ()
             (set-process-query-on-exit-flag
               (get-buffer-process (current-buffer)) nil))) 
 
@@ -187,7 +187,7 @@
 (when (is-system "cygwin")
   ;; Plato Wu,2010/03/29: emacs in cygwin does not support . of num area key
   (global-set-key "On" 
-                  '(lambda () 
+                  #'(lambda () 
                      (interactive)
                      (insert ".")))
   (defvar mode-line-position nil)

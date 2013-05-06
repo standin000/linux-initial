@@ -2,7 +2,7 @@
 # Plato Wu,2011/06/11: TODO use dirname of link file to decide if link is OK instead of
 # link file judgement
 
-linkfiles=".emacs .bash_profile .sbclrc .bash_logout .gnus.el
+linkfiles=".emacs .bash_profile .sbclrc .bash_logout .gnus.el .vimrc
 .ssh .subversion/config .sawfishrc .screenrc .hgrc .hgignore 
 .gitconfig .gitignore .inputrc .bashrc .Xresources .stumpwmrc .minttyrc emacs"
 #linkfiles="test test1 test2/test2"
