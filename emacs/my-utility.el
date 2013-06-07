@@ -711,7 +711,7 @@ isn't there and triggers an error"
 
 (defun ielm2 nil
   "Interactively evaluate Emacs Lisp expressions.
-Switches to the buffer `*ielm*' in other window, or creates it if it does not exist."
+Switches to the buffer `*ielm*' *in other window*, or creates it if it does not exist."
   (interactive)
   (load "ielm")
   (let (old-point)

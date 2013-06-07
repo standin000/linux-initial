@@ -77,8 +77,9 @@
 
 (setq vc-follow-symlinks t)
 
-(setq scroll-margin 3
-       scroll-conservatively 10000)
+;; Plato Wu,2013/05/11: set scroll-margin make multi-terminal unhappy
+;; (setq scroll-margin 3)
+(setq scroll-conservatively 10000)
 
 
 ;; Plato Wu,2008/11/20, It is not good for I use desktop for save all buffers;
@@ -411,14 +412,6 @@
 ;; Plato Wu,2011/06/03: auto insert content for .h, .el and so on.
 (auto-insert-mode 1)
 
-;Plato Wu,2013/04/15: use (symbol-function 'c-mode) to get autoload for eval-after-load
-(eval-after-load
-    "cc-mode"
-  '(define-key c-mode-map [f7] 'smart-compile))
-
-(eval-after-load
-    "make-mode"
-  '(define-key makefile-mode-map [f7] 'smart-compile))
 ;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
 ;; Plato Wu,2012/07/29: start cua-set-rectangle-mark and select the column, then press C-c
 ;; copy the column, C-y will paste the column

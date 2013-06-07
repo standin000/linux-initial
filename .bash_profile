@@ -151,9 +151,9 @@ if [ "$EMACS" != '' ]; then
   export PROMPT_COMMAND=
 elif [ "$SSH_CONNECTION" != '' ]; then
 ## Plato Wu,2009/06/22: For putty windows title, it is identified for login by ssh
-   export HOSTIP=`echo $SSH_CONNECTION |awk '{print $3}' |awk -F: '{if ($1 == "") print $4; else print $1}'`
+  export HOSTIP=`echo $SSH_CONNECTION |awk '{print $3}' |awk -F: '{if ($1 == "") print $4; else print $1}'`
     # Plato Wu,2012/04/22: \007 for BEL \033 for ESC
-   export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}"'
+  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}"'
 else
 
   export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}"'
@@ -194,5 +194,5 @@ if [ "$OSTYPE" = "cygwin" ] ; then
 fi
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
- exec startx
+  exec startx
 fi
