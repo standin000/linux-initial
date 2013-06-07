@@ -1,135 +1,95 @@
-
-;; Set el-get-sources and call el-get to init all those packages we need.
-
-(unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
-  (let ((buffer (url-retrieve-synchronously
+;; Plato Wu,2013/06/03: emacs 24 support ELPA natively
+(if (is-version 24)
+  (package-initialize)
+  (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
+    (let ((buffer (url-retrieve-synchronously
                "http://tromey.com/elpa/package-install.el")))
-  (save-excursion
-    (set-buffer buffer)
-    (goto-char (point-min))
-    (re-search-forward "^$" nil 'move)
-    (eval-region (point) (point-max))
-    (kill-buffer (current-buffer)))))
-
-;;; This was installed by package-install.el.
-;;; This provides support for the package system and
-;;; interfacing with ELPA, the package archive.
-;;; Move this code earlier if you want to reference
-;;; packages in your .emacs.
-(when
-    (load
-     (expand-file-name "~/.emacs.d/elpa/package.el"))
+      (save-excursion
+        (set-buffer buffer)
+        (goto-char (point-min))
+        (re-search-forward "^$" nil 'move)
+        (eval-region (point) (point-max))
+        (kill-buffer (current-buffer)))))
+  (load (expand-file-name "~/.emacs.d/elpa/package.el"))
   (package-initialize))
 
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
+
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+(add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
 
-(if (require 'el-get nil t)
-    (progn
-      (setq el-get-recipe-path 
-            (cons "~/linux-initial/emacs/recipes/" el-get-recipe-path))
+;; Plato Wu,2011/05/07: remove it for require will search it first for package,
+;; and the recipe file name is the same as package file name
+(setq load-path 
+      (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
+;; Plato Wu,2013/06/07: TOCHECK
+;; Plato Wu,2011/05/19: we must change the usage of el-get, don't use :after option to
+;; call package configuration, but run it after el-get finished its task. since el-get
+;; use eval-after-load to call :after function, it is annoy style.
 
-      ;; Plato Wu,2011/05/07: remove it for require will search it first for package,
-      ;; and the recipe file name is the same as package file name
-      (setq load-path 
-            (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
-      ;; Plato Wu,2010/12/26: features don't works for elpa type
-      (setq el-get-sources
-            ;; Plato Wu,2011/01/23: It report Package el-get failed to install, remove it first.
-            ;; so remove el-get from el-get-sources
-            '(;nxhtml
-                                        ;(:name dictionary-el    :type apt-get)
-                                        ;(:name emacs-goodies-el :type apt-get)
-              vkill
-              (:name org-mode :features org :after (org-configuration))
-              ;; Plato Wu,2011/02/24: ido will add ido-configuration into after-load-alist
-              ;; which cause error, so must use features.
-              (:name magit :features magit
-                     :after (progn (global-set-key (kbd "C-x C-z") 'magit-status)))
-              (:name paredit :features paredit :after (paredit-configuration))
-              ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
-              ;; get installed to pass error.
-                                        ;        (:name xml-rpc :type elpa)
-              ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
-              ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
-              ;; lisppaste, so disable lisppaste first, it is not useful for me.
-                                        ;	(:name lisppaste :type elpa)        
-              (:name smart-tab :features smart-tab :after (smart-tab-configuration))
-              (:name google-c-style :features google-c-style :after (c-mode-configuration))
-              (:name psvn :features psvn :after (psvn-configuration))
-              (:name ascii :after (ascii-configuration))
-              ;; Plato Wu,2011/05/15: vi can be used in it.
-              ;; Plato Wu,2011/05/23: quicklisp will install slime
-              ;; (:name slime :after slime-configuration)
-              (:name cldoc :features cldoc :after (cldoc-configuration))
-              (:name smart-compile :features smart-compile :after (compile-configuration))))
+;; Set el-get-sources and call el-get to init all those packages we need.
+(setq el-get-sources
+      '((:name magit :after (global-set-key (kbd "C-x C-z") 'magit-status))
+        (:name org-mode :after (org-configuration))
+        (:name paredit :after (paredit-configuration))
+        (:name smart-tab :after (smart-tab-configuration))
+        (:name google-c-style :after (c-mode-configuration))
+        (:name psvn :after (psvn-configuration))
+        (:name ascii :after (ascii-configuration))
+        (:name smart-compile :after (compile-configuration))
+      ;; (:name nxhtml)
+      ;; (:name dictionary-el    :type apt-get)
+      ;; (:name emacs-goodies-el :type apt-get)
+      ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
+      ;; get installed to pass error.
+      ;; (:name xml-rpc :type elpa)
+      ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
+      ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
+      ;; lisppaste, so disable lisppaste first, it is not useful for me.
+      ;; (:name lisppaste :type elpa)        
+        ))
 
-      (if (not (is-system "cygwin"))
-          (progn (setq el-get-sources
-                       (append el-get-sources
-                               '(
-                                 nrepl xclip
-                                 (:name clojure-mode :type elpa)
-;                                 (:name clojure-test-mode :type elpa)
-                                ; (:name auctex :after auctex-configuration)
-                                 (:name htmlize :type elpa :features htmlize)
-                                 (:name muse :type elpa :features muse)
-                                 (:name sawfish :features sawfish :after (sawfish-configuration))
-                                 ;(:name dired-single :features dired-single :after (dired-single-configuration))
-                                 dired-single
-                                 (:name multi-term :features multi-term)
-                                 (:name emms :type elpa :features emms :after (emms-configuration))
-                                 ;; Plato Wu,2011/07/02: it seems there is a problem with session
-                                 ;; recipe in el-get
-;                                 (:name session :features session :after session-configuration)
-                                 redshank dpans2texi)))
-                 (when (executable-find "w3m") 
-                   (setq el-get-sources
-                         (append el-get-sources
-                                 '((:name emacs-w3m :features w3m
-                                          :after (w3m-configuration))
-                                   (:name weblogger :type elpa :features weblogger :after (blogger-configuration))))))))
-      (setq my-packages
-            (append
-             '(el-get)
-             (mapcar 'el-get-source-name el-get-sources)))
-;      (el-get-cleanup my-packages)
-      (el-get 'sync my-packages))
-  (url-retrieve
- ;; Plato Wu,2011/11/15: gnutls must get installed and make /etc/ssl/certs/ca-certificates.crt readable
-      "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-      (lambda (s)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
-  (el-get 'sync))
+(when (not (is-system "cygwin"))
+  (setq el-get-sources
+        (append el-get-sources
+                '(;; Plato Wu,2013/05/27: TODO
+                  (:name xclip :after 
+                         #'(lambda ()
+                             (when (getenv "DISPLAY")
+                               (turn-on-xclip)))) 
+                  (:name clojure-mode :type elpa)
+      ;           (:name clojure-test-mode :type elpa)
+                  (:name nrepl) 
+      ;           (:name auctex :after auctex-configuration)
+                  (:name htmlize :type elpa)
+                  (:name muse :type elpa)
+                  (:name sawfish :after (sawfish-configuration))
+                 ;(:name dired-single :features dired-single :after (dired-single-configuration))
+                  (:name dired-single)
+                  (:name multi-term)
+                  (:name emms :type elpa :after (emms-configuration))
+                  ;; Plato Wu,2011/07/02: it seems there is a problem with session
+                  ;; recipe in el-get
+      ;            (:name session :features session :after session-configuration)
+                  (:name redshank) 
+      ;           (:name dpans2texi)
+                  )))
+  (when (executable-find "w3m") 
+    (setq el-get-sources
+          (append el-get-sources
+                  '((:name emacs-w3m :after (w3m-configuration))
+                    (:name weblogger :type elpa :after (blogger-configuration)))))))
+(setq my-packages
+      (append
+       '(vkill el-get cldoc)
+       (mapcar 'el-get-source-name el-get-sources)))
 
-;; Plato Wu, 2010/12/17, this function should not use el-get-dir which is conflict with
-;; el-get package itself
-;; (let ((el-get-install-dir        (expand-file-name "~/.emacs.d/el-get/"))
-;;       (package           "el-get"))
-;;   (unless (file-directory-p (concat el-get-install-dir package))
-;;     (let* ((bname             "*el-get bootstrap*")
-;;            (dummy             (unless (file-directory-p el-get-install-dir)
-;;                                 (make-directory el-get-install-dir t)))
-;;            (pdir              (concat (file-name-as-directory el-get-install-dir) package))
-;;            (git               (or (executable-find "git") (error "Unable to find `git'")))
-;; ; Plato Wu,2010/10/11: use sslVerify = false in git config skip https verification in http clone
-;;            (url               "https://github.com/dimitri/el-get.git")
-;;            (el-get-sources    `((:name ,package :type "git" :url ,url :features el-get :compile "el-get.el")))
-;;            (default-directory el-get-install-dir)
-;;            (process-connection-type nil) ; pipe, no pty (--no-progress)
-;;            (status            (call-process git nil bname t "--no-pager" "clone" "-v" url package)))
-;;       (set-window-buffer (selected-window) bname)
-;;       (when (eq 0 status)
-;;         (load (concat (file-name-as-directory pdir) package ".el"))
-;;         ;; (require 'bytecomp)
-;;         (el-get-init "el-get")
-;;         (with-current-buffer bname
-;;           (goto-char (point-max))
-;;           (insert "\nCongrats, el-get is installed and ready to serve!"))))))
-
-;; (let ((default-directory "~/.emacs.d/"))
-;;   (setq load-path (cons default-directory load-path))
-;;   (normal-top-level-add-subdirs-to-load-path))
+(el-get 'sync my-packages)
 
 (provide 'el-get-package)
 

@@ -52,11 +52,9 @@
       (eshell-bol)
       (if (= p (point))
 	  (beginning-of-line))))
-  ;; Plato Wu,2013/04/15: TODO move define-key from mode-hook to eval-after-load
   (add-hook 'eshell-mode-hook
-	    #'(lambda () 
-	       (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
-
+            #'(lambda () 
+                (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
   (defun eshel ()
     "change to visited file's directory every time"
     (interactive)
@@ -130,7 +128,8 @@
 
 (defun ido-configuration ()
   ;; Plato Wu,2011/08/13: 
-  (setq ido-enable-tramp-completion t) 
+  ;; Plato Wu,2013/06/07: why set it t? to lookup remote path
+  (setq ido-enable-tramp-completion nil) 
 ;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history 
   (setq ido-ignore-buffers
 	'("^ .*"
@@ -153,7 +152,8 @@
   (setq ido-use-virtual-buffers t)
   (setq ido-enable-flex-matching t)
   (setq ido-everywhere t)
-  (setq ido-use-filename-at-point 'guess)
+  ;; Plato Wu,2013/06/07: it is annoy when current-word is meaningless path.
+  (setq ido-use-filename-at-point nil)
   (ido-mode t))
 
 (ido-configuration)
@@ -379,9 +379,6 @@
       default))
 ;  (global-set-key [f9] 'Test-command-master)
   )
-;; Plato Wu,2011/05/19: we must change the usage of el-get, don't use :after option to
-;; call package configuration, but run it after el-get finished its task. since el-get
-;; use eval-after-load to call :after function, it is annoy style.
 ;(auctex-configuration)
 
 (defun blogger-configuration ()
@@ -821,9 +818,12 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
 (defun org-configuration ()
   ;; Plato Wu,2010/08/29: use C-u C-c $ org-archive-subtree to archive DONE items
-  (require 'org)
   (require 'org-archive)
   (require 'org-mobile)
+  (require 'org-publish)
+  (require 'org-latex)
+  (require 'org-crypt)
+
   (setq org-log-done t)
   (setq org-log-into-drawer t)
 
@@ -846,7 +846,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
         '(org-bbdb org-bibtex org-crypt org-gnus org-info
                    org-jsinfo org-inlinetask org-irc org-mew org-mhe org-vm org-wl org-w3m))
 
-  (require 'org-crypt)
                                         ; Encrypt all entries before saving
   (org-crypt-use-before-save-magic)
   (setq org-tags-exclude-from-inheritance (quote ("crypt")))
@@ -882,8 +881,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (setq org-capture-templates 
         (quote (("t" "todo" entry (file+headline "~/org/todo.org" "Toodledo") "** TODO %?"))))
 
-  (require 'org-publish)
-  (require 'org-latex)
   ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
   ;; for text which contains number.
   (add-to-list 'org-export-latex-emphasis-alist
@@ -975,6 +972,7 @@ this function is called."
   )
 
 (defun c-mode-configuration () 
+  (autoload 'google-set-c-style "google-c-style" nil t)
   (add-hook 'c-mode-common-hook 'google-set-c-style)
   (add-hook 'c-mode-common-hook 
             #'(lambda () 
@@ -1000,6 +998,18 @@ this function is called."
 ;;                           (c-toggle-auto-hungry-state nil)))
 
 (defun compile-configuration ()
+  (autoload 'smart-compile "smart-compile" "load smart compile")
+;Plato Wu,2013/04/15: use (symbol-function 'cc-mode) to get autoload for eval-after-load
+;Plato Wu,2013/05/14: there is cc-mode.el) to get autoload for eval-after-load
+ (eval-after-load
+    "cc-mode"
+   '(progn (define-key c-mode-map [f7] 'smart-compile)
+          (define-key c++-mode-map [f7] 'smart-compile)))
+
+  (eval-after-load
+    "make-mode"
+    '(define-key makefile-mode-map [f7] 'smart-compile))
+
   (setq compilation-read-command nil)
   (setq compilation-scroll-output t)
   (setq compilation-ask-about-save nil)
@@ -1121,14 +1131,14 @@ else evaluate sexp"
 
 ;(compile-configuration)
 
-(defun slime-configuration ()
+(defun common-lisp-configuration ()
+  (cldoc-configuration)
 ;; slime-inspector-mode's quick key
 ;; l runs the command slime-inspector-pop, return top level
 ;; d runs the command slime-inspector-describe
 ;; sldb-mode's quick key
 ;; v runs the command sldb-show-source
 ;; swank::inspect-function can describe a function
-  (load (expand-file-name "~/quicklisp/slime-helper.el"))
   ;; Replace "sbcl" with the path to your implementation
   (setq inferior-lisp-program "sbcl")
   ;; Plato Wu,2011/05/16: it will report different version between slime and
@@ -1271,8 +1281,12 @@ else evaluate sexp"
   (define-key slime-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol)
   (define-key slime-repl-mode-map "\C-\M-i" 'slime-fuzzy-complete-symbol))
 
-(when (file-exists-p "~/quicklisp/slime-helper.el")
-    (slime-configuration)) 
+(eval-after-load
+   "~/quicklisp/slime-helper.el"
+   '(common-lisp-configuration))
+
+;; Plato Wu,2013/06/06: (ql:update-client) and (ql:update-all-dists) 
+(autoload 'slime "~/quicklisp/slime-helper.el" "The Superior Lisp Interaction Mode for Emacs" t nil)
 
 (defun cldoc-configuration ()
   (autoload 'turn-on-cldoc-mode "cldoc" nil t)
