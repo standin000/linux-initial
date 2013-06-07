@@ -13,6 +13,8 @@
   (load (expand-file-name "~/.emacs.d/elpa/package.el"))
   (package-initialize))
 
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+
 (unless (require 'el-get nil 'noerror)
   (with-current-buffer
       (url-retrieve-synchronously
@@ -20,7 +22,6 @@
     (goto-char (point-max))
     (eval-print-last-sexp)))
 
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 (add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
 
 ;; Plato Wu,2011/05/07: remove it for require will search it first for package,
