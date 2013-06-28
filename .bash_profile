@@ -191,8 +191,13 @@ export TERM=xterm-256color
 # Plato Wu,2011/10/31: special for cygwin environment
 if [ "$OSTYPE" = "cygwin" ] ; then
     export LANG=zh_CN.GBK
+# Plato Wu,2013/06/27: so "cd d" is "cd /cygdrive/d"
+    export CDPATH=/cygdrive/    
 fi
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
   exec startx
 fi
+
+# Plato Wu,2013/06/27: spell checking for cd command
+shopt -s cdspell
