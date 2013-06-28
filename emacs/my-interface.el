@@ -72,6 +72,9 @@
 ;;let search case sensitively
 (setq-default case-fold-search nil)
 
+;; Plato Wu,2013/06/15: let sort-lines ignore case
+(setq-default sort-fold-case t)
+
 ;; Plato Wu,2009/11/26: all indentation must be made from spaces only.
 (setq-default indent-tabs-mode nil)
 

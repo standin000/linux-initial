@@ -35,7 +35,10 @@
 
 ;; Set el-get-sources and call el-get to init all those packages we need.
 (setq el-get-sources
-      '((:name magit :after (global-set-key (kbd "C-x C-z") 'magit-status))
+      '(
+        ;; Plato Wu,2013/06/13: emacs below 24.3 need it
+;        (:name cl-lib :type elpa)
+        (:name magit :after (global-set-key (kbd "C-x C-z") 'magit-status))
         (:name org-mode :after (org-configuration))
         (:name paredit :after (paredit-configuration))
         (:name smart-tab :after (smart-tab-configuration))
@@ -78,6 +81,8 @@
                   ;; recipe in el-get
       ;            (:name session :features session :after session-configuration)
                   (:name redshank) 
+                  (:name vkill)
+                  (:name cldoc)
       ;           (:name dpans2texi)
                   )))
   (when (executable-find "w3m") 
@@ -87,7 +92,7 @@
                     (:name weblogger :type elpa :after (blogger-configuration)))))))
 (setq my-packages
       (append
-       '(vkill el-get cldoc)
+       '(el-get)
        (mapcar 'el-get-source-name el-get-sources)))
 
 (el-get 'sync my-packages)
