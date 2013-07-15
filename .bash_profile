@@ -192,7 +192,7 @@ export TERM=xterm-256color
 if [ "$OSTYPE" = "cygwin" ] ; then
     export LANG=zh_CN.GBK
 # Plato Wu,2013/06/27: so "cd d" is "cd /cygdrive/d"
-    export CDPATH=/cygdrive/    
+    export CDPATH=./:/cygdrive/    
 fi
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
