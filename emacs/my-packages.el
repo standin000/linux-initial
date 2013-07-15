@@ -822,6 +822,48 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;; (require 'org-mobile)
   ;; (require 'org-publish)
   ;; (require 'org-latex)
+  ;; Plato Wu,2013/07/15: cygwin need (prefer-coding-system 'utf-8) and filename is english to export Chinese pdf
+  (if (string<  "8.0" org-version)
+    (progn
+      (require 'org-crypt)
+      (require 'org-table)
+      (require 'ox-beamer)
+      ;; Plato Wu,2013/07/10: TODO maybe use org-latex-text-markup-alist instead org-export-latex-emphasis-alist
+      (setq org-latex-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
+                                   "xelatex -output-directory  log/ %f" 
+                                   ;; moving intermediate tex file
+                                   "mv `basename %b`.tex log/"
+                                   ;; moving pdf for meeting org-export-as-pdf
+                                   "mv log/`basename %b`.pdf ."))
+      (add-to-list 'org-latex-classes
+             '("CV"
+               "\\documentclass{CV}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subsection{%s}" . "\\subsection{%s}"))))
+    ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
+  
+    (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
+                                   "xelatex -output-directory  log/ %f" 
+                                   ;; moving intermediate tex file
+                                   "mv `basename %b`.tex log/"
+                                   ;; moving pdf for meeting org-export-as-pdf
+                                   "mv log/`basename %b`.pdf ."))
+  ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
+  ;; for text which contains number.
+    (add-to-list 'org-export-latex-emphasis-alist
+                ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
+                ;; if we use font as main font, the english font is ugly.
+                ;; Plato Wu,2012/08/28: org-emph-re only support "[*/_=~+]"
+                '("~" "\\kai{%s}" t ))
+    (add-to-list 'org-export-latex-classes
+             '("CV"
+               "\\documentclass{CV}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subsection{%s}" . "\\subsection{%s}"))))
+  
+
   (setq org-log-done t)
   (setq org-log-into-drawer t)
 
@@ -893,45 +935,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;            )
   ;;           ;; ... add all the components here (see below)...
   ;;           ))
-  ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
-  (if (string<  "8.0" org-version)
-    (progn
-      (require 'org-crypt)
-      (require 'org-table)
-      (require 'ox-beamer)
-      ;; Plato Wu,2013/07/10: TODO maybe use org-latex-text-markup-alist instead org-export-latex-emphasis-alist
-      (setq org-latex-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
-                                   "xelatex -output-directory  log/ %f" 
-                                   ;; moving intermediate tex file
-                                   "mv `basename %b`.tex log/"
-                                   ;; moving pdf for meeting org-export-as-pdf
-                                   "mv log/`basename %b`.pdf ."
-                                   "rm log/`basename %b`.*"))
-      (add-to-list 'org-latex-classes
-             '("CV"
-               "\\documentclass{CV}
-                \\title{}"
-               ("\\cvsection{%s}" . "\\cvsection{%s}")
-               ("\\subsection{%s}" . "\\subsection{%s}"))))
-    (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
-                                   "xelatex -output-directory  log/ %f" 
-                                   ;; moving intermediate tex file
-                                   "mv `basename %b`.tex log/"
-                                   ;; moving pdf for meeting org-export-as-pdf
-                                   "mv log/`basename %b`.pdf ."))
-  ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
-  ;; for text which contains number.
-    (add-to-list 'org-export-latex-emphasis-alist
-                ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
-                ;; if we use font as main font, the english font is ugly.
-                ;; Plato Wu,2012/08/28: org-emph-re only support "[*/_=~+]"
-                '("~" "\\kai{%s}" t ))
-    (add-to-list 'org-export-latex-classes
-             '("CV"
-               "\\documentclass{CV}
-                \\title{}"
-               ("\\cvsection{%s}" . "\\cvsection{%s}")
-               ("\\subsection{%s}" . "\\subsection{%s}"))))
   
   (setq org-export-copy-to-kill-ring nil)
   (setq org-confirm-babel-evaluate nil)
