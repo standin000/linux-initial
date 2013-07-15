@@ -818,12 +818,10 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 
 (defun org-configuration ()
   ;; Plato Wu,2010/08/29: use C-u C-c $ org-archive-subtree to archive DONE items
-  (require 'org-archive)
-  (require 'org-mobile)
-  (require 'org-publish)
-  (require 'org-latex)
-  (require 'org-crypt)
-
+  ;; (require 'org-archive)
+  ;; (require 'org-mobile)
+  ;; (require 'org-publish)
+  ;; (require 'org-latex)
   (setq org-log-done t)
   (setq org-log-into-drawer t)
 
@@ -881,13 +879,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (setq org-capture-templates 
         (quote (("t" "todo" entry (file+headline "~/org/todo.org" "Toodledo") "** TODO %?"))))
 
-  ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
-  ;; for text which contains number.
-  (add-to-list 'org-export-latex-emphasis-alist
-               ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
-               ;; if we use font as main font, the english font is ugly.
-             ;; Plato Wu,2012/08/28: org-emph-re only support "[*/_=~+]"
-               '("~" "\\kai{%s}" t ))
   ;; Plato Wu,2011/02/18: use org-export-as-pdf instead
   ;; (setq org-publish-project-alist
   ;;       '(  ("CoreBoardTesting"
@@ -903,12 +894,45 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;           ;; ... add all the components here (see below)...
   ;;           ))
   ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
-  (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
+  (if (string<  "8.0" org-version)
+    (progn
+      (require 'org-crypt)
+      (require 'org-table)
+      (require 'ox-beamer)
+      ;; Plato Wu,2013/07/10: TODO maybe use org-latex-text-markup-alist instead org-export-latex-emphasis-alist
+      (setq org-latex-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
+                                   "xelatex -output-directory  log/ %f" 
+                                   ;; moving intermediate tex file
+                                   "mv `basename %b`.tex log/"
+                                   ;; moving pdf for meeting org-export-as-pdf
+                                   "mv log/`basename %b`.pdf ."
+                                   "rm log/`basename %b`.*"))
+      (add-to-list 'org-latex-classes
+             '("CV"
+               "\\documentclass{CV}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subsection{%s}" . "\\subsection{%s}"))))
+    (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
                                    "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
                                    "mv `basename %b`.tex log/"
                                    ;; moving pdf for meeting org-export-as-pdf
                                    "mv log/`basename %b`.pdf ."))
+  ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
+  ;; for text which contains number.
+    (add-to-list 'org-export-latex-emphasis-alist
+                ;; Plato Wu,2011/02/18: use ~ to tag Chinese characters for song font
+                ;; if we use font as main font, the english font is ugly.
+                ;; Plato Wu,2012/08/28: org-emph-re only support "[*/_=~+]"
+                '("~" "\\kai{%s}" t ))
+    (add-to-list 'org-export-latex-classes
+             '("CV"
+               "\\documentclass{CV}
+                \\title{}"
+               ("\\cvsection{%s}" . "\\cvsection{%s}")
+               ("\\subsection{%s}" . "\\subsection{%s}"))))
+  
   (setq org-export-copy-to-kill-ring nil)
   (setq org-confirm-babel-evaluate nil)
   (org-babel-do-load-languages
@@ -922,13 +946,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
      (perl . t)
      (sh . t)
      (C . t)
-     (sqlite . t)))
-  (add-to-list 'org-export-latex-classes
-             '("CV"
-               "\\documentclass{CV}
-                \\title{}"
-               ("\\cvsection{%s}" . "\\cvsection{%s}")
-               ("\\subsection{%s}" . "\\subsection{%s}")))
+     (sqlite . t)))  
 
   (defun orgtbl-to-latex (table params)
   "Convert the orgtbl-mode TABLE to LaTeX.

@@ -39,7 +39,8 @@
         ;; Plato Wu,2013/06/13: emacs below 24.3 need it
 ;        (:name cl-lib :type elpa)
         (:name magit :after (global-set-key (kbd "C-x C-z") 'magit-status))
-        (:name org-mode :after (org-configuration))
+        (:name org-mode :after 
+               (eval-after-load "ox-latex" '(org-configuration)))
         (:name paredit :after (paredit-configuration))
         (:name smart-tab :after (smart-tab-configuration))
         (:name google-c-style :after (c-mode-configuration))
