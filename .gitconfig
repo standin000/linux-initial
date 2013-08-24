@@ -21,10 +21,6 @@ status = auto
 branch = auto
 ui = auto
 
-
-[merge "merge-changelog"]
-name = GNU-style ChangeLog merge driver
-driver = /usr/local/bin/git-merge-changelog %O %A %B
 [http]
 # Plato Wu,2010/10/11: skip it for https clone
 sslVerify = false

@@ -9,6 +9,7 @@
 ;;(setq eshell-save-history-on-exit nil) to ignore coding system problem
   ;; Plato Wu,2013/01/25: eshell will overwrite bash command history which is invoked during
   ;; eshell running timeframe.
+  ;; Plato Wu,2013/07/24: if .bash_history is mess, clear it when emacs is closed
   (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
   (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-unix)
   (setq eshell-prompt-function 
@@ -52,9 +53,45 @@
       (eshell-bol)
       (if (= p (point))
 	  (beginning-of-line))))
+  (defun eshell-update-history ()
+    (let ((file eshell-history-file-name))
+      (cond
+       ((or (null file)
+            (equal file ""))
+        nil)
+       ((not (file-readable-p file))
+        (or silent
+            (message "Cannot read history file %s" file)))
+       (t
+        (let* ((count 0)
+               ;; Plato Wu,2013/06/21: because it is difficult to accurate new number of
+               ;; .bash_history after starting eshell, it assume 22 is OK.
+               (size 22) 
+               ;; Plato Wu,2013/06/21: temp buffer will use its own eshell variable
+               (ring eshell-history-ring)
+               (ignore-dups eshell-hist-ignoredups))
+          (with-temp-buffer
+            (insert-file-contents file)
+            ;; Save restriction in case file is already visited...
+            ;; Watch for those date stamps in history files!
+            (goto-char (point-max))
+            (forward-line (* -1 size))
+            (while (and (< count size)
+                        (re-search-forward "^[ \t]*\\([^#\n].*\\)[ \t]*$"
+                                            nil t))
+              (let ((history (match-string 1)))
+                (if (or (null ignore-dups)
+                        (ring-empty-p ring)
+                        (not (string-equal (ring-ref ring 0) history)))
+                    (ring-insert
+                     ring (subst-char-in-string ?\177 ?\n history))))
+              (setq count (1+ count)))))))))
   (add-hook 'eshell-mode-hook
             #'(lambda () 
-                (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)))
+                (define-key eshell-mode-map "\C-a" 'eshell-maybe-bol)
+                ;; Plato Wu,2013/06/21: it must be defined here, or this file will new
+                ;; its own variabile for eshell-exit-hook
+                (add-hook 'eshell-exit-hook 'eshell-update-history nil t)))
   (defun eshel ()
     "change to visited file's directory every time"
     (interactive)
@@ -130,7 +167,9 @@
   ;; Plato Wu,2011/08/13: 
   ;; Plato Wu,2013/06/07: why set it t? to lookup remote path
   (setq ido-enable-tramp-completion nil) 
-;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history 
+;; Plato Wu,2013/07/05: if .ido.last is mess or bring sudo buffer at the beginning, 
+;; clear it when emacs is closed
+
   (setq ido-ignore-buffers
 	'("^ .*"
 	;; ignore *eshell*, *svn-status*, a awkward regular expression
@@ -259,6 +298,8 @@
   ;; use emms-shuffle instead which  will shuffle the playlist
   ;;  (add-hook 'emms-player-finished-hook 'emms-random)
   ;;  (setq emms-player-next-function 'emms-random)
+  ;; Plato Wu,2013/07/24: use this to random play
+  (emms-player-mpd-send  "random 1" nil #'ignore)
   (setq emms-playlist-buffer-name "*Music*")
   (setq emms-player-mpd-music-directory "~/Music")
   (setq emms-player-next-function 'emms-next-noerror)
@@ -291,14 +332,13 @@
   (setq emms-lyrics-coding-system 'gbk-dos)
                                         ;    (setq emms-lyrics-display-on-minibuffer t)
 ;  (emms-lyrics 1)
-  (defadvice gnus-group-get-new-news (around pause-emms)
+  (defadvice gnus-group-get-new-news (around pause-emms activate)
     "Pause emms while Gnus is fetching mails or news."
     (if emms-player-playing-p
         (progn (emms-pause)
                ad-do-it
                (emms-pause))
       ad-do-it))
-  (ad-activate 'gnus-group-get-new-news)
   ;; global key-map
   ;; all global keys prefix is C-c e
   ;; compatible with emms-playlist mode keybindings
@@ -323,6 +363,27 @@
   (global-set-key (kbd "C-c e u") 'emms-score-up-playing)
   (global-set-key (kbd "C-c e d") 'emms-score-down-playing)
   (global-set-key (kbd "C-c e o") 'emms-score-show-playing)    
+
+(defadvice emms-history-save (before emm-history-save-set-repeat-flag activate)
+  "set emms-repeat-track nil for mpd which restart without remember repeating"
+  (setq emms-repeat-track nil))
+
+  ;; Plato Wu,2013/07/23: let emms-player-mpd support single track-repeat.
+(defun emms-mpd-toggle-repeat-track ()
+  "Toggle whether emms repeats the current track.
+See  `emms-repeat-track'."
+  (interactive)
+  (setq emms-repeat-track (not emms-repeat-track))
+  (if emms-repeat-track
+      (progn
+        (message "Will repeat the current track.")
+        (emms-player-mpd-send  "repeat 1" nil #'ignore)
+        ;; Plato Wu,2013/07/25: single mode is introduced with MPD 0.15
+        (emms-player-mpd-send  "single 1" nil #'ignore)
+        )
+    (emms-player-mpd-send  "repeat 0" nil #'ignore)
+    (emms-player-mpd-send  "single 0" nil #'ignore)
+    (message "Will advance to the next track after this one.")))
   )
 
 (defvar my-authinfo "~/.authinfo")
@@ -389,6 +450,7 @@
   (require 'weblogger)
   (require 'muse-latex2png)
   (require 'muse-colors)
+  (require 'w3m)
 ;; I also want to use regexp to markup inline latex equations of the
 ;; form `$\alpha$' because I'm too lazy to write
 ;; <latex inline="t">$\alpha$</latex>
@@ -492,7 +554,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
       ;;            (cons "weblog" 1))))
       )
     (weblogger-select-configuration))
-                                        ;  (setq-default case-fold-search t)
+
   (defun blogger-post ()
     (interactive)
     (unless weblogger-config-alist 
@@ -547,7 +609,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                              ;;              weblogger-ring-index)))
                              "\n")))
          (setq user-mail-address "plato.wu@qq.com")
-                                        ;      (setq user-mail-address "68697211@qq.com")
+         ;; (setq user-mail-address "68697211@qq.com")
          (setq smtpmail-default-smtp-server "smtp.qq.com") 
          (setq smtpmail-smtp-server "smtp.qq.com") 
          (setq send-mail-function 'smtpmail-send-it)
@@ -561,15 +623,16 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
          ;; Plato Wu,2010/09/28: delete weiruan000.platowu@spaces.live.com, Live Space will be shutdown
          ;; use its connect RSS instead.
          (compose-mail "42662703@qzone.qq.com"
-                       ;;platowu@qq.com,68697211@qzone.qq.com,
+                       ;;68697211@qzone.qq.com,
                        (cdr (assoc "title" entry)))
          (let ((content (cdr (assoc "content" entry))))
            ;; (insert (substring content 0 
            ;;                    (+ 4 (string-match "</p>" content))))
            (insert (format "<p>....</p><p>请移步<a href=\"http://platowu.info\">恒永之地</a>查看<a href=\"http://platowu.info/%s\"><font size = 6 color=\"#FF0000\">点我</font></a>，评论也在那边留哦，:)</p>" 
-                           (w3m-url-encode-string 
+                           (w3m-url-encode-string
                             (cdr (assoc "title" entry)) 'utf-8))))
-         (mail-send-and-exit)))))
+         ;; (mail-send-and-exit)
+         (message-send-and-exit)))))
 ;; Plato Wu,2013/01/02: refine to support multi footnote for many article in one page.
   (defun muse-html-markup-footnote ()
     (cond
@@ -604,200 +667,200 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                    "\" href=\"#" (muse-publishing-directive "title") "fn." text "\">"
                    text "</a></sup>")))
         (replace-match ""))))
-  (require 'smtpmail)
-
-  (defun smtpmail-send-it ()
-    (let ((errbuf (if mail-interactive
-                      (generate-new-buffer " smtpmail errors")
-                    0))
-          (tembuf (generate-new-buffer " smtpmail temp"))
-          (case-fold-search nil)
-          delimline
-          (mailbuf (current-buffer))
-          ;; Examine this variable now, so that
-          ;; local binding in the mail buffer will take effect.
-          (smtpmail-mail-address
-           (or (and mail-specify-envelope-from (mail-envelope-from))
-               user-mail-address))
-          (smtpmail-code-conv-from
-           (if enable-multibyte-characters
-               (let ((sendmail-coding-system smtpmail-code-conv-from))
-                 (select-message-coding-system)))))
-      (unwind-protect
-          (save-excursion
-            (set-buffer tembuf)
-            (erase-buffer)
-            ;; Use the same `buffer-file-coding-system' as in the mail
-            ;; buffer, otherwise any `write-region' invocations (e.g., in
-            ;; mail-do-fcc below) will annoy with asking for a suitable
-            ;; encoding.
-            (set-buffer-file-coding-system smtpmail-code-conv-from nil t)
-            (insert-buffer-substring mailbuf)
-            (goto-char (point-max))
-            ;; require one newline at the end.
-            (or (= (preceding-char) ?\n)
-                (insert ?\n))
-            ;; Change header-delimiter to be what sendmail expects.
-            (mail-sendmail-undelimit-header)
-            (setq delimline (point-marker))
-            ;; (sendmail-synch-aliases)
-            (if mail-aliases
-                (expand-mail-aliases (point-min) delimline))
-            (goto-char (point-min))
-            ;; ignore any blank lines in the header
-            (while (and (re-search-forward "\n\n\n*" delimline t)
-                        (< (point) delimline))
-              (replace-match "\n"))
-            (let ((case-fold-search t))
-              ;; We used to process Resent-... headers here,
-              ;; but it was not done properly, and the job
-              ;; is done correctly in `smtpmail-deduce-address-list'.
-              ;; Don't send out a blank subject line
-              (goto-char (point-min))
-              (if (re-search-forward "^Subject:\\([ \t]*\n\\)+\\b" delimline t)
-                  (replace-match "")
-                ;; This one matches a Subject just before the header delimiter.
-                (if (and (re-search-forward "^Subject:\\([ \t]*\n\\)+" delimline t)
-                         (= (match-end 0) delimline))
-                    (replace-match "")))
-              ;; Put the "From:" field in unless for some odd reason
-              ;; they put one in themselves.
-              (goto-char (point-min))
-              (if (not (re-search-forward "^From:" delimline t))
-                  (let* ((login smtpmail-mail-address)
-                         (fullname (user-full-name)))
-                    (cond ((eq mail-from-style 'angles)
-                           (insert "From: " fullname)
-                           (let ((fullname-start (+ (point-min) 6))
-                                 (fullname-end (point-marker)))
-                             (goto-char fullname-start)
-                             ;; Look for a character that cannot appear unquoted
-                             ;; according to RFC 822.
-                             (if (re-search-forward "[^- !#-'*+/-9=?A-Z^-~]"
-                                                    fullname-end 1)
-                                 (progn
-                                   ;; Quote fullname, escaping specials.
-                                   (goto-char fullname-start)
-                                   (insert "\"")
-                                   (while (re-search-forward "[\"\\]"
-                                                             fullname-end 1)
-                                     (replace-match "\\\\\\&" t))
-                                   (insert "\""))))
-                           (insert " <" login ">\n"))
-                          ((eq mail-from-style 'parens)
-                           (insert "From: " login " (")
-                           (let ((fullname-start (point)))
-                             (insert fullname)
-                             (let ((fullname-end (point-marker)))
-                               (goto-char fullname-start)
-                               ;; RFC 822 says \ and nonmatching parentheses
-                               ;; must be escaped in comments.
-                               ;; Escape every instance of ()\ ...
-                               (while (re-search-forward "[()\\]" fullname-end 1)
-                                 (replace-match "\\\\\\&" t))
-                               ;; ... then undo escaping of matching parentheses,
-                               ;; including matching nested parentheses.
-                               (goto-char fullname-start)
-                               (while (re-search-forward
-                                       "\\(\\=\\|[^\\]\\(\\\\\\\\\\)*\\)\\\\(\\(\\([^\\]\\|\\\\\\\\\\)*\\)\\\\)"
-                                       fullname-end 1)
-                                 (replace-match "\\1(\\3)" t)
-                                 (goto-char fullname-start))))
-                           (insert ")\n"))
-                          ((null mail-from-style)
-                           (insert "From: " login "\n")))))
-              ;; Insert a `Message-Id:' field if there isn't one yet.
-              (goto-char (point-min))
-              (unless (re-search-forward "^Message-Id:" delimline t)
-                (insert "Message-Id: " (message-make-message-id) "\n"))
-              ;; Insert a `Date:' field if there isn't one yet.
-              (goto-char (point-min))
-              (unless (re-search-forward "^Date:" delimline t)
-                (insert "Date: " (message-make-date) "\n"))
-              ;; Possibly add a MIME header for the current coding system
-              (let (charset)
-                (goto-char (point-min))
-                (and (eq mail-send-nonascii 'mime)
-                     (not (re-search-forward "^MIME-version:" delimline t))
-                     (progn (skip-chars-forward "\0-\177")
-                            (/= (point) (point-max)))
-                     smtpmail-code-conv-from
-                     (setq charset
-                           (coding-system-get smtpmail-code-conv-from
-                                              'mime-charset))
-                     (goto-char delimline)
-                     (insert "MIME-version: 1.0\n"
-                             ;; Plato Wu,2009/12/19: use html format
-                             "Content-type: text/html; charset="
-                             (symbol-name charset)
-                             "\nContent-Transfer-Encoding: 8bit\n")))
-              ;; Insert an extra newline if we need it to work around
-              ;; Sun's bug that swallows newlines.
-              (goto-char (1+ delimline))
-              (if (eval mail-mailer-swallows-blank-line)
-                  (newline))
-              ;; Find and handle any FCC fields.
-              (goto-char (point-min))
-              (if (re-search-forward "^FCC:" delimline t)
-                  ;; Force `mail-do-fcc' to use the encoding of the mail
-                  ;; buffer to encode outgoing messages on FCC files.
-                  (let ((coding-system-for-write smtpmail-code-conv-from))
-                    (mail-do-fcc delimline)))
-              (if mail-interactive
-                  (with-current-buffer errbuf
-                    (erase-buffer))))
-            ;;
-            (setq smtpmail-address-buffer (generate-new-buffer "*smtp-mail*"))
-            (setq smtpmail-recipient-address-list
-                  (smtpmail-deduce-address-list tembuf (point-min) delimline))
-            (kill-buffer smtpmail-address-buffer)
-
-            (smtpmail-do-bcc delimline)
-            ;; Send or queue
-            (if (not smtpmail-queue-mail)
-                (if (not (null smtpmail-recipient-address-list))
-                    (if (not (smtpmail-via-smtp
-                              smtpmail-recipient-address-list tembuf))
-                        (error "Sending failed; SMTP protocol error"))
-                  (error "Sending failed; no recipients"))
-              (let* ((file-data
-                      (expand-file-name
-                       (format "%s_%i"
-                               (format-time-string "%Y-%m-%d_%H:%M:%S")
-                               (setq smtpmail-queue-counter
-                                     (1+ smtpmail-queue-counter)))
-                       smtpmail-queue-dir))
-                     (file-data (convert-standard-filename file-data))
-                     (file-elisp (concat file-data ".el"))
-                     (buffer-data (create-file-buffer file-data))
-                     (buffer-elisp (create-file-buffer file-elisp))
-                     (buffer-scratch "*queue-mail*"))
-                (unless (file-exists-p smtpmail-queue-dir)
-                  (make-directory smtpmail-queue-dir t))
-                (with-current-buffer buffer-data
-                  (erase-buffer)
-                  (set-buffer-file-coding-system smtpmail-code-conv-from nil t)
-                  (insert-buffer-substring tembuf)
-                  (write-file file-data)
-                  (set-buffer buffer-elisp)
-                  (erase-buffer)
-                  (insert (concat
-                           "(setq smtpmail-recipient-address-list '"
-                           (prin1-to-string smtpmail-recipient-address-list)
-                           ")\n"))
-                  (write-file file-elisp)
-                  (set-buffer (generate-new-buffer buffer-scratch))
-                  (insert (concat file-data "\n"))
-                  (append-to-file (point-min)
-                                  (point-max)
-                                  (expand-file-name smtpmail-queue-index-file
-                                                    smtpmail-queue-dir)))
-                (kill-buffer buffer-scratch)
-                (kill-buffer buffer-data)
-                (kill-buffer buffer-elisp))))
-        (kill-buffer tembuf)
-        (if (bufferp errbuf)
-            (kill-buffer errbuf))))))
+  ;; Plato Wu,2013/08/24: emacs 24 use message-send-and-exit instead mail-send-and-exit
+  ;; (require 'smtpmail)
+  ;; (defun smtpmail-send-it ()
+  ;;   (let ((errbuf (if mail-interactive
+  ;;                     (generate-new-buffer " smtpmail errors")
+  ;;                   0))
+  ;;         (tembuf (generate-new-buffer " smtpmail temp"))
+  ;;         (case-fold-search nil)
+  ;;         delimline
+  ;;         (mailbuf (current-buffer))
+  ;;         ;; Examine this variable now, so that
+  ;;         ;; local binding in the mail buffer will take effect.
+  ;;         (smtpmail-mail-address
+  ;;          (or (and mail-specify-envelope-from (mail-envelope-from))
+  ;;              user-mail-address))
+  ;;         (smtpmail-code-conv-from
+  ;;          (if enable-multibyte-characters
+  ;;              (let ((sendmail-coding-system smtpmail-code-conv-from))
+  ;;                (select-message-coding-system)))))
+  ;;     (unwind-protect
+  ;;         (save-excursion
+  ;;           (set-buffer tembuf)
+  ;;           (erase-buffer)
+  ;;           ;; Use the same `buffer-file-coding-system' as in the mail
+  ;;           ;; buffer, otherwise any `write-region' invocations (e.g., in
+  ;;           ;; mail-do-fcc below) will annoy with asking for a suitable
+  ;;           ;; encoding.
+  ;;           (set-buffer-file-coding-system smtpmail-code-conv-from nil t)
+  ;;           (insert-buffer-substring mailbuf)
+  ;;           (goto-char (point-max))
+  ;;           ;; require one newline at the end.
+  ;;           (or (= (preceding-char) ?\n)
+  ;;               (insert ?\n))
+  ;;           ;; Change header-delimiter to be what sendmail expects.
+  ;;           (mail-sendmail-undelimit-header)
+  ;;           (setq delimline (point-marker))
+  ;;           ;; (sendmail-synch-aliases)
+  ;;           (if mail-aliases
+  ;;               (expand-mail-aliases (point-min) delimline))
+  ;;           (goto-char (point-min))
+  ;;           ;; ignore any blank lines in the header
+  ;;           (while (and (re-search-forward "\n\n\n*" delimline t)
+  ;;                       (< (point) delimline))
+  ;;             (replace-match "\n"))
+  ;;           (let ((case-fold-search t))
+  ;;             ;; We used to process Resent-... headers here,
+  ;;             ;; but it was not done properly, and the job
+  ;;             ;; is done correctly in `smtpmail-deduce-address-list'.
+  ;;             ;; Don't send out a blank subject line
+  ;;             (goto-char (point-min))
+  ;;             (if (re-search-forward "^Subject:\\([ \t]*\n\\)+\\b" delimline t)
+  ;;                 (replace-match "")
+  ;;               ;; This one matches a Subject just before the header delimiter.
+  ;;               (if (and (re-search-forward "^Subject:\\([ \t]*\n\\)+" delimline t)
+  ;;                        (= (match-end 0) delimline))
+  ;;                   (replace-match "")))
+  ;;             ;; Put the "From:" field in unless for some odd reason
+  ;;             ;; they put one in themselves.
+  ;;             (goto-char (point-min))
+  ;;             (if (not (re-search-forward "^From:" delimline t))
+  ;;                 (let* ((login smtpmail-mail-address)
+  ;;                        (fullname (user-full-name)))
+  ;;                   (cond ((eq mail-from-style 'angles)
+  ;;                          (insert "From: " fullname)
+  ;;                          (let ((fullname-start (+ (point-min) 6))
+  ;;                                (fullname-end (point-marker)))
+  ;;                            (goto-char fullname-start)
+  ;;                            ;; Look for a character that cannot appear unquoted
+  ;;                            ;; according to RFC 822.
+  ;;                            (if (re-search-forward "[^- !#-'*+/-9=?A-Z^-~]"
+  ;;                                                   fullname-end 1)
+  ;;                                (progn
+  ;;                                  ;; Quote fullname, escaping specials.
+  ;;                                  (goto-char fullname-start)
+  ;;                                  (insert "\"")
+  ;;                                  (while (re-search-forward "[\"\\]"
+  ;;                                                            fullname-end 1)
+  ;;                                    (replace-match "\\\\\\&" t))
+  ;;                                  (insert "\""))))
+  ;;                          (insert " <" login ">\n"))
+  ;;                         ((eq mail-from-style 'parens)
+  ;;                          (insert "From: " login " (")
+  ;;                          (let ((fullname-start (point)))
+  ;;                            (insert fullname)
+  ;;                            (let ((fullname-end (point-marker)))
+  ;;                              (goto-char fullname-start)
+  ;;                              ;; RFC 822 says \ and nonmatching parentheses
+  ;;                              ;; must be escaped in comments.
+  ;;                              ;; Escape every instance of ()\ ...
+  ;;                              (while (re-search-forward "[()\\]" fullname-end 1)
+  ;;                                (replace-match "\\\\\\&" t))
+  ;;                              ;; ... then undo escaping of matching parentheses,
+  ;;                              ;; including matching nested parentheses.
+  ;;                              (goto-char fullname-start)
+  ;;                              (while (re-search-forward
+  ;;                                      "\\(\\=\\|[^\\]\\(\\\\\\\\\\)*\\)\\\\(\\(\\([^\\]\\|\\\\\\\\\\)*\\)\\\\)"
+  ;;                                      fullname-end 1)
+  ;;                                (replace-match "\\1(\\3)" t)
+  ;;                                (goto-char fullname-start))))
+  ;;                          (insert ")\n"))
+  ;;                         ((null mail-from-style)
+  ;;                          (insert "From: " login "\n")))))
+  ;;             ;; Insert a `Message-Id:' field if there isn't one yet.
+  ;;             (goto-char (point-min))
+  ;;             (unless (re-search-forward "^Message-Id:" delimline t)
+  ;;               (insert "Message-Id: " (message-make-message-id) "\n"))
+  ;;             ;; Insert a `Date:' field if there isn't one yet.
+  ;;             (goto-char (point-min))
+  ;;             (unless (re-search-forward "^Date:" delimline t)
+  ;;               (insert "Date: " (message-make-date) "\n"))
+  ;;             ;; Possibly add a MIME header for the current coding system
+  ;;             (let (charset)
+  ;;               (goto-char (point-min))
+  ;;               (and (eq mail-send-nonascii 'mime)
+  ;;                    (not (re-search-forward "^MIME-version:" delimline t))
+  ;;                    (progn (skip-chars-forward "\0-\177")
+  ;;                           (/= (point) (point-max)))
+  ;;                    smtpmail-code-conv-from
+  ;;                    (setq charset
+  ;;                          (coding-system-get smtpmail-code-conv-from
+  ;;                                             'mime-charset))
+  ;;                    (goto-char delimline)
+  ;;                    (insert "MIME-version: 1.0\n"
+  ;;                            ;; Plato Wu,2009/12/19: use html format
+  ;;                            "Content-type: text/html; charset="
+  ;;                            (symbol-name charset)
+  ;;                            "\nContent-Transfer-Encoding: 8bit\n")))
+  ;;             ;; Insert an extra newline if we need it to work around
+  ;;             ;; Sun's bug that swallows newlines.
+  ;;             (goto-char (1+ delimline))
+  ;;             (if (eval mail-mailer-swallows-blank-line)
+  ;;                 (newline))
+  ;;             ;; Find and handle any FCC fields.
+  ;;             (goto-char (point-min))
+  ;;             (if (re-search-forward "^FCC:" delimline t)
+  ;;                 ;; Force `mail-do-fcc' to use the encoding of the mail
+  ;;                 ;; buffer to encode outgoing messages on FCC files.
+  ;;                 (let ((coding-system-for-write smtpmail-code-conv-from))
+  ;;                   (mail-do-fcc delimline)))
+  ;;             (if mail-interactive
+  ;;                 (with-current-buffer errbuf
+  ;;                   (erase-buffer))))
+  ;;           ;;
+  ;;           (setq smtpmail-address-buffer (generate-new-buffer "*smtp-mail*"))
+  ;;           (setq smtpmail-recipient-address-list
+  ;;                 (smtpmail-deduce-address-list tembuf (point-min) delimline))
+  ;;           (kill-buffer smtpmail-address-buffer)
+  ;;           (smtpmail-do-bcc delimline)
+  ;;           ;; Send or queue
+  ;;           (if (not smtpmail-queue-mail)
+  ;;               (if (not (null smtpmail-recipient-address-list))
+  ;;                   (if (not (smtpmail-via-smtp
+  ;;                             smtpmail-recipient-address-list tembuf))
+  ;;                       (error "Sending failed; SMTP protocol error"))
+  ;;                 (error "Sending failed; no recipients"))
+  ;;             (let* ((file-data
+  ;;                     (expand-file-name
+  ;;                      (format "%s_%i"
+  ;;                              (format-time-string "%Y-%m-%d_%H:%M:%S")
+  ;;                              (setq smtpmail-queue-counter
+  ;;                                    (1+ smtpmail-queue-counter)))
+  ;;                      smtpmail-queue-dir))
+  ;;                    (file-data (convert-standard-filename file-data))
+  ;;                    (file-elisp (concat file-data ".el"))
+  ;;                    (buffer-data (create-file-buffer file-data))
+  ;;                    (buffer-elisp (create-file-buffer file-elisp))
+  ;;                    (buffer-scratch "*queue-mail*"))
+  ;;               (unless (file-exists-p smtpmail-queue-dir)
+  ;;                 (make-directory smtpmail-queue-dir t))
+  ;;               (with-current-buffer buffer-data
+  ;;                 (erase-buffer)
+  ;;                 (set-buffer-file-coding-system smtpmail-code-conv-from nil t)
+  ;;                 (insert-buffer-substring tembuf)
+  ;;                 (write-file file-data)
+  ;;                 (set-buffer buffer-elisp)
+  ;;                 (erase-buffer)
+  ;;                 (insert (concat
+  ;;                          "(setq smtpmail-recipient-address-list '"
+  ;;                          (prin1-to-string smtpmail-recipient-address-list)
+  ;;                          ")\n"))
+  ;;                 (write-file file-elisp)
+  ;;                 (set-buffer (generate-new-buffer buffer-scratch))
+  ;;                 (insert (concat file-data "\n"))
+  ;;                 (append-to-file (point-min)
+  ;;                                 (point-max)
+  ;;                                 (expand-file-name smtpmail-queue-index-file
+  ;;                                                   smtpmail-queue-dir)))
+  ;;               (kill-buffer buffer-scratch)
+  ;;               (kill-buffer buffer-data)
+  ;;               (kill-buffer buffer-elisp))))
+  ;;       (kill-buffer tembuf)
+  ;;       (if (bufferp errbuf)
+  ;;           (kill-buffer errbuf)))))
+  )
 
 (defun smart-tab-configuration ()
   (setq smart-tab-using-hippie-expand t)
@@ -821,7 +884,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;; (require 'org-archive)
   ;; (require 'org-mobile)
   ;; (require 'org-publish)
-  ;; (require 'org-latex)
+  (require 'org)
   ;; Plato Wu,2013/07/15: cygwin need (prefer-coding-system 'utf-8) and filename is english to export Chinese pdf
   (if (string<  "8.0" org-version)
     (progn
@@ -841,8 +904,12 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                 \\title{}"
                ("\\cvsection{%s}" . "\\cvsection{%s}")
                ("\\subsection{%s}" . "\\subsection{%s}"))))
+    (require 'org-crypt)
+    (require 'org-latex)
+    ;Plato Wu,2013/07/15: org-verison < 8.0 don't support BEAMER_THEME and ATTR_BEAMER
+ ;   (require 'org-latex)
+;    (require 'org-beamer)
     ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
-  
     (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
                                    "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
@@ -864,9 +931,10 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                ("\\subsection{%s}" . "\\subsection{%s}"))))
   
 
-  (setq org-log-done t)
+  (setq org-log-done 'time)
   (setq org-log-into-drawer t)
-
+  ;; Plato Wu,2013/07/24: auto fill lone line
+  (setq org-startup-truncated nil)
   ;; Turn off prefer future dates 
   (setq org-read-date-prefer-future nil)
 
@@ -1154,6 +1222,8 @@ else evaluate sexp"
 
 (defun common-lisp-configuration ()
   (cldoc-configuration)
+;; Plato Wu,2013/06/06: (ql:update-client) and (ql:update-all-dists) 
+  (autoload 'slime "~/quicklisp/slime-helper.el" "The Superior Lisp Interaction Mode for Emacs" t nil)
 ;; slime-inspector-mode's quick key
 ;; l runs the command slime-inspector-pop, return top level
 ;; d runs the command slime-inspector-describe
@@ -1306,9 +1376,6 @@ else evaluate sexp"
    "~/quicklisp/slime-helper.el"
    '(common-lisp-configuration))
 
-;; Plato Wu,2013/06/06: (ql:update-client) and (ql:update-all-dists) 
-(autoload 'slime "~/quicklisp/slime-helper.el" "The Superior Lisp Interaction Mode for Emacs" t nil)
-
 (defun cldoc-configuration ()
   (autoload 'turn-on-cldoc-mode "cldoc" nil t)
   (add-hook 'lisp-mode-hook 'turn-on-cldoc-mode)
@@ -1338,7 +1405,9 @@ else evaluate sexp"
   (setq w3m-enable-google-feeling-lucky nil)
   (add-hook 'w3m-mode-hook 
              #'(lambda ()
-                (w3m-link-numbering-mode 1)))
+                 ;; Plato Wu,2013/06/19: is it obsolete in w3m/0.5.3
+                ;(w3m-link-numbering-mode 1)
+                ))
   
   (defun my-w3m-href-text (&optional position)
      "Return text linked up with the href anchor at the given POSITION.

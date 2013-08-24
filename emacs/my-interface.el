@@ -423,3 +423,10 @@
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
 ;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line
 
+;; Plato Wu,2013/06/29: for emacs w32
+;; Plato Wu,2009/11/21: It seems .emacs and .emacs.lnk in the same directory are conflict
+;; in cygwin, so if Emacs w32 can not use .emacs in home directory.
+;; Plato Wu,2009/11/23: HOME variable must set in Windows first.
+;; (load "~/linux-backup/.emacs")
+;; (server-start)
+;; (setq kill-buffer-query-functions nil)
