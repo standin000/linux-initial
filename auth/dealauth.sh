@@ -19,7 +19,7 @@ for authfile in $authfiles; do
     # gpg --export-secret-keys -a -o private.asc
     # scp -P 80 plato@netawater.blogdns.org://home/plato/backup/private.asc .
     # gpg --import private.asc
-    #gpg -e -a -r "Plato Wu" $authfile will encrypt file with public key
+    # gpg -e -a -r "Plato Wu" $authfile will encrypt file with public key
     gpg -o $authfile -d $filehome/$authfile.asc
     if ([ -f $authfile.old ]); then
         diff $authfile.old $authfile

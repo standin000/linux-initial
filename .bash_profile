@@ -199,5 +199,9 @@ if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
   exec startx
 fi
 
+# Plato Wu,2013/06/15: for Kitty to invoke winscp
+winscp() { echo -ne "\033];__ws:${PWD}\007"; }
+
 # Plato Wu,2013/06/27: spell checking for cd command
 shopt -s cdspell
+

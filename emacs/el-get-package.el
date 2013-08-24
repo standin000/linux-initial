@@ -40,7 +40,7 @@
 ;        (:name cl-lib :type elpa)
         (:name magit :after (global-set-key (kbd "C-x C-z") 'magit-status))
         (:name org-mode :after 
-               (eval-after-load "ox-latex" '(org-configuration)))
+               (eval-after-load "org" '(org-configuration)))
         (:name paredit :after (paredit-configuration))
         (:name smart-tab :after (smart-tab-configuration))
         (:name google-c-style :after (c-mode-configuration))
@@ -64,8 +64,9 @@
         (append el-get-sources
                 '(;; Plato Wu,2013/05/27: TODO
                   (:name xclip :after 
-                         #'(lambda ()
+                         (progn
                              (when (getenv "DISPLAY")
+                               (autoload 'turn-on-xclip "xclip" "exchange clip between X and emacs" t nil)
                                (turn-on-xclip)))) 
                   (:name clojure-mode :type elpa)
       ;           (:name clojure-test-mode :type elpa)
@@ -90,7 +91,9 @@
     (setq el-get-sources
           (append el-get-sources
                   '((:name emacs-w3m :after (w3m-configuration))
-                    (:name weblogger :type elpa :after (blogger-configuration)))))))
+                    (:name weblogger :type elpa :after 
+                           (eval-after-load "muse-mode" '(blogger-configuration)))
+                    )))))
 (setq my-packages
       (append
        '(el-get)

@@ -4,7 +4,9 @@
     'NG))
 
 (defmacro try-require (library)
-  `(try-function '(require ,library)))
+  (condition-case nil
+      (require library)
+    (error (message "%s is not existed"  library))))
 
 (defun is-system (type)
   (string= system-type type))
@@ -752,7 +754,11 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
 ;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
 (defun rename-file-and-buffer (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive "sNew name: ")
+;  (interactive "FNew name: ")
+  (interactive (list 
+                (completing-read "New name:"
+                                 nil
+                                 nil nil (buffer-name))))
   (let ((name (buffer-name))
         (filename (buffer-file-name)))
     (if (not filename)
