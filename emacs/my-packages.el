@@ -6,12 +6,13 @@
     (setq eshell-save-history-on-exit t))
   ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
   (setq eshell-history-size 1000)
-;;(setq eshell-save-history-on-exit nil) to ignore coding system problem
+  ;; (setq eshell-history-ring nil)
+  ;; remove bad character in .bash_history to resolve coding system problem when exit eshell
   ;; Plato Wu,2013/01/25: eshell will overwrite bash command history which is invoked during
   ;; eshell running timeframe.
   ;; Plato Wu,2013/07/24: if .bash_history is mess, clear it when emacs is closed
   (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
-  (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-unix)
+;  (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-unix)
   (setq eshell-prompt-function 
         (function
          (lambda ()
@@ -167,6 +168,7 @@
   ;; Plato Wu,2011/08/13: 
   ;; Plato Wu,2013/06/07: why set it t? to lookup remote path
   (setq ido-enable-tramp-completion nil) 
+;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history and set ido-work-file-list to nil
 ;; Plato Wu,2013/07/05: if .ido.last is mess or bring sudo buffer at the beginning, 
 ;; clear it when emacs is closed
 

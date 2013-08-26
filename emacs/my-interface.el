@@ -342,21 +342,14 @@
 
 ;; (global-set-key [f9] 'my-search)
 
-(setq grep-files-aliases
-      '(("asm" .    "*.[sS]")
-        ;; Plato Wu,2013/01/25: hh take precdence over items below.
-        ("hh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
-        ;; Plato Wu,2010/02/27: Let ch match .c file first!
-        ("ch" .    "*.[ch]")
-        ("c" .     "*.c")
-        ("cc" .    "*.cc *.cxx *.cpp *.C *.CC *.c++")
-        ("cchh" .  "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
-        ("el" .    "*.el")
-        ("h" .     "*.h")
-        ("l" .      "[Cc]hange[Ll]og*")
-        ("m" .     "[Mm]akefile*")
-        ("tex" .    "*.tex")
-        ("texi" .   "*.texi")))
+;; (add-to-list 'grep-files-aliases
+;;              ;; Plato Wu,2010/02/27: Let ch match .c file first!
+;;              ;; Plato Wu,2013/01/25: hh take precdence over items below.
+;;              '("hh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++"))
+;; Plato Wu,2013/08/26: project-grep will match (cdr aliaes) to determine search default files.
+(add-to-list 'grep-files-aliases
+             '("cchh" . "*.[ch] *.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++"))
+
 
 ;;C-x ( start-kbd-macro; C-x ) end-kbd-macro; C-x e call-last-kbd-macro
 ;; Dos to unix
@@ -423,6 +416,11 @@
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
 ;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line
 
+(add-to-list 'custom-theme-load-path
+                  (file-name-as-directory
+                   (file-name-directory load-file-name)))
+
+(load-theme 'molokai t nil)
 ;; Plato Wu,2013/06/29: for emacs w32
 ;; Plato Wu,2009/11/21: It seems .emacs and .emacs.lnk in the same directory are conflict
 ;; in cygwin, so if Emacs w32 can not use .emacs in home directory.
