@@ -4,6 +4,8 @@
 # Plato Wu,2010/01/03: * must be escaped for it is used by Shell first.
 # Plato Wu,2011/06/28: archlinux provides etags.emacs, don't create link
 # Plato Wu,2011/08/31: emacs 23.3.a-2 use etags intead etags.emacs
-find . -iname \*.[chs] -print0 -or -iname \*.cpp -print0 | xargs -0 etags -a
+#find . -iname \*.[chs] -print0 -or -iname \*.cpp -print0 | xargs -0 etags -a
+find . \( -iname \*.cc -o -iname \*.\[ch\]xx -o -iname \*.\[ch\]pp -o -iname \*.\[CHh\] -o -iname \*.CC -o -iname \*.HH -o -iname \*.\[ch\]\+\+ \) -print0 | xargs -0 etags -a
 # Plato Wu,2013/01/21: count line
-find . -iname \*.[chs] -print0 -or -iname \*.cpp -print0 | xargs -0 wc -l
+#find . -iname \*.[chs] -print0 -or -iname \*.cpp -print0 | xargs -0 wc -l
+find . \( -iname \*.cc -o -iname \*.\[ch\]xx -o -iname \*.\[ch\]pp -o -iname \*.\[CHh\] -o -iname \*.CC -o -iname \*.HH -o -iname \*.\[ch\]\+\+ \) -print0 | xargs -0 wc -l
