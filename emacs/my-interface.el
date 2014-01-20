@@ -78,7 +78,12 @@
 ;; Plato Wu,2009/11/26: all indentation must be made from spaces only.
 (setq-default indent-tabs-mode nil)
 
+;; Plato Wu,2013/12/02: same with Visual Studio
+(setq-default tab-width 4)
+
 (setq vc-follow-symlinks t)
+;; Plato Wu,2013/12/02: backup files under VC
+;; (setq vc-make-backup-files t)
 
 ;; Plato Wu,2013/05/11: set scroll-margin make multi-terminal unhappy
 ;; (setq scroll-margin 3)
@@ -383,8 +388,10 @@
 (set-face-background 'default "black")
 
 
-; show the current function when possible; it need cedet to know function'name
-(which-func-mode 1)
+; show the current function when possible
+(if (is-version 24)
+    (which-function-mode 1)
+    (which-func-mode 1))
 
 ;; Plato Wu,2009/11/26: get rid of warning for not safe variables
 ;;(setq enable-local-variables :safe)
@@ -428,3 +435,10 @@
 ;; (load "~/linux-backup/.emacs")
 ;; (server-start)
 ;; (setq kill-buffer-query-functions nil)
+
+;; Plato Wu,2013/11/13: ediff for utf16 file
+(setq ediff-diff-options "--text")
+
+;; Plato Wu,2014/01/10: when emacs halt, C-g will show where it is
+;; (toggle-debug-on-quit)
+

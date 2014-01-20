@@ -865,9 +865,9 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   )
 
 (defun smart-tab-configuration ()
-  (setq smart-tab-using-hippie-expand t)
-  (global-smart-tab-mode 1)
-  (add-to-list 'smart-tab-disabled-major-modes 'eshell-mode))
+;; Plato Wu,2014/01/10: dabbrev-expand is better than hippie expand when coding
+;;  (setq smart-tab-using-hippie-expand t)
+  (global-smart-tab-mode 1))
 
 (defun org-toodledo-configuration ()
   (require 'org-toodledo)
@@ -898,7 +898,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                                    "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
                                    "mv `basename %b`.tex log/"
-                                   ;; moving pdf for meeting org-export-as-pdf
+                                   ;; moving pdf for meeting org-latex-export-to-pdf
                                    "mv log/`basename %b`.pdf ."))
       (add-to-list 'org-latex-classes
              '("CV"
@@ -916,7 +916,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                                    "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
                                    "mv `basename %b`.tex log/"
-                                   ;; moving pdf for meeting org-export-as-pdf
+                                   ;; moving pdf for meeting org-latex-export-to-pdf
                                    "mv log/`basename %b`.pdf ."))
   ;; Plato Wu,2011/02/17: protected all emphasis text for there is a bug
   ;; for text which contains number.
@@ -991,7 +991,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (setq org-capture-templates 
         (quote (("t" "todo" entry (file+headline "~/org/todo.org" "Toodledo") "** TODO %?"))))
 
-  ;; Plato Wu,2011/02/18: use org-export-as-pdf instead
+  ;; Plato Wu,2011/02/18: use org-latex-export-to-pdf instead
   ;; (setq org-publish-project-alist
   ;;       '(  ("CoreBoardTesting"
   ;;            :base-directory "~/org/"
@@ -1087,6 +1087,23 @@ this function is called."
 ;; (add-hook 'c-mode-hook #'(lambda ()
 ;;                           (c-set-style "stroustrup")
 ;;                           (c-toggle-auto-hungry-state nil)))
+(defun ggtags-configuration ()
+;; Plato Wu,2014/01/10: M-. finds definitions or references according to the tag at point, 
+;; if point is at a definition tag find references and vice versa. M-] finds references.
+;; If multiple matches are found, navigation mode is entered, the mode-line lighter 
+;; changed, and a navigation menu-bar entry presented. In this mode, M-n and M-p moves 
+;; to next and previous match, M-} and M-{ to next and previous file respectively. M-o 
+;; toggles between full and abbreviated displays of file names in the auxiliary popup 
+;; window. When you locate the right match, press RET to finish which hides the 
+;; auxiliary window and exits navigation mode. You can continue the search using M-,. 
+;; To abort the search press M-*.
+
+;; Normally after a few searches a dozen buffers are created visiting files tracked 
+;; by GNU Global. C-c M-k helps clean them up.
+  (add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              (ggtags-mode 1)))))
 
 (defun compile-configuration ()
   (autoload 'smart-compile "smart-compile" "load smart compile")
@@ -1444,6 +1461,5 @@ to the position where the property exists."
 ;;                         slime-repl-mode-hook
 ;; 			emacs-lisp-mode-hook) t)
 
-(provide 'my-packages)
 
-  
+(provide 'my-packages)

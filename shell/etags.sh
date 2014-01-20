@@ -9,3 +9,5 @@ find . \( -iname \*.cc -o -iname \*.\[ch\]xx -o -iname \*.\[ch\]pp -o -iname \*.
 # Plato Wu,2013/01/21: count line
 #find . -iname \*.[chs] -print0 -or -iname \*.cpp -print0 | xargs -0 wc -l
 find . \( -iname \*.cc -o -iname \*.\[ch\]xx -o -iname \*.\[ch\]pp -o -iname \*.\[CHh\] -o -iname \*.CC -o -iname \*.HH -o -iname \*.\[ch\]\+\+ \) -print0 | xargs -0 wc -l
+# Plato Wu,2014/01/10: try to transfer to GNU Global
+# gtags

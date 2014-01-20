@@ -191,10 +191,11 @@ do kill lines as `dd' in vim."
 ;; f12 set mark; S-F12 goto mark in ssh mode
 (global-set-key [f12] 'ska-point-to-register)
 ;; Plato Wu,2009/12/17: Alt+F12 does not work in X window and Windows
-;; Ctrl+F12 does not work in termial, so enable them both.
+;; Plato Wu,2010/04/07 Ctrl+F12 for cygwin
 (global-set-key (quote [C-f12]) 'ska-jump-to-register)
+;; Plato Wu,2010/04/07: ESC-F12 for terminal, which is the same with Alt-F12
 (global-set-key (quote [27 f12]) 'ska-jump-to-register)
-;; Plato Wu,2010/04/07: M-f12 for windows
+;; Plato Wu,2010/04/07: Alt-F12
 (global-set-key (quote [M f12]) 'ska-jump-to-register)
 
 (defun ska-point-to-register()
@@ -508,7 +509,6 @@ isn't there and triggers an error"
 
 ;; Plato Wu,2011/04/09: use smart-tab instead.
 ;; (defun my-indent-or-complete ()
-;;   ;;   "If cursor is at the end of word then hippie-expand, else indent"
 ;;    "If cursor is at the end of word then call M-TAB's function, else call
 ;;    TAB's function."
 ;;   (interactive)
@@ -516,9 +516,7 @@ isn't there and triggers an error"
 ;;   (let ((TAB-func (key-binding '[C-tab]))
 ;; 	(M-TAB-func (key-binding "\M-\t")))
 ;;    (if (looking-at "\\>") 
-;;        ;;       (hippie-expand nil)
 ;;        (call-interactively M-TAB-func)
-;;      ;;       (indent-for-tab-command)
 ;;      (call-interactively TAB-func))))
 
 ;; some useful fuction

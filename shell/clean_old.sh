@@ -38,11 +38,11 @@ clean_old(){
     # Plato Wu,2009/09/26: use mtime is more accurate in Cygwin.
     # Plato Wu,2010/08/28: print and confirm before delete
     if [  $2 ]; then
-        find $1 -maxdepth 1 ! -type d -mtime +90 -exec ls -l {} \; > output.txt
+        find $1 -maxdepth 1 ! -type d -mtime +90 -exec ls -l {} \; > trash_items.txt
         # Plato Wu,2009/07/27: use mindepth avoid delete itself
-        find $1 -mindepth 1 -maxdepth 1 -type d -mtime +90 -exec ls -l -d {} \; >> output.txt
-        if [ -s output.txt ]; then
-          cat output.txt  
+        find $1 -mindepth 1 -maxdepth 1 -type d -mtime +90 -exec ls -l -d {} \; >> trash_items.txt
+        if [ -s trash_items.txt ]; then
+          cat trash_items.txt  
           doContinue=n
           echo -n "Are you sure clean $1 them all (y/n)"
           read doContinue
@@ -89,4 +89,4 @@ else
     done
 fi
 
-rm output.txt
+rm trash_items.txt

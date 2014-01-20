@@ -28,7 +28,7 @@
 ;; and the recipe file name is the same as package file name
 (setq load-path 
       (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
-;; Plato Wu,2013/06/07: TOCHECK
+;; Plato Wu,2013/06/07: @todo
 ;; Plato Wu,2011/05/19: we must change the usage of el-get, don't use :after option to
 ;; call package configuration, but run it after el-get finished its task. since el-get
 ;; use eval-after-load to call :after function, it is annoy style.
@@ -47,6 +47,7 @@
         (:name psvn :after (psvn-configuration))
         (:name ascii :after (ascii-configuration))
         (:name smart-compile :after (compile-configuration))
+        (:name ggtags :type elpa :features ggtags :after (ggtags-configuration))
       ;; (:name nxhtml)
       ;; (:name dictionary-el    :type apt-get)
       ;; (:name emacs-goodies-el :type apt-get)
