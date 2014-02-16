@@ -5,7 +5,7 @@
     (setq eshell-ask-to-save-history 'always)
     (setq eshell-save-history-on-exit t))
   ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
-  (setq eshell-history-size 1000)
+  (setq eshell-history-size 2000)
   ;; (setq eshell-history-ring nil)
   ;; remove bad character in .bash_history to resolve coding system problem when exit eshell
   ;; Plato Wu,2013/01/25: eshell will overwrite bash command history which is invoked during
@@ -178,7 +178,10 @@
 	;; for I do not know how to perfect match a word which is not "eshell"
 	;; or "svn-status", magit:. "*terminal" for multi-terminal
 	  "^\\*[^esmt].\\{3\\}[^s].*"
-	  "TAGS"))
+	  "TAGS"
+          "^\/sudo.*"
+          "^\/ssh.*"
+          "^\\*tramp.*"))
   (setq ido-record-ftp-work-directories nil)
   ;; Plato Wu,2011/06/08: ignore Too big for folder whose size >116k
   ;; since folder size expand when number of files increase but
@@ -192,7 +195,8 @@
   (define-key ctl-x-map "\C-r" nil)
   (setq ido-use-virtual-buffers t)
   (setq ido-enable-flex-matching t)
-  (setq ido-everywhere t)
+  ;; Plato Wu,2014/02/09: disable it temperately
+;;  (setq ido-everywhere t)
   ;; Plato Wu,2013/06/07: it is annoy when current-word is meaningless path.
   (setq ido-use-filename-at-point nil)
   (ido-mode t))
@@ -378,15 +382,13 @@ See  `emms-repeat-track'."
   (setq emms-repeat-track (not emms-repeat-track))
   (if emms-repeat-track
       (progn
-        (message "Will repeat the current track.")
         (emms-player-mpd-send  "repeat 1" nil #'ignore)
         ;; Plato Wu,2013/07/25: single mode is introduced with MPD 0.15
         (emms-player-mpd-send  "single 1" nil #'ignore)
-        )
+        (message "Will repeat the current track."))
     (emms-player-mpd-send  "repeat 0" nil #'ignore)
     (emms-player-mpd-send  "single 0" nil #'ignore)
-    (message "Will advance to the next track after this one.")))
-  )
+    (message "Will advance to the next track after this one."))))
 
 (defvar my-authinfo "~/.authinfo")
 
@@ -445,6 +447,8 @@ See  `emms-repeat-track'."
 ;(auctex-configuration)
 
 (defun blogger-configuration ()
+;; Plato Wu,2011/01/23: it is need by blogger-configuration and org-toodledo-configuration
+  (require 'netrc)
   (require 'muse) 
   (require 'muse-mode) 
   (require 'muse-publish) 
@@ -545,16 +549,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                         ;; is entry when net-machine will return if there is not match entry
                         (cdr (assoc "account" netrc-data))
                         (cdr (assoc "login" netrc-data))
-                        (cdr (assoc "password" netrc-data)) "1")))
-      ;; (setq weblogger-config-alist 
-      ;;     (list (list "default"  
-      ;;            (cons "user" (cdr (assoc "login" netrc-data)))
-      ;;            ;; Plato Wu,2010/09/01: use account instead default, default is entry when net-machine
-      ;;            ;; will return if there is not match entry
-      ;;            (cons "server-url" (cdr (assoc "account" netrc-data)))
-      ;;            (cons "pass" (cdr (assoc "password" netrc-data)))
-      ;;            (cons "weblog" 1))))
-      )
+                        (cdr (assoc "password" netrc-data)) "1"))))
     (weblogger-select-configuration))
 
   (defun blogger-post ()
@@ -573,7 +568,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
       (find-file (expand-file-name (muse-publish-output-name buffer-file-name (muse-style "blogger")) "/tmp"))
       (weblogger-entry-mode)
       (message-goto-body)
-                                        ;replace single newline in <p></p> for wordpress 
+      ;replace single newline in <p></p> for wordpress 
       (while (re-search-forward "\n\n" nil t)
         (replace-match "\r\r" nil t))
       (message-goto-body)
@@ -605,23 +600,29 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
              (insert (concat "#date "
                              (format-time-string "%Y-%m-%d %H:%M:%S %z"
                                                  (caddr (assoc "dateCreated" entry)))
-                             ;; (cdr (assoc "dateCreated"
-                             ;;             (ring-ref
-                             ;;              weblogger-entry-ring
-                             ;;              weblogger-ring-index)))
                              "\n")))
          (setq user-mail-address "plato.wu@qq.com")
          ;; (setq user-mail-address "68697211@qq.com")
          (setq smtpmail-default-smtp-server "smtp.qq.com") 
          (setq smtpmail-smtp-server "smtp.qq.com") 
          (setq send-mail-function 'smtpmail-send-it)
+         ;; Plato Wu,2014/01/25: it seems these variables is obselete
+         ;; (setq smtpmail-starttls-credentials 
+         ;;       '(("smtp.qq.com" 25 nil nil)))
+         ;; (setq smtpmail-auth-credentials )
          ;; Plato Wu,2009/12/19: QQ smtp server is garbage!!!
          ;; It can not used in post2qzone for Wordpress, it said content is reject
          ;; It can not used DJ EmailPublish for wordpress
          ;; It need set smtpmail-starttls-credentials as 25 but not 465 in Gnus.
-         (setq smtpmail-smtp-service 25
-               smtpmail-starttls-credentials 
-               '(("smtp.qq.com" 25 nil nil)))
+         ;; Plato Wu,2014/01/25: now smtp.qq.com must use tls, but don't work for
+         ;; set smtpmail-stream-type as nil()
+         (setq smtpmail-smtp-service 465)
+         (setq smtpmail-stream-type 'tls)
+;         (setq smtpmail-stream-type 'ssl)
+
+         ;; (setq smtpmail-debug-info t)
+         ;; (setq smtpmail-debug-verb t)
+         (setq smtpmail-smtp-user "42662703")
          ;; Plato Wu,2010/09/28: delete weiruan000.platowu@spaces.live.com, Live Space will be shutdown
          ;; use its connect RSS instead.
          (compose-mail "42662703@qzone.qq.com"
@@ -670,7 +671,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                    text "</a></sup>")))
         (replace-match ""))))
   ;; Plato Wu,2013/08/24: emacs 24 use message-send-and-exit instead mail-send-and-exit
-  ;; (require 'smtpmail)
+;;  (require 'smtpmail)
   ;; (defun smtpmail-send-it ()
   ;;   (let ((errbuf (if mail-interactive
   ;;                     (generate-new-buffer " smtpmail errors")
@@ -1251,7 +1252,7 @@ else evaluate sexp"
   (slime-setup '(slime-fancy slime-tramp slime-asdf slime-repl
                              slime-fancy-inspector slime-autodoc slime-fuzzy slime-presentation-streams))
   (add-hook 'lisp-mode-hook #'(lambda () (slime-mode t)))
-  ;; Plato Wu,2009/12/12: temperate clear lisp connection closed unexpectedly
+  ;; Plato Wu,2009/12/12: provisional clear lisp connection closed unexpectedly
   ;; problem
   ;; Plato Wu,2012/09/15: it will cause problem for latest sbcl & slime
   ;; (defun load-swank-dont-close (port-filename encoding)

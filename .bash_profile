@@ -37,7 +37,7 @@ fi
 # Don't put duplicate lines in the whole history.
  export HISTCONTROL=erasedups
 
- export HISTSIZE=1000 # .bash_history size.
+ export HISTSIZE=2000 # .bash_history size.
  export HISTFILESIZE=1000 # history command size.
 
 # Default to human readable figures
@@ -62,6 +62,7 @@ fi
  alias free='free -m'                          # show output in MB
  # Plato Wu,2011/11/21: curl -O 127.0.0.1:8888 will return Remote file name has no length!
  alias curl='curl -C - -O'                     # resume download and use remote file name
+ alias proxy-curl='curl -x 192.168.1.1:8118'
  alias aria2c='aria2c -c --file-allocation=none'
 
  # Plato Wu,2009/06/07: use ssh's X11 forwarding
@@ -205,3 +206,4 @@ winscp() { echo -ne "\033];__ws:${PWD}\007"; }
 # Plato Wu,2013/06/27: spell checking for cd command
 shopt -s cdspell
 
+export NODE_PATH=/home/plato/node_modules/
