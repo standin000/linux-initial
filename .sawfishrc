@@ -268,7 +268,7 @@ b\" without losing PRESERVE-PREFIX. "
 (plato-bind-keys global-keymap "M-F4" 'delete-window)
 
 ;; Plato Wu,2011/07/17: in order to show Chinese title
-(custom-set-typed-variable (quote default-font) (quote ("Xft" . "SimHei-12")) (quote font))
+(custom-set-typed-variable (quote default-font) (quote ("Xft" . "simsun")) (quote font))
 
 ;(custom-set-typed-variable (quote default-frame-style) (quote mono) (quote frame-style))
 

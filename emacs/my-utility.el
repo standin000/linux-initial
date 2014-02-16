@@ -27,7 +27,8 @@
 
 
 ;; Plato Wu,2010/04/14: tramp useage
-;; /ssh:username@host:/path
+;; /ssh:username@host:/path 
+;; Plato Wu,2014/01/08: disable auto-save-mode for ssh file
 ;; it can not work in this version of tramp
 ;; (add-to-list 'tramp-default-proxies-alist
 ;; 	     '("remote_hostname" "\\`root\\'" "/ssh:%h:"))
@@ -180,10 +181,6 @@ do kill lines as `dd' in vim."
     (with-current-buffer output-buffer
       (call-process "xsltproc" nil t t filename)
       (browse-url-of-buffer))))
-
-;; Plato Wu,2011/01/23: it is need by blogger-configuration and org-toodledo-configuration
-(require 'netrc)
-
 
 ;;;;C-. set mark; C-, goto mark
 ;;(global-set-key [(control ?\.)] 'ska-point-to-register)

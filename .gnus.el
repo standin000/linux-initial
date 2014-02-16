@@ -240,10 +240,14 @@
 ;let my own articles be auto filled
 (add-hook 'message-mode-hook
 	  (lambda ()
-            (orgstruct++-mode
-              (lambda nil 
-                (setq fill-column 72) 
-                (flyspell-mode 1)))
+            ;; Plato Wu,2014/01/25: orgstruct++-mode is obselete
+            ;; (orgstruct++-mode
+            ;;   (lambda nil 
+            ;;     (setq fill-column 72) 
+            ;;     (flyspell-mode 1)
+            ;;     ))
+            (setq fill-column 72) 
+            (flyspell-mode 1)
               (turn-on-auto-fill)))
 
 ;let other's articles be auto filled
