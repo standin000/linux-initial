@@ -4,15 +4,6 @@
   (if (is-version 21)
     (setq eshell-ask-to-save-history 'always)
     (setq eshell-save-history-on-exit t))
-  ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
-  (setq eshell-history-size 2000)
-  ;; (setq eshell-history-ring nil)
-  ;; remove bad character in .bash_history to resolve coding system problem when exit eshell
-  ;; Plato Wu,2013/01/25: eshell will overwrite bash command history which is invoked during
-  ;; eshell running timeframe.
-  ;; Plato Wu,2013/07/24: if .bash_history is mess, clear it when emacs is closed
-  (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
-;  (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-unix)
   (setq eshell-prompt-function 
         (function
          (lambda ()
@@ -54,6 +45,17 @@
       (eshell-bol)
       (if (= p (point))
 	  (beginning-of-line))))
+
+  ;; Plato Wu,2012/07/26: set it nil it will use envvar HISTSIZE, but (getenv "HISTSIZE") return a string, make-ring report a error.
+  (setq eshell-history-size 2000)
+  ;; (setq eshell-history-ring nil)
+  ;; remove bad character in .bash_history to resolve coding system problem when exit eshell
+  ;; Plato Wu,2013/01/25: eshell will overwrite bash command history which is invoked during
+  ;; eshell running timeframe.
+  ;; Plato Wu,2013/07/24: if .bash_history is mess, clear it when emacs is closed
+  (setq eshell-history-file-name (expand-file-name "~/.bash_history"))
+  ;; Plato Wu,2014/02/13: If not, insert .bash_history will bring \d
+  (modify-coding-system-alist 'file "\\.bash_history\\'" 'utf-8-dos)
   (defun eshell-update-history ()
     (let ((file eshell-history-file-name))
       (cond
@@ -889,12 +891,13 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;; (require 'org-publish)
   (require 'org)
   ;; Plato Wu,2013/07/15: cygwin need (prefer-coding-system 'utf-8) and filename is english to export Chinese pdf
+  ;; Plato Wu,2014/01/23: use (org-beamer-export-to-pdf) to export presentation, the presentation filename must be English in Cygwin
   (if (string<  "8.0" org-version)
     (progn
       (require 'org-crypt)
       (require 'org-table)
       (require 'ox-beamer)
-      ;; Plato Wu,2013/07/10: TODO maybe use org-latex-text-markup-alist instead org-export-latex-emphasis-alist
+      ;; Plato Wu,2013/07/10: @todo maybe use org-latex-text-markup-alist instead org-export-latex-emphasis-alist
       (setq org-latex-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
                                    "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file

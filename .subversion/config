@@ -5,7 +5,7 @@
 # Plato Wu,2011/05/31: 
 # use svn propedit svn:ignore directory to edit directory'own ignore mode.
 # use svn propset svn:executable ON file to set file exectuable 
-# attribute. TODO: confirm whether it will keep its exectuable 
+# attribute. @todo: confirm whether it will keep its exectuable 
 # attribute if is added with this attribute.
 
 ### Section for authentication and authorization customizations.
@@ -73,7 +73,8 @@
 ### Set global-ignores to a set of whitespace-delimited globs
 ### which Subversion will ignore in its 'status' output, and
 ### while importing or adding files and directories.
-global-ignores = *.o *.lo *.la *.fasl #*# .*.rej *.rej .*~ *~ .#* .DS_Store *.elc *.cache
+global-ignores = *.o *.lo .la *.fasl ## .*.rej .rej .~ ~ .# .DS_Store *.elc *.cache thumbs.db Thumbs.db *.bak *.class *.exe *.dll *.mine *.obj *.ncb *.lib *.log *.idb *.pdb *.ilk .msi .res *.pch *.suo *.exp ~. cvs CVS .CVS .cvs release Release debug Debug ignore Ignore bin Bin obj Obj *.csproj.user *.user _ReSharper.* *.resharper.user
+
 ### Set log-encoding to the default encoding for log messages
 # log-encoding = latin1
 ### Set use-commit-times to make checkout/update/switch/revert
