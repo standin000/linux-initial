@@ -175,6 +175,7 @@ export ALTERNATE_EDITOR=
 
 if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ]); then
  alias emacs='emacsclient -t'
+ export NODE_PATH=/home/plato/node_modules/
 fi
 # Plato Wu,2010/02/21: proxy setting for chromium
 # Plato Wu,2012/04/11: swtichy sharp instead
@@ -206,4 +207,6 @@ winscp() { echo -ne "\033];__ws:${PWD}\007"; }
 # Plato Wu,2013/06/27: spell checking for cd command
 shopt -s cdspell
 
-export NODE_PATH=/home/plato/node_modules/
+if ([ "$HOSTNAME" = "nabla" ] ); then
+  eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
+fi
