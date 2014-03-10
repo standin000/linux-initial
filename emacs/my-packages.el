@@ -68,7 +68,8 @@
        (t
         (let* ((count 0)
                ;; Plato Wu,2013/06/21: because it is difficult to accurate new number of
-               ;; .bash_history after starting eshell, it assume 22 is OK.
+               ;; .bash_history after starting eshell, it assume 222 is OK.
+               ;; @todo need a accurate number
                (size 22) 
                ;; Plato Wu,2013/06/21: temp buffer will use its own eshell variable
                (ring eshell-history-ring)
@@ -181,9 +182,10 @@
 	;; or "svn-status", magit:. "*terminal" for multi-terminal
 	  "^\\*[^esmt].\\{3\\}[^s].*"
 	  "TAGS"
-          "^\/sudo.*"
-          "^\/ssh.*"
-          "^\\*tramp.*"))
+      "^sudo.*"
+      "^ssh.*"
+      "^scp.*"
+      "^\\*tramp.*"))
   (setq ido-record-ftp-work-directories nil)
   ;; Plato Wu,2011/06/08: ignore Too big for folder whose size >116k
   ;; since folder size expand when number of files increase but
@@ -192,7 +194,7 @@
 
 ;; Plato Wu,2009/06/04: let ido-work-directory-list not record /sudo
 ;; and /ssh so that ido do not need wait 60s for visit /sudo or /ssh
-  (setq ido-work-directory-list-ignore-regexps '("/sudo:" "/ssh:"))
+  (setq ido-work-directory-list-ignore-regexps '("^/sudo:.*" "^/ssh:.*" "^/scp.*"))
   ;; Plato Wu,2008/12/09: remarks for key is conflict with redshank mode
   (define-key ctl-x-map "\C-r" nil)
   (setq ido-use-virtual-buffers t)
@@ -870,6 +872,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 (defun smart-tab-configuration ()
 ;; Plato Wu,2014/01/10: dabbrev-expand is better than hippie expand when coding
 ;;  (setq smart-tab-using-hippie-expand t)
+  ;; Plato Wu,2014/02/28: paste text which contain \t need disable this mode
   (global-smart-tab-mode 1))
 
 (defun org-toodledo-configuration ()
@@ -887,7 +890,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
 (defun org-configuration ()
   ;; Plato Wu,2010/08/29: use C-u C-c $ org-archive-subtree to archive DONE items
   ;; (require 'org-archive)
-  ;; (require 'org-mobile)
   ;; (require 'org-publish)
   (require 'org)
   ;; Plato Wu,2013/07/15: cygwin need (prefer-coding-system 'utf-8) and filename is english to export Chinese pdf
@@ -950,9 +952,6 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                                               ("1)" . "-"))))
                                         ;disable priority commands.
   (setq org-enable-priority-commands nil)
-
-  (setq org-agenda-files '("~/org/agendas.org"))
-  (setq org-mobile-directory "~/backup/backup/Dropbox/MobileOrg")
 
   (define-key org-mode-map (kbd "C-M-j") 'org-insert-todo-heading)
 
