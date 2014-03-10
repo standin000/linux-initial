@@ -423,11 +423,13 @@
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
 ;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line
 
-(add-to-list 'custom-theme-load-path
+(when (is-version 24)
+ (add-to-list 'custom-theme-load-path
                   (file-name-as-directory
                    (file-name-directory load-file-name)))
+ (load-theme 'molokai t nil))
 
-(load-theme 'molokai t nil)
+
 ;; Plato Wu,2013/06/29: for emacs w32
 ;; Plato Wu,2009/11/21: It seems .emacs and .emacs.lnk in the same directory are conflict
 ;; in cygwin, so if Emacs w32 can not use .emacs in home directory.
