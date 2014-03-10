@@ -37,8 +37,8 @@ fi
 # Don't put duplicate lines in the whole history.
  export HISTCONTROL=erasedups
 
- export HISTSIZE=2000 # .bash_history size.
- export HISTFILESIZE=1000 # history command size.
+ export HISTSIZE=1000 # history command size.
+ export HISTFILESIZE=2000 # .bash_history size.
 
 # Default to human readable figures
  alias df='df -h'
@@ -207,6 +207,6 @@ winscp() { echo -ne "\033];__ws:${PWD}\007"; }
 # Plato Wu,2013/06/27: spell checking for cd command
 shopt -s cdspell
 
-if ([ "$HOSTNAME" = "nabla" ] ); then
+if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ]); then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi

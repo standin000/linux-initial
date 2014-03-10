@@ -27,7 +27,7 @@
 
 
 ;; Plato Wu,2010/04/14: tramp useage
-;; /ssh:username@host:/path 
+;; /username@host:/path 
 ;; Plato Wu,2014/01/08: disable auto-save-mode for ssh file
 ;; it can not work in this version of tramp
 ;; (add-to-list 'tramp-default-proxies-alist
