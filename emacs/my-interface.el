@@ -444,3 +444,5 @@
 ;; Plato Wu,2014/01/10: when emacs halt, C-g will show where it is
 ;; (toggle-debug-on-quit)
 
+;; Plato Wu,2014/02/28: paste text which contain \t with shift + insert will convert tab to space in text mode
+;; it depends tab function in mode.
