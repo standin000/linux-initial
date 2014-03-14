@@ -408,6 +408,7 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
     ;;(setq erc-autojoin-channels-alist '(("freenode.net" "#symbolicweb")))
     ;(setq erc-autojoin-channels-alist '(("freenode.net" "#stumpwm")))
     )
+(require 'etags)
 
 (defun vj-find-tag ()
     "My find-tag wrapper for easy repetition (VJO 2003).
@@ -424,7 +425,6 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 
 (define-key global-map "\M-." 'vj-find-tag)
 
-(require 'etags)
 ;; Plato Wu,2009/04/07: In order to support lookup elisp function.
 (defun find-tag-also-for-elisp (tagname &optional next-p regexp-p)
   (interactive 
@@ -504,44 +504,57 @@ isn't there and triggers an error"
                 (y-or-n-p "The binary files differ, look at the differences in hexl-mode? ")))
      (error (error-message-string err)))))
 
-;; Plato Wu,2011/04/09: use smart-tab instead.
-;; (defun my-indent-or-complete ()
+;; Plato Wu,2014/03/14: it seems auto-complete cover tab function.
+;; Plato Wu,2014/03/11: use dabbrev-expand  hippie-expand dabbrev-completion
+;; (defcustom smart-tab-completion-functions-alist
+;;   '((emacs-lisp-mode . lisp-complete-symbol)
+
+;;     (text-mode       . dabbrev-completion)
+;;     (c++-mode . ac-complete-semantic))
+;;   "A-list of major modes in which to use a mode specific completion function.
+;; If current major mode is not found in this alist, fall back to
+;; `hippie-expand' or `dabbrev-expand', depending on the value of
+;; `smart-tab-using-hippie-expand'"
+;;   :type '(alist :key-type (symbol :tag "Major mode")
+;;                 :value-type (function :tag "Completion function to use in this mode")))
+
+;; (defun my-indent-or-complete (&optional prefix)
 ;;    "If cursor is at the end of word then call M-TAB's function, else call
 ;;    TAB's function."
 ;;   (interactive)
 ;;   ;; C-TAB has been binded to tab key's function in mode-hook.
 ;;   (let ((TAB-func (key-binding '[C-tab]))
 ;; 	(M-TAB-func (key-binding "\M-\t")))
-;;    (if (looking-at "\\>") 
-;;        (call-interactively M-TAB-func)
+;;    (if (and 
+;;         (not (or (consp prefix) (use-region-p)))
+;;         (looking-back "[a-zA-Z0-9_\.\>\-]+"))
+;; ;; (looking-at "\\_>") start\end of symbol,but it can not handle . ->
+;;        (call-interactively M-TAB-func)    
 ;;      (call-interactively TAB-func))))
-
-;; some useful fuction
-;; (make-variable-buffer-local 'M-TAB-func)
-;; (kill-local-variable 'buffer-file-coding-system)
-;; (buffer-local-variables)
 
 ;; (defun define-my-indent () 
 ;;   ;; Plato Wu,2008/11/28 latex-mode and LaTeX-mode-map is inconsistent
-;;   (let (;; Plato Wu,2008/11/19, it seems in X window & eshell mode [tab] is not "\t"
-;; 	;; is (quote [tab]) but this does not work for other modes.
-;; 	;(tab-key (quote [tab]))
-;; 	(tab-key "\t")
-;; 	)
+;;   (let ( ;; Plato Wu,2008/11/19, it seems in X window & eshell mode [tab] is not "\t"
+;;         ;; is (quote [tab]) but this does not work for other modes.
+;;                                         ;(tab-key (quote [tab]))     
+;;         (tab-key "\t"))
 ;;     (when (current-local-map)
-;;       (let ((TAB-func (key-binding tab-key)))
-;; 	(unless (or (eq (key-binding tab-key) 'my-indent-or-complete)
+;;       (let ((TAB-func (key-binding tab-key))
+;;             (completion-function
+;;              (cdr (assq major-mode smart-tab-completion-functions-alist))))
+;;         (if completion-function
+;;             (define-key (current-local-map) "\M-\t" completion-function))
+;;         (unless (or (eq (key-binding tab-key) 'my-indent-or-complete)
 ;;                     ;; Plato Wu,2010/01/26: tab in shell and eshell don't have completion-at-point
 ;;                     ;; function.
-;; 		    (string-match "^eshell-mode\\|^shell-mode" (symbol-name major-mode)))
-;; 	  ;; Plato Wu,2008/09/24
-;; 	  ;; if use string to represent key sequence, it will meet some problem
-;; 	  ;; like ^ have been defined in gnus-*-mode, so "^C\t" is NG. Besides,
-;; 	  ;; it seems \ can not occur twice in string, so "\C\t" is NG.
-;; 	  (define-key (current-local-map) '[C-tab] TAB-func)
-;; 	  (define-key (current-local-map) tab-key 'my-indent-or-complete))))))
-
-;; (add-hook 'after-change-major-mode-hook 'define-my-indent)
+;;                     (string-match "^eshell-mode\\|^shell-mode" (symbol-name major-mode)))
+;;           ;; Plato Wu,2008/09/24
+;;           ;; if use string to represent key sequence, it will meet some problem
+;;           ;; like ^ have been defined in gnus-*-mode, so "^C\t" is NG. Besides,
+;;           ;; it seems \ can not occur twice in string, so "\C\t" is NG.
+;;           (define-key (current-local-map) '[C-tab] TAB-func)
+;;           (define-key (current-local-map) tab-key 'my-indent-or-complete))))))
+;;(add-hook 'after-change-major-mode-hook 'define-my-indent)
 
 ;; emacs 22 has this function
 (if (is-version 21)
@@ -765,5 +778,11 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
           (rename-buffer new-name)
           (set-visited-file-name new-name)
           (set-buffer-modified-p nil))))))
+
+;; some useful fuction
+;; (make-variable-buffer-local 'M-TAB-func)
+;;(kill-local-variable 'buffer-file-coding-system)
+;;(buffer-local-variables)
+
 
 (provide 'my-utility)

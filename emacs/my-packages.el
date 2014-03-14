@@ -869,11 +869,10 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;;           (kill-buffer errbuf)))))
   )
 
-(defun smart-tab-configuration ()
-;; Plato Wu,2014/01/10: dabbrev-expand is better than hippie expand when coding
-;;  (setq smart-tab-using-hippie-expand t)
-  ;; Plato Wu,2014/02/28: paste text which contain \t need disable this mode
-  (global-smart-tab-mode 1))
+;; (defun smart-tab-configuration ()
+;; ;; Plato Wu,2014/01/10: dabbrev-expand is better than hippie expand when coding
+;; ;;  (setq smart-tab-using-hippie-expand t)
+;;   (global-smart-tab-mode 1))
 
 (defun org-toodledo-configuration ()
   (require 'org-toodledo)
@@ -1067,10 +1066,13 @@ this function is called."
 
 (defun c-mode-configuration () 
   (autoload 'google-set-c-style "google-c-style" nil t)
-  (add-hook 'c-mode-common-hook 'google-set-c-style)
   (add-hook 'c-mode-common-hook 
             #'(lambda () 
-              (c-set-offset 'cpp-macro 0))))
+                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                 ;; (c-set-style "stroustrup")
+                 ;; (c-toggle-auto-hungry-state nil)
+                  (google-set-c-style)
+                  (c-set-offset 'cpp-macro 0)))))
               
 
 (defun sawfish-configuration ()
@@ -1087,26 +1089,24 @@ this function is called."
 ;; 	(sawfish-eval "(quit)"))
 ;;      t)))
 ;; (define-key scheme-mode-map [f9] 'gds-show-last-stack)
-;; (add-hook 'c-mode-hook #'(lambda ()
-;;                           (c-set-style "stroustrup")
-;;                           (c-toggle-auto-hungry-state nil)))
-(defun ggtags-configuration ()
-;; Plato Wu,2014/01/10: M-. finds definitions or references according to the tag at point, 
-;; if point is at a definition tag find references and vice versa. M-] finds references.
-;; If multiple matches are found, navigation mode is entered, the mode-line lighter 
-;; changed, and a navigation menu-bar entry presented. In this mode, M-n and M-p moves 
-;; to next and previous match, M-} and M-{ to next and previous file respectively. M-o 
-;; toggles between full and abbreviated displays of file names in the auxiliary popup 
-;; window. When you locate the right match, press RET to finish which hides the 
-;; auxiliary window and exits navigation mode. You can continue the search using M-,. 
-;; To abort the search press M-*.
 
-;; Normally after a few searches a dozen buffers are created visiting files tracked 
-;; by GNU Global. C-c M-k helps clean them up.
-  (add-hook 'c-mode-common-hook
-          (lambda ()
-            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-              (ggtags-mode 1)))))
+;; (defun ggtags-configuration ()
+;; ;; Plato Wu,2014/01/10: M-. finds definitions or references according to the tag at point, 
+;; ;; if point is at a definition tag find references and vice versa. M-] finds references.
+;; ;; If multiple matches are found, navigation mode is entered, the mode-line lighter 
+;; ;; changed, and a navigation menu-bar entry presented. In this mode, M-n and M-p moves 
+;; ;; to next and previous match, M-} and M-{ to next and previous file respectively. M-o 
+;; ;; toggles between full and abbreviated displays of file names in the auxiliary popup 
+;; ;; window. When you locate the right match, press RET to finish which hides the 
+;; ;; auxiliary window and exits navigation mode. You can continue the search using M-,. 
+;; ;; To abort the search press M-*.
+
+;; ;; Normally after a few searches a dozen buffers are created visiting files tracked 
+;; ;; by GNU Global. C-c M-k helps clean them up.
+;;   (add-hook 'c-mode-common-hook
+;;           (lambda ()
+;;             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+;;               (ggtags-mode 1)))))
 
 (defun compile-configuration ()
   (autoload 'smart-compile "smart-compile" "load smart compile")
@@ -1464,5 +1464,40 @@ to the position where the property exists."
 ;;                         slime-repl-mode-hook
 ;; 			emacs-lisp-mode-hook) t)
 
+(defun auto-complete-configure ()
+ (ac-config-default)
+ (setq ac-auto-start 3)
+ (add-hook 'c-mode-common-hook 
+           (lambda ()
+             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+               (require 'semantic/ia)
+               (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+               (require 'semantic/ia)
+               (require 'semantic/mru-bookmark)
+               (semantic-mode 1)
+               (define-key (current-local-map) "\M-." 'semantic-ia-fast-jump)
+               ;; Plato Wu,2014/03/14: there is not this device in buildin CEDET 
+               (defadvice push-mark (around semantic-mru-bookmark activate)
+                 "Push a mark at LOCATION with NOMSG and ACTIVATE passed to `push-mark'.
+If `semantic-mru-bookmark-mode' is active, also push a tag onto
+the mru bookmark stack."
+                 (semantic-mrub-push semantic-mru-bookmark-ring
+                                     (point)
+                                     'mark)
+                 ad-do-it)
+               (defun semantic-ia-fast-jump-back ()
+                 (interactive)
+                 (if (ring-empty-p (oref semantic-mru-bookmark-ring ring))
+                     (error "Semantic Bookmark ring is currently empty"))
+                 (let* ((ring (oref semantic-mru-bookmark-ring ring))
+                        (alist (semantic-mrub-ring-to-assoc-list ring))
+                        (first (cdr (car alist))))
+                   (if (semantic-equivalent-tag-p (oref first tag) (semantic-current-tag))
+                       (setq first (cdr (car (cdr alist)))))
+                   (semantic-mrub-switch-tags first)))
+
+               (define-key (current-local-map) "\M-*" 'semantic-ia-fast-jump-back)
+               (add-to-list 'ac-sources 'ac-source-gtags)
+               (add-to-list 'ac-sources 'ac-source-semantic)))))
 
 (provide 'my-packages)
