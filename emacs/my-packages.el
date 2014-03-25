@@ -1475,29 +1475,46 @@ to the position where the property exists."
                (require 'semantic/ia)
                (require 'semantic/mru-bookmark)
                (semantic-mode 1)
-               (define-key (current-local-map) "\M-." 'semantic-ia-fast-jump)
-               ;; Plato Wu,2014/03/14: there is not this device in buildin CEDET 
-               (defadvice push-mark (around semantic-mru-bookmark activate)
-                 "Push a mark at LOCATION with NOMSG and ACTIVATE passed to `push-mark'.
-If `semantic-mru-bookmark-mode' is active, also push a tag onto
-the mru bookmark stack."
-                 (semantic-mrub-push semantic-mru-bookmark-ring
-                                     (point)
-                                     'mark)
-                 ad-do-it)
-               (defun semantic-ia-fast-jump-back ()
-                 (interactive)
-                 (if (ring-empty-p (oref semantic-mru-bookmark-ring ring))
-                     (error "Semantic Bookmark ring is currently empty"))
-                 (let* ((ring (oref semantic-mru-bookmark-ring ring))
-                        (alist (semantic-mrub-ring-to-assoc-list ring))
-                        (first (cdr (car alist))))
-                   (if (semantic-equivalent-tag-p (oref first tag) (semantic-current-tag))
-                       (setq first (cdr (car (cdr alist)))))
-                   (semantic-mrub-switch-tags first)))
+               (defun semantic-ia-find-tag (point)
+                 "Try semantic-ia-fast-jump first, then try find-tag"
+                 (interactive "d")
+                 (condition-case nil
+                     (semantic-ia-fast-jump point)
+                   (error
+                    (vj-find-tag))))
+               (define-key (current-local-map) "\M-." 'semantic-ia-find-tag)
+               ;; Plato Wu,2014/03/21: after 23.3, there is no push-tag-mark in etags.el
+               ;; but semantic-ia-fast-jump need it.
+               (unless (fboundp 'push-tag-mark)
+                 (defun push-tag-mark ()
+                   "Push the current position to the ring of markers so that
+                   \\[pop-tag-mark] can be used to come back to current position."
+                   (interactive)
+                   (ring-insert find-tag-marker-ring (point-marker))))
 
-               (define-key (current-local-map) "\M-*" 'semantic-ia-fast-jump-back)
-               (add-to-list 'ac-sources 'ac-source-gtags)
+               ;; Plato Wu,2014/03/14: no pulse highlight
+               (setq pulse-flag 'never)
+;;                ;; Plato Wu,2014/03/14: there is not this device in buildin CEDET 
+;;                (defadvice push-mark (around semantic-mru-bookmark activate)
+;;                  "Push a mark at LOCATION with NOMSG and ACTIVATE passed to `push-mark'.
+;; If `semantic-mru-bookmark-mode' is active, also push a tag onto
+;; the mru bookmark stack."
+;;                  (semantic-mrub-push semantic-mru-bookmark-ring
+;;                                      (point)
+;;                                      'mark)
+;;                  ad-do-it)
+;;                (defun semantic-ia-fast-jump-back ()
+;;                  (interactive)
+;;                  (if (ring-empty-p (oref semantic-mru-bookmark-ring ring))
+;;                      (error "Semantic Bookmark ring is currently empty"))
+;;                  (let* ((ring (oref semantic-mru-bookmark-ring ring))
+;;                         (alist (semantic-mrub-ring-to-assoc-list ring))
+;;                         (first (cdr (car alist))))
+;;                    (if (semantic-equivalent-tag-p (oref first tag) (semantic-current-tag))
+;;                        (setq first (cdr (car (cdr alist)))))
+;;                    (semantic-mrub-switch-tags first)))
+;;                (define-key (current-local-map) "\M-*" 'semantic-ia-fast-jump-back)
+
                (add-to-list 'ac-sources 'ac-source-semantic)))))
 
 (provide 'my-packages)

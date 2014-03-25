@@ -447,6 +447,7 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
      (t (find-tag tagname next-p regexp-p)))))
 
 (define-key emacs-lisp-mode-map "\M-." 'find-tag-also-for-elisp)
+(define-key lisp-interaction-mode-map "\M-." 'find-tag-also-for-elisp)
 
 (unless (or (is-system "cygwin") 
             (is-version 21))
