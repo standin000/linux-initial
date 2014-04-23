@@ -207,6 +207,7 @@ winscp() { echo -ne "\033];__ws:${PWD}\007"; }
 # Plato Wu,2013/06/27: spell checking for cd command
 shopt -s cdspell
 
+# perl -MCPAN -e shell
 if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ]); then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi

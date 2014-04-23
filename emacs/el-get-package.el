@@ -1,3 +1,4 @@
+;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs
 ;; Plato Wu,2013/06/03: emacs 24 support ELPA natively
 (if (is-version 24)
   (package-initialize)
