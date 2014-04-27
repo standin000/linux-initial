@@ -211,3 +211,7 @@ shopt -s cdspell
 if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ]); then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi
+
+if [ "$HOSTNAME" = "nabla" ]; then
+TZ='Asia/Shanghai'; export TZ
+fi
