@@ -26,13 +26,9 @@
   (insert (user-full-name) (format-time-string ",%Y/%m/%d: " (current-time))))
 
 
-;; Plato Wu,2010/04/14: tramp useage
+;; Plato Wu,2010/04/14: tramp usage
 ;; /username@host:/path 
 ;; Plato Wu,2014/01/08: disable auto-save-mode for ssh file
-;; it can not work in this version of tramp
-;; (add-to-list 'tramp-default-proxies-alist
-;; 	     '("remote_hostname" "\\`root\\'" "/ssh:%h:"))
-
 ;; tramp need perl or other encode or decode tools.
 ;; Plato Wu,2009/06/04: sudo: is NG in tramp but sudo:: is OK. because sudo::
 ;; is shortend syntax for root@localhost

@@ -105,7 +105,7 @@
   (when (executable-find "mpd")
     (setq el-get-sources
           (append el-get-sources
-                  (:name emms :type elpa :after (emms-configuration))))))
+                  '((:name emms :type elpa :after (emms-configuration)))))))
 (setq my-packages
       (append
        '("el-get")
