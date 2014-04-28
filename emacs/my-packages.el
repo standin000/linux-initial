@@ -174,7 +174,9 @@
 ;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history and set ido-work-file-list to nil
 ;; Plato Wu,2013/07/05: if .ido.last is mess or bring sudo buffer at the beginning, 
 ;; clear it when emacs is closed
-
+;; Plato Wu,2014/04/28: use new method to get rid of sudo buffer
+  (require 'tramp-cmds)
+  (add-hook 'desktop-save-hook 'tramp-cleanup-all-buffers)
   (setq ido-ignore-buffers
 	'("^ .*"
 	;; ignore *eshell*, *svn-status*, a awkward regular expression
@@ -182,11 +184,11 @@
 	;; or "svn-status", magit:. "*terminal" for multi-terminal
 	  "^\\*[^esmt].\\{3\\}[^s].*"
 	  "TAGS"
-      "^sudo.*"
-      "^/sudo.*"
-      "^ssh.*"
-      "^scp.*"
-      "^\\*tramp.*"))
+      ;; "^/sudo.*"
+      ;; "^ssh.*"
+      ;; "^scp.*"
+      ;; "^\\*tramp.*"
+      ))
   (setq ido-record-ftp-work-directories nil)
   ;; Plato Wu,2011/06/08: ignore Too big for folder whose size >116k
   ;; since folder size expand when number of files increase but
