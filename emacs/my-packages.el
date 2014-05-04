@@ -1492,6 +1492,7 @@ to the position where the property exists."
                     (error
                      (vj-find-tag))))
                 (define-key (current-local-map) "\M-." 'semantic-ia-find-tag)
+                (define-key (current-local-map) "\M-]" 'semantic-symref)
                 ;; Plato Wu,2014/03/21: after 23.3, there is no push-tag-mark in etags.el
                 ;; but semantic-ia-fast-jump need it.
                 (unless (fboundp 'push-tag-mark)
@@ -1501,28 +1502,30 @@ to the position where the property exists."
                     (interactive)
                     (ring-insert find-tag-marker-ring (point-marker))))
 
-                ;; Plato Wu,2014/03/14: no pulse highlight
-                (setq pulse-flag 'never)
-                ;;                ;; Plato Wu,2014/03/14: there is not this device in buildin CEDET 
-                ;;                (defadvice push-mark (around semantic-mru-bookmark activate)
-                ;;                  "Push a mark at LOCATION with NOMSG and ACTIVATE passed to `push-mark'.
-                ;; If `semantic-mru-bookmark-mode' is active, also push a tag onto
-                ;; the mru bookmark stack."
-                ;;                  (semantic-mrub-push semantic-mru-bookmark-ring
-                ;;                                      (point)
-                ;;                                      'mark)
-                ;;                  ad-do-it)
-                ;;                (defun semantic-ia-fast-jump-back ()
-                ;;                  (interactive)
-                ;;                  (if (ring-empty-p (oref semantic-mru-bookmark-ring ring))
-                ;;                      (error "Semantic Bookmark ring is currently empty"))
-                ;;                  (let* ((ring (oref semantic-mru-bookmark-ring ring))
-                ;;                         (alist (semantic-mrub-ring-to-assoc-list ring))
-                ;;                         (first (cdr (car alist))))
-                ;;                    (if (semantic-equivalent-tag-p (oref first tag) (semantic-current-tag))
-                ;;                        (setq first (cdr (car (cdr alist)))))
-                ;;                    (semantic-mrub-switch-tags first)))
-                ;;                (define-key (current-local-map) "\M-*" 'semantic-ia-fast-jump-back)
+               ;; Plato Wu,2014/03/14: no pulse highlight
+               (setq pulse-flag 'never)
+               ;; Plato Wu,2014/03/26: backspace don't invoke auto-complete
+               (add-to-list 'ac-non-trigger-commands 'c-electric-backspace)
+;;                ;; Plato Wu,2014/03/14: there is not this device in buildin CEDET 
+;;                (defadvice push-mark (around semantic-mru-bookmark activate)
+;;                  "Push a mark at LOCATION with NOMSG and ACTIVATE passed to `push-mark'.
+;; If `semantic-mru-bookmark-mode' is active, also push a tag onto
+;; the mru bookmark stack."
+;;                  (semantic-mrub-push semantic-mru-bookmark-ring
+;;                                      (point)
+;;                                      'mark)
+;;                  ad-do-it)
+;;                (defun semantic-ia-fast-jump-back ()
+;;                  (interactive)
+;;                  (if (ring-empty-p (oref semantic-mru-bookmark-ring ring))
+;;                      (error "Semantic Bookmark ring is currently empty"))
+;;                  (let* ((ring (oref semantic-mru-bookmark-ring ring))
+;;                         (alist (semantic-mrub-ring-to-assoc-list ring))
+;;                         (first (cdr (car alist))))
+;;                    (if (semantic-equivalent-tag-p (oref first tag) (semantic-current-tag))
+;;                        (setq first (cdr (car (cdr alist)))))
+;;                    (semantic-mrub-switch-tags first)))
+;;                (define-key (current-local-map) "\M-*" 'semantic-ia-fast-jump-back)
 
                 (add-to-list 'ac-sources 'ac-source-semantic)))))
 

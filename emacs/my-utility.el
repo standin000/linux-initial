@@ -576,6 +576,55 @@ isn't there and triggers an error"
 
 (require 'grep)
 
+(defun read-regexp (prompt &optional defaults history)
+  "Read and return a regular expression as a string.
+When PROMPT doesn't end with a colon and space, it adds a final \": \".
+If DEFAULTS is non-nil, it displays the first default in the prompt.
+
+Non-nil optional arg DEFAULTS is a string or a list of strings that
+are prepended to a list of standard default values, which include the
+string at point, the last isearch regexp, the last isearch string, and
+the last replacement regexp.
+
+Non-nil HISTORY is a symbol to use for the history list.
+If HISTORY is nil, `regexp-history' is used."
+  (let* ((default (if (consp defaults) (car defaults) defaults))
+	 (defaults
+	   (append
+	    (if (listp defaults) defaults (list defaults))
+	    (list (regexp-quote
+		   (or (funcall (or find-tag-default-function
+				    (get major-mode 'find-tag-default-function)
+				    'find-tag-default))
+		       ""))
+		  (car regexp-search-ring)
+		  (regexp-quote (or (car search-ring) ""))
+		  (car (symbol-value
+			query-replace-from-history-variable)))))
+	 (defaults (delete-dups (delq nil (delete "" defaults))))
+	 ;; Do not automatically add default to the history for empty input.
+     ;; Plato Wu,2014/03/27: why not remember defaults?
+;;	 (history-add-new-input nil)
+	 (input (read-from-minibuffer
+		 (cond ((string-match-p ":[ \t]*\\'" prompt)
+			prompt)
+		       (default
+			 (format "%s (default %s): " prompt
+				 (query-replace-descr default)))
+		       (t
+			(format "%s: " prompt)))
+		 nil nil nil (or history 'regexp-history) defaults t)))
+    (if (equal input "")
+	(or default input)
+      (prog1 input
+	(add-to-history (or history 'regexp-history) input)))))
+
+(defun project-grep-ignore-case ()
+  "regexp must be all low case for rgrep case insensitive"
+  (interactive)
+  (let ((case-fold-search t))
+    (call-interactively 'project-grep)))
+
 (defun project-grep (regexp &optional files)
   "grep files in project directory recursively no matter the sub directory the visited
    stay. get direcotry from tag-file-name"
@@ -780,6 +829,21 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
 ;; (make-variable-buffer-local 'M-TAB-func)
 ;;(kill-local-variable 'buffer-file-coding-system)
 ;;(buffer-local-variables)
+
+(defun recursive-svn-status ()
+  (interactive)
+  (let ((i 0)
+        (svn-file-name ".svn")
+        (old default-directory))
+    (while (and (not (file-exists-p svn-file-name))
+                (< i 5))
+      (setq svn-file-name (concat "../" svn-file-name))
+      (setq i (+ 1 i)))
+    (setq svn-file-name (file-truename (file-name-directory svn-file-name)))
+    (when (< i 5) 
+      (cd svn-file-name)
+      (svn-status svn-file-name)
+      (cd old))))
 
 
 (provide 'my-utility)
