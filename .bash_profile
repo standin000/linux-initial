@@ -173,7 +173,7 @@ export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
 # connect to it if one is not found running
 export ALTERNATE_EDITOR=
 
-if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ]); then
+if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ]); then
  alias emacs='emacsclient -t'
  export NODE_PATH=/home/plato/node_modules/
 fi
@@ -213,5 +213,6 @@ if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ]); then
 fi
 
 if [ "$HOSTNAME" = "nabla" ]; then
-TZ='Asia/Shanghai'; export TZ
+  TZ='Asia/Shanghai'; export TZ
 fi
+
