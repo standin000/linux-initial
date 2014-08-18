@@ -4,7 +4,8 @@
 [core]
 # Plato Wu,2009/05/22: Absolute path is needed with git version 1.6.2.1
 # Plato Wu,2010/06/03: it doesn't work at cywin, have to use .gitignore in project directory.
-excludesfile = /home/plato/.gitignore
+# Plato Wu,2014/07/08: use ~ to unify linux & cygwin
+	excludesfile = ~/.gitignore
 # Plato Wu,2012/09/08: support UTF-8
 quotepath = false
 

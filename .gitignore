@@ -10,4 +10,5 @@
 *.stg
 *.obj
 *.so
+*.bak
 TAGS

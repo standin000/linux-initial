@@ -446,3 +446,27 @@
 
 ;; Plato Wu,2014/02/28: paste text which contain \t with shift + insert will convert tab to space in text mode
 ;; it depends tab function in mode.
+
+;;Plato Wu,2014/07/31: use C-l to scroll in isearch-mode
+(setq isearch-allow-scroll t)
+
+;; Plato Wu,2014/08/06: recenter after isearch
+;; Plato Wu,2014/08/14: don't recenter for isearch at first time
+;; (defadvice
+;;     isearch-forward
+;;     (after isearch-forward-recenter activate)
+;;     (recenter))
+;; (ad-activate 'isearch-forward)
+
+;; (defadvice
+;;     isearch-repeat-forward
+;;     (after isearch-repeat-forward-recenter activate)
+;;     (recenter))
+;; (ad-activate 'isearch-repeat-forward)
+
+;; (defadvice
+;;     isearch-repeat-backward
+;;     (after isearch-repeat-backward-recenter activate)
+;;     (recenter))
+;; (ad-activate 'isearch-repeat-backward)
+
