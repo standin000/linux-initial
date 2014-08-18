@@ -1,0 +1,12 @@
+Font=Courier New
+FontHeight=16
+AllowBlinking=yes
+Columns=80
+Rows=24
+CursorType=underscore
+Term=xterm-256color
+Locale=zh_CN
+Charset=
+CopyOnSelect=yes
+RightClickAction=paste
+BoldAsFont=no

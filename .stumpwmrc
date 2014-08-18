@@ -1,0 +1,380 @@
+;;; -*- Mode: Lisp -*-
+
+(in-package :stumpwm)
+
+;; Allow to select StumpWM as session on Ubuntu
+
+;; gksu nano /usr/share/xsessions/stumpwm.desktop
+
+
+;; Paste this in:
+
+;; [Desktop Entry]
+;; Encoding=UTF-8
+;; Type=XSession
+;; Exec=stumpwm
+;; TryExec=stumpwm
+;; Name=StumpWM
+;; Comment=Stump window manager
+;;Making StumpWM the default session will update your .dmrc  file:
+;
+;[Desktop]
+;Session=stumpwm
+;
+;;
+
+;; Load swank.
+(load "/home/plato/clbuild/source/slime/swank-loader.lisp")
+(swank-loader:init)
+;Plato Wu,2010/02/27: define-stumpwm-command is deprecated. use `defcommand' instead
+(defcommand swank () ()
+  "Start swank server"
+  (setf stumpwm:*top-level-error-action* :break)
+  (swank:create-server :port 4005
+                       :style swank:*communication-style*
+                       :dont-close t)
+  (echo-string (current-screen) "Starting swank."))
+;(swank)
+(define-key *root-map* (kbd "C-s") "swank")       
+(define-key *root-map* (kbd "C-1") "only")
+(define-key *root-map* (kbd "C-0") "remove")
+(define-key *root-map* (kbd "TAB") "pull-hidden-other")
+;; (defcommand yank () () 
+;;   ;; Plato Wu,2010/02/28: It only support ASCII code now.
+;;   "insert content in clipboard"
+;;   (set-x-selection 
+;;    (xlib:cut-buffer
+;;     ;; Plato Wu,2010/03/17: TODO use *display* instead
+;;     (xlib:open-default-display))) 
+;;   ;(eval-command (concatenate 'string "insert " (get-x-selection)))
+;;   (send-fake-click (current-window) 2))
+
+;; (define-key *top-map* (kbd "C-y") "yank")
+
+;; (defcommand save () ()
+;;   "copy the x selection into cut buffer"
+;;   (setf (xlib:cut-buffer
+;;          ;; Plato Wu,2010/03/07: xlib:open-default-display is NG for this task
+;;          (xlib:window-display (screen-focus-window (current-screen))))
+;;         (get-x-selection)))
+;; ;; Use TightVNC
+;; ;; Plato Wu,2010/03/02: A-w & M-w does not work at top-map but work at root-map.
+;; ;; Plato Wu,2010/03/11: 
+;; ;; Use XDMCP M-w is OK.
+;; (define-key *top-map* (kbd "M-w") "save")
+;; Plato Wu,2010/08/21: it seems don't work for xterm
+(defparameter *no-emacs* '("URxvt" "Namoroka" "XTerm" "Emacs"))
+
+(defmacro define-key-command (name map kbd (&rest args) (&rest interactive-args) &body body)
+  "merge define-key and defcommand"
+  `(progn 
+    (defcommand ,name ,args ,interactive-args ,@body)
+    (define-key ,map ,kbd (string (quote ,name)))))
+
+(defparameter *emacs-style-keys*
+  '((move-beginning-of-line "C-a" "Home")
+    (move-end-of-line "C-e" "End")
+    (forward-char "C-f" "Right")
+    (backward-char "C-b" "Left")
+    (next-line "C-n" "Down")
+    (previous-line "C-p" "Up")
+    (delete-char "C-d" "Delete")
+    (kill-region "C-w" "C-x")
+    (copy-region "M-w" "C-c")
+    (yank "C-y" "C-v")
+    ))
+
+(defun press-key (key-name press)
+  (let ((key (parse-key key-name)))
+    (if (key-control key)
+        (xtest:fake-key-event 
+         *display* 
+         (xlib:keysym->keycodes 
+          *display*
+          (keysym-name->keysym "Control_L")) press))
+    (if (key-meta key)
+        (xtest:fake-key-event 
+         *display* 
+         (xlib:keysym->keycodes 
+          *display*
+          (keysym-name->keysym "Meta_L")) press))
+    (xtest:fake-key-event 
+         *display* 
+         (xlib:keysym->keycodes 
+          *display*
+          (key-keysym key)) press)))
+
+(defun send-key (string)
+  (press-key string t)
+  (press-key string nil))
+
+
+;; (mapcar 
+;;  (lambda (key-define)
+;;    (let ((name (first key-define))
+;;           (key (second key-define))
+;;           (function (third key-define)))
+;;      ;; Plato Wu,2010/10/06: use show-window-properties to get window class
+;;       (eval `(define-key-command ,name *top-map* (kbd ,key) () ()
+;;                ",name"
+;;          (if (find (window-class (current-window)) *no-emacs* :test #'(lambda (a b) (search b a)))
+;;              (press-key ,key) ;(send-fake-key (current-window) (kbd ,key))
+;;              (press-key ,function) ;(send-fake-key (current-window) (kbd ,function))
+;;              )))))            
+;;  *emacs-style-keys*)
+
+;; (define-key-command next-line *top-map* (kbd "C-n") () ()
+;;   (if (find (window-class (current-window)) *no-emacs* :test #'(lambda (a b) (search b a)))
+;;       (send-fake-key (current-window) (kbd "C-n"))
+;;       (progn 
+;;         ;; (run-shell-command "xmodmap -e \'clear control\'")
+        
+;; ;        (sleep 0.1)
+;;  ;       (xlib:set-modifier-mapping *display* :shift '(50 62) :lock '(66) :control nil :mod1 '(64 125 113 156) :mod2 '(77) :mod3 nil :mod4 '(115 116 127 128) :mod5 '(93 124 78))
+;;        (send-fake-key (current-window) (kbd "Down"))
+;;                                         ;(sleep 1)
+;;   q                                      ;  (echo-string (current-screen) "Down begin!")
+;;   ;        (press-key "Down" t)
+;;  ; qq      (press-key "Down" nil)
+ 
+;;                                         ;        (sleep 1)
+;;                                         ;   (echo-string (current-screen) "Down end!")
+;; ;        (xlib:set-modifier-mapping *display* :shift '(50 62) :lock '(66) :control '(37 109) :mod1 '(64 125 113 156) :mod2 '(77) :mod3 nil :mod4 '(115 116 127 128) :mod5 '(93 124 78))
+;;         ;; (run-shell-command 
+;;         ;;  "xmodmap -e \'add control = Control_L Control_R\'")
+;;         )))
+
+;; ;; (define-key-command up *top-map* (kbd "C-Up") () ()
+;; ;;    (send-fake-key (current-window) (kbd "Up")))
+
+;; Customize bars and modeline.
+(setf *message-window-gravity* :center)
+(setf *input-window-gravity* :center)
+
+;; Turn on mode line.
+(if (not (head-mode-line (current-head)))
+ (toggle-mode-line (current-screen) (current-head)))
+(setf *screen-mode-line-format* 
+      (list '(:eval (run-shell-command "date '+%Y/%m/%d %a %H:%M:%S' | tr -d '[:cntrl:]'" t)) "| %w"))
+
+;; Change the Stumpwm prefix key: Use the menu key
+;; (run-shell-command "xmodmap -e \'keycode 135 = F20\'")
+;; (set-prefix-key (kbd "F20"))
+
+ 
+;; It does't work
+;; (set-prefix-key (kbd "Super_L"))
+;; It only report error
+;; (set-prefix-key (kbd "Super_R"))
+;; Plato Wu,2010/08/15: when I use windows's client, there is not Menu key
+;; in my keyboard.
+(if (string= (stumpwm::screen-host (current-screen)) "192.168.1.24")
+    (set-prefix-key (kbd "C-i"))
+    (set-prefix-key (kbd "Menu")))
+
+
+; (define-key *root-map* (kbd "c") 
+;   "exec urxvt +sb -fn \"xft:Bitstream Vera Sans Mono:pixelsize=20\"")
+
+; (define-stumpwm-command "firefox" ()
+;   "Run or switch to firefox."
+;   (run-or-raise "firefox" '(:class "Firefox")))
+; (define-key *root-map* (kbd "f") "firefox")
+
+(defcommand paste () ()
+  "Simulate an S-Insert keypress on the focused window"
+  (let ((shift-keycode
+         (xlib:keysym->keycodes *display*
+                                (keysym-name->keysym "Shift_R")))
+        (insert-keycode
+         (xlib:keysym->keycodes *display*
+                                (keysym-name->keysym "Insert"))))
+    (xtest:fake-key-event *display* shift-keycode t)
+    (xtest:fake-key-event *display* insert-keycode t)
+    (xtest:fake-key-event *display* insert-keycode nil)
+    (xtest:fake-key-event *display* shift-keycode nil)))
+
+(defcommand send-a () ()
+  "Send a single 'a' to the focused window"
+  (xtest:fake-key-event *display* 38 t)    ; 38 is the keycode for the
+  (xtest:fake-key-event *display* 38 nil)) ; key 'a' on my keyboard
+
+;;Set the mouse policy to focus follows mouse;
+(setf *mouse-focus-policy* :sloppy) ;; :click, :ignore, :sloppy
+(set-font "-misc-wenquanyi zen hei-medium-r-normal--0-0-0-0-p-0-iso10646-1")
+
+(define-key-command part-screenshot *top-map* (kbd "M-Print") () ()
+  "Take a screenshot of only the active window."
+  (run-shell-command "scrot -s"))
+
+(define-key-command screenshot *top-map* (kbd "Print") () ()
+  "Take a screenshot"
+  (run-shell-command "scrot "))
+
+(defparameter *start-menu*
+  '(
+    ("Xterm"             "xterm")
+    ("Graphics"
+     ("Color Picker"   "gcolor2")
+     ("GIMP"           "gimp")
+     ("Inkscape"       "inkscape")
+     ("Picasa"         "picasa")
+     ("Scanner"        "xsane")
+     ("OCR"            "gocr"))
+
+    ("Internet"
+     ("Filezilla" "filezilla")
+     ("Firefox"   "firefox")
+     ("Skype"     "skype"))
+
+    ("Office"
+     ("OpenOffice.org"  "openoffice"))
+
+    ("Sound and Video"
+     ("Mixer"         "xterm -rv -e alsamixer")
+     ("K3b Burner"    "k3b")
+     ("Eject CD-ROM"  "eject cdrom"))
+
+    ("System Tools"
+     ("Calculator"        "speedcrunch")
+     ("Disk space"        "filelight")
+     ("File Manager"      "nautilus")  ; thunar
+     ("Nvidia X Server"   "nvidia-settings")
+     ("Power Preferences" "gnome-power-preferences")
+     ("Printers"          "system-config-printer")
+     ("Terminal Server"   "tsclient")
+         ; Turn on "Enable window manager's key bindings" for prefix key to
+         ; be passed seamlessly (when *not* in full screen).
+         ; Toggle between full screen and not full screen using
+         ; `Ctrl-Alt-Enter'.
+
+     ;; > In the case of Rdesktop you have to launch the app with the option
+     ;; > '-K' so Stump can retain control over the key combinations that you
+     ;; > input inside the remote session.
+
+     ("VirtualBox"       "VirtualBox"))
+
+    ("X Windows Tools"
+     ("Clipboard"  "xclipboard")
+     ("Fonts"      "xfontsel")
+     ("Ruler"      "kruler")
+     ("Events"     "xev"))
+    ))
+
+(defcommand menu () ()
+  "docstring"
+  (labels ((pick (options)
+                 (let ((selection (stumpwm::select-from-menu
+                                   (current-screen) options "")))
+                   (cond
+                    ((null selection)
+                     (throw 'stumpwm::error "Abort."))
+                    ((stringp (second selection))
+                     (second selection))
+                    (t
+                     (pick (cdr selection)))))))
+    (let ((choice (pick *start-menu*)))
+      (run-shell-command choice))))
+
+(define-key *root-map* (kbd ".") "menu")
+
+(set-focus-color "orange")  ; `white' by default
+
+(set-unfocus-color "palegreen3")
+
+(setf *window-format* "^B%m%n^b %40t  ")
+
+;; Plato Wu,2010/08/08: be in accord with 1-0 keypad
+
+(clear-window-placement-rules)
+;; Plato Wu,2010/08/19: it is for frame
+(setf *frame-number-map* "1234567890abcdefghijklmnopqrstuvxwyz")
+(defun find-free-number (l &optional (min 1) dir)
+  "Return a number that is not in the list l. If dir is :negative then
+look for a free number in the negative direction. anything else means
+positive direction."
+  (let* ((dirfn (if (eq dir :negative) '> '<))
+         ;; sort it and crop numbers below/above min depending on dir
+         (nums (sort (remove-if (lambda (n)
+                                  (funcall dirfn n min))
+                                l) dirfn))
+         (max (car (last nums)))
+         (inc (if (eq dir :negative) -1 1))
+         (new-num (loop for n = min then (+ n inc)
+                        for i in nums
+                        when (/= n i)
+                        do (return n))))
+    (dformat 3 "Free number: ~S~%" nums)
+    (if new-num
+        new-num
+        ;; there was no space between the numbers, so use the max+inc
+        (if max
+            (+ inc max)
+            min))))
+
+;(add-group (current-screen) "VM" :background t :type 'float-group)
+;; (defclass emacs-group (group)
+;;   ())
+;; (setf *group-top-maps* (cons '(emacs-group *emacs-group-top-map*) *group-top-maps*))
+
+;; (defvar *emacs-group-top-map* nil)
+;; (fill-keymap *emacs-group-top-map*)
+
+;; (add-group (current-screen) "VM" :type 'emacs-group)
+
+;(add-group (current-screen) "system")
+
+;(define-frame-preference "VM" (nil nil t :class "rdesktop"))
+;(define-frame-preference "system" (1 t t :class "trayer"))
+
+;(run-shell-command "/usr/bin/trayer --SetDockType false --transparent true --expand false --align right --edge top &")
+
+(defun process-mapped-window (screen xwin)
+  "Add the window to the screen's mapped window list and process it as
+needed."
+  (let ((window (xwin-to-window xwin)))
+    (screen-add-mapped-window screen xwin)
+    ;; windows always have border width 0. Their parents provide the
+    ;; border.
+    (set-window-geometry window :border-width 0)
+    (setf (xlib:window-event-mask (window-xwin window)) *window-events*)
+    (register-window window)
+    (reparent-window screen window)
+    (netwm-set-allowed-actions window)
+    (let ((placement-data (place-window screen window)))
+      (apply 'group-add-window (window-group window) window placement-data)
+      ;; If the placement rule matched then either the window's group
+      ;; is the current group or the rule's :lock attribute was
+      ;; on. Either way the window's group should become the current
+      ;; one (if it isn't already) if :raise is T.
+      (when placement-data
+        (if (getf placement-data :raise)
+          (switch-to-group (window-group window))
+          (message "Placing window ~a in group ~a" (window-name window) (group-name (window-group window))))
+        ;; Plato Wu,2010/09/11: it is a bug for using apply
+        (run-hook-with-args *place-window-hook* window (window-group window) placement-data)))
+    ;; must call this after the group slot is set for the window.
+    (grab-keys-on-window window)
+    ;; quite often the modeline displays the window list, so update it
+    (update-all-mode-lines)
+    ;; Run the new window hook on it.
+    (run-hook-with-args *new-window-hook* window)
+    window))
+
+;(setf *place-window-hook* nil)
+(add-hook *place-window-hook* 'maximize-rdesktop)
+        
+(defun maximize-rdesktop (w g f)
+  "maxmize rdesktop"
+  (declare (ignore g f))
+  (if (string= (window-class w) "rdesktop")
+      (activate-fullscreen w)))
+
+(sleep 3)
+(switch-to-group (find-group (current-screen) "Default"))
+
+(when *initializing*
+ (run-shell-command "numlockx")
+ (run-shell-command "xterm &")
+ (run-shell-command "ibus-daemon -d -x")
+ (run-shell-command "xterm &"))
