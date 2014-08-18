@@ -61,7 +61,7 @@
       ;; (:name emacs-goodies-el :type apt-get)
       ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
       ;; get installed to pass error.
-      ;; (:name xml-rpc :type elpa)
+       (:name xml-rpc :type elpa)
       ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
       ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
       ;; lisppaste, so disable lisppaste first, it is not useful for me.

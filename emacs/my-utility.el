@@ -459,47 +459,56 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 ;; Plato Wu,2010/09/30: revert-buffer will throw a error when the buffer is not modifed
 ;; it cause revert-buffer-with-coding-system also works weirdly.
 
-(defvar ediff-do-hexl-diff nil
-  "variable used to store trigger for doing diff in hexl-mode")
-(defadvice ediff-files-internal (around ediff-files-internal-for-binary-files activate)
-  "catch the condition when the binary files differ
 
-the reason for catching the error out here (when re-thrown from the inner advice)
-is to let the stack continue to unwind before we start the new diff
-otherwise some code in the middle of the stack expects some output that
-isn't there and triggers an error"
-  (let ((file-A (ad-get-arg 0))
-        (file-B (ad-get-arg 1))
-        ediff-do-hexl-diff)
-    (condition-case err
-        (progn
-          ad-do-it)
-      (error
-       (if ediff-do-hexl-diff 
-           (let ((buf-A (find-file-noselect file-A))
-                 (buf-B (find-file-noselect file-B)))
-             (with-current-buffer buf-A
-               (hexl-mode 1))
-             (with-current-buffer buf-B
-               (hexl-mode 1))
-             (ediff-buffers buf-A buf-B))
-         (error (error-message-string err)))))))
+;; Plato Wu,2014/05/11: this advice is NG in 24.3.1
+;; switch to hexl-mode and use ediff-buffers instead
 
-(defadvice ediff-setup-diff-regions (around ediff-setup-diff-regions-for-binary-files activate)
-  "when binary files differ, set the variable "
-  (condition-case err
-      (progn
-        ad-do-it)
-    (error
-     (setq ediff-do-hexl-diff
-           (and (string-match-p "^Errors in diff output.  Diff output is in.*"
-                                (error-message-string err))
-                (string-match-p "^\\(Binary \\)?[fF]iles .* and .* differ"
-                                (buffer-substring-no-properties
-                                 (line-beginning-position)
-                                 (line-end-position)))
-                (y-or-n-p "The binary files differ, look at the differences in hexl-mode? ")))
-     (error (error-message-string err)))))
+;; (defvar ediff-do-hexl-diff nil
+;;   "Variable used to store trigger for doing diff in hexl-mode.")
+
+;; ;;;###autoload
+;; (defadvice ediff-files-internal
+;;   (around ediff-files-internal-for-binary-files activate)
+;;   "Catch the condition when the binary files differ.
+
+;; The reason for catching the error out here (when re-thrown from
+;; the inner advice) is to let the stack continue to unwind before
+;; we start the new diff otherwise some code in the middle of the
+;; stack expects some output that isn't there and triggers an error."
+;;   (let ((file-A (ad-get-arg 0))
+;;         (file-B (ad-get-arg 1))
+;;         ediff-do-hexl-diff)
+;;     (condition-case err
+;;         (progn
+;;           ad-do-it)
+;;       (error
+;;        (if ediff-do-hexl-diff
+;;            (let ((buf-A (find-file-noselect file-A))
+;;                  (buf-B (find-file-noselect file-B)))
+;;              (with-current-buffer buf-A
+;;                (hexl-mode 1))
+;;              (with-current-buffer buf-B
+;;                (hexl-mode 1))
+;;              (ediff-buffers buf-A buf-B))
+;;          (error (error-message-string err)))))))
+
+;; ;;;###autoload
+;; (defadvice ediff-setup-diff-regions
+;;   (around ediff-setup-diff-regions-for-binary-files activate)
+;;   "When binary files differ, set the trigger variable."
+;;   (condition-case err
+;;       (progn
+;;         ad-do-it)
+;;     (error
+;;      (setq ediff-do-hexl-diff
+;;            (and (string-match-p "^Errors in diff output.  Diff output is in.*"
+;;                                 (error-message-string err))
+;;                 (string-match-p "^\\(Binary \\)?[fF]iles .* and .* differ"
+;;                                 (buffer-substring-no-properties
+;;                                  (line-beginning-position)
+;;                                  (line-end-position)))
+;;                 (y-or-n-p "The binary files differ, look at the differences in hexl-mode? ")))
+;;      (error (error-message-string err)))))
 
 ;; Plato Wu,2014/03/14: it seems auto-complete cover tab function.
 ;; Plato Wu,2014/03/11: use dabbrev-expand  hippie-expand dabbrev-completion
@@ -844,6 +853,25 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
       (cd svn-file-name)
       (svn-status svn-file-name)
       (cd old))))
+
+(defun uniq-lines (beg end)
+  "Unique lines in region.
+Called from a program, there are two arguments:
+BEG and END (region to sort)."
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (while (not (eobp))
+        (kill-line 1)
+        (yank)
+        (let ((next-line (point)))
+          (while
+              (re-search-forward
+               (format "^%s" (regexp-quote (car kill-ring))) nil t)
+            (replace-match "" nil nil))
+          (goto-char next-line))))))
 
 
 (provide 'my-utility)
