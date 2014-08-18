@@ -168,26 +168,26 @@
 ;; (setq dictionary-server "dict.hewgill.com")
 
 (defun ido-configuration ()
-  ;; Plato Wu,2011/08/13: 
   ;; Plato Wu,2013/06/07: why set it t? to lookup remote path
-  (setq ido-enable-tramp-completion nil) 
+;; Plato Wu,2014/05/02: 
+;;  (setq ido-enable-tramp-completion nil) 
 ;; Plato Wu,2009/06/04: If it is mess, try to use ido-wash-history and set ido-work-file-list to nil
 ;; Plato Wu,2013/07/05: if .ido.last is mess or bring sudo buffer at the beginning, 
 ;; clear it when emacs is closed
 ;; Plato Wu,2014/04/28: use new method to get rid of sudo buffer
-  (require 'tramp-cmds)
-  (add-hook 'desktop-save-hook 'tramp-cleanup-all-buffers)
+;;  (require 'tramp-cmds)
+;;  (add-hook 'desktop-save-hook 'tramp-cleanup-all-buffers)
   (setq ido-ignore-buffers
 	'("^ .*"
 	;; ignore *eshell*, *svn-status*, a awkward regular expression
 	;; for I do not know how to perfect match a word which is not "eshell"
 	;; or "svn-status", magit:. "*terminal" for multi-terminal
-	  "^\\*[^esmt].\\{3\\}[^s].*"
+	  "^\\*[^esmti].\\{3\\}[^s].*"
 	  "^TAGS$"
       ;; "^/sudo.*"
       ;; "^ssh.*"
       ;; "^scp.*"
-      ;; "^\\*tramp.*"
+      "^\\*tramp.*"
       ))
   (setq ido-record-ftp-work-directories nil)
   ;; Plato Wu,2011/06/08: ignore Too big for folder whose size >116k
@@ -326,6 +326,10 @@
     (setq default-process-coding-system (cons 'cp936 'cp936)))
 
   (emms-score 1)
+  (defun emms-pause-after-10mintue ()
+    (interactive)
+    (sleep-for 600)
+    (emms-pause))
   (defun my-stop-player ()
     "Stop emms player."
     (interactive)
@@ -342,9 +346,35 @@
   ;; run (emms-history-save) first
   ;; (emms-history-load)
   ;; Plato Wu,2014/04/23: 
-  (defun emms-history-load-plus ()
+  (defun emms-history-load ()
     "if .emms-history is empty, then load .emms-history.bak"
-    )
+    (interactive)
+    (when (and (stringp emms-history-file)
+             (file-exists-p emms-history-file))
+    (let (history buf playlists)
+      (with-temp-buffer
+        (insert-file-contents emms-history-file)
+        (setq history (read (current-buffer)))
+        (setq playlists (cadr history))
+        (unless playlists 
+          (erase-buffer)
+          (insert-file-contents "~/.emacs.d/.emms-history.bak")
+          (setq history (read (current-buffer)))
+          (setq playlists (cadr history)))
+        (dolist (playlist playlists)
+          (with-current-buffer (emms-playlist-new (car playlist))
+            (setq emms-playlist-buffer (current-buffer))
+            (if (string= (car playlist) (car history))
+                (setq buf (current-buffer)))
+            (mapc 'emms-playlist-insert-track
+                  (nth 2 playlist))
+            (ignore-errors
+              (emms-playlist-select (cadr playlist)))))
+        (setq emms-playlist-buffer buf)
+        (dolist (method (nth 2 history))
+          (set (car method) (cdr method)))
+        (ignore-errors
+          (emms-start))))))
   (setq emms-lyrics-dir "~/Music/Lyrics")
   (setq emms-lyrics-coding-system 'gbk-dos)
                                         ;    (setq emms-lyrics-display-on-minibuffer t)
@@ -920,8 +950,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                ("\\subsection{%s}" . "\\subsection{%s}"))))
     (require 'org-crypt)
     (require 'org-latex)
-    ;Plato Wu,2013/07/15: org-verison < 8.0 don't support BEAMER_THEME and ATTR_BEAMER
- ;   (require 'org-latex)
+;    Plato Wu,2013/07/15: org-verison < 8.0 don't support BEAMER_THEME and ATTR_BEAMER
 ;    (require 'org-beamer)
     ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
     (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
