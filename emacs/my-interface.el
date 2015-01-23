@@ -82,6 +82,10 @@
 (setq-default tab-width 4)
 
 (setq vc-follow-symlinks t)
+
+;; Plato Wu,2015/01/19: vc-ediff is good than svn diff
+(eval-after-load "vc-hooks"
+  '(define-key vc-prefix-map "=" 'vc-ediff))
 ;; Plato Wu,2013/12/02: backup files under VC
 ;; (setq vc-make-backup-files t)
 
@@ -409,11 +413,20 @@
 
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
+;; Plato Wu,2014/12/10: for DR Series Chemical database
+(modify-coding-system-alist 'file "\\.lst\\'" 'macintosh-mac)
+(modify-coding-system-alist 'file "\\.lsx\\'" 'macintosh-mac)
+
 ;; Plato Wu,2011/09/02: support End key in emacs of myhost
 (global-set-key (quote [select]) 'move-end-of-line)
 
 ;; Plato Wu,2011/06/03: auto insert content for .h, .el and so on.
 (auto-insert-mode 1)
+
+(setq auto-insert-directory "~/linux-initial/emacs/auto-insert/")
+
+(setq auto-insert-query nil)
+
 
 ;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
 ;; Plato Wu,2012/07/29: start cua-set-rectangle-mark and select the column, then press C-c

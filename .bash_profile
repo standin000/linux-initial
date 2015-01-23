@@ -30,6 +30,7 @@ fi
  alias del='/bin/rm -i -f'
  alias cp='cp -p -i'
  alias mv='mv -i'
+ alias vi='vim'
  
 # # Don't put continuous duplicate lines in the history.
 #  export HISTCONTROL=ignoredups
