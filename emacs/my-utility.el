@@ -838,7 +838,6 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
 ;; (make-variable-buffer-local 'M-TAB-func)
 ;;(kill-local-variable 'buffer-file-coding-system)
 ;;(buffer-local-variables)
-
 (defun recursive-svn-status ()
   (interactive)
   (let ((i 0)
@@ -848,7 +847,7 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
                 (< i 5))
       (setq svn-file-name (concat "../" svn-file-name))
       (setq i (+ 1 i)))
-    (setq svn-file-name (file-truename (file-name-directory svn-file-name)))
+    (setq svn-file-name (file-name-directory (file-truename svn-file-name)))
     (when (< i 5) 
       (cd svn-file-name)
       (svn-status svn-file-name)

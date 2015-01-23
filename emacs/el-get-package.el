@@ -1,18 +1,19 @@
 ;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs
-;; Plato Wu,2013/06/03: emacs 24 support ELPA natively
-;; (if (is-version 24)
-;;   (package-initialize)
-;;   (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
-;;     (let ((buffer (url-retrieve-synchronously
-;;                "http://tromey.com/elpa/package-install.el")))
-;;       (save-excursion
-;;         (set-buffer buffer)
-;;         (goto-char (point-min))
-;;         (re-search-forward "^$" nil 'move)
-;;         (eval-region (point) (point-max))
-;;         (kill-buffer (current-buffer)))))
-;;   (load (expand-file-name "~/.emacs.d/elpa/package.el"))
-;;   (package-initialize))
+(if (is-version 24)
+;; Plato Wu,2013/06/03: emacs 24 support ELPA natively, but it need refresh package list
+  (package-initialize)
+  (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
+    (let ((buffer (url-retrieve-synchronously
+               "http://tromey.com/elpa/package-install.el")))
+      (save-excursion
+        (set-buffer buffer)
+        (goto-char (point-min))
+        (re-search-forward "^$" nil 'move)
+        (eval-region (point) (point-max))
+        (kill-buffer (current-buffer)))))
+  (load (expand-file-name "~/.emacs.d/elpa/package.el"))
+  (package-initialize))
+
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
@@ -55,13 +56,11 @@
         (:name ascii :after (ascii-configuration))
         (:name smart-compile :after (compile-configuration))
 ;;        (:name ggtags :type elpa :features ggtags :after (ggtags-configuration))
+        (:name popup)
         (:name auto-complete :features auto-complete-config :after (auto-complete-configure))
       ;; (:name nxhtml)
       ;; (:name dictionary-el    :type apt-get)
       ;; (:name emacs-goodies-el :type apt-get)
-      ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
-      ;; get installed to pass error.
-       (:name xml-rpc :type elpa)
       ;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
       ;; deal with correctly, it report xml-rpc existed when try to install weblogger after
       ;; lisppaste, so disable lisppaste first, it is not useful for me.
@@ -100,18 +99,20 @@
     (setq el-get-sources
           (append el-get-sources
                   '((:name emacs-w3m :after (w3m-configuration))
+                    ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
+                    ;; get installed to pass error.
+                    (:name xml-rpc :type elpa)
                     (:name weblogger :type elpa :after 
                            (eval-after-load "muse-mode" '(blogger-configuration)))))))
   (when (executable-find "mpd")
     (setq el-get-sources
           (append el-get-sources
                   '((:name emms :type elpa :after (emms-configuration)))))))
-(setq my-packages
-      (append
-       '("el-get")
-       (mapcar 'el-get-source-name el-get-sources)))
 
-(el-get 'sync my-packages)
+(el-get 'sync (append
+               '("el-get")
+               (mapcar 'el-get-source-name el-get-sources)))
+
 
 (provide 'el-get-package)
 

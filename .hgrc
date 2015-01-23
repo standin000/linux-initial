@@ -2,6 +2,8 @@
 username = Plato Wu <gtalk000@gmail.com>
 verbose = True
 ignore = ~/.hgignore
+# Plato Wu,2015/01/23: for merge warning
+merge=internal:merge 
 [trusted]
 # it is needed by get source code from mystic
 users = *

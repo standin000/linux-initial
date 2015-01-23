@@ -1464,11 +1464,11 @@ else evaluate sexp"
    ;; Plato Wu,2010/03/28: google.com is censored, disable this function for
    ;; w3m-goto-url
   (setq w3m-enable-google-feeling-lucky nil)
-  (add-hook 'w3m-mode-hook 
-             #'(lambda ()
-                 ;; Plato Wu,2013/06/19: is it obsolete in w3m/0.5.3
-                ;(w3m-link-numbering-mode 1)
-                ))
+  ;; Plato Wu,2013/06/19: is it obsolete in w3m/0.5.3
+  ;; (add-hook 'w3m-mode-hook 
+  ;;            #'(lambda ()
+  ;;               (w3m-link-numbering-mode 1)
+  ;;               ))
   
   (defun my-w3m-href-text (&optional position)
      "Return text linked up with the href anchor at the given POSITION.
@@ -1570,5 +1570,54 @@ to the position where the property exists."
 ;;                (define-key (current-local-map) "\M-*" 'semantic-ia-fast-jump-back)
 
                 (add-to-list 'ac-sources 'ac-source-semantic)))))
+
+(eval-after-load 'autoinsert
+  '(progn 
+     ;; Plato Wu,2014/08/26: define-auto-insert can't delete ("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C / C++ header") case
+     (setq auto-insert-alist
+           (cl-delete-if #'(lambda (elt) (equal (car elt) '("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C / C++ header"))) 
+                         auto-insert-alist))
+     (setq auto-insert-alist
+           (cl-delete-if #'(lambda (elt) (equal (car elt) '("\\.\\([Cc]\\|cc\\|cpp\\)\\'" . "C / C++ program"))) 
+                         auto-insert-alist))
+     
+     ;; Plato Wu,2014/08/26: n means indent after break-line, "\n" don't do it, refer to skeleton-insert
+     ;; _ means cursor's location.
+     (define-auto-insert '("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C / C++ header")
+       '((upcase
+          (concat
+           (file-name-nondirectory
+            (file-name-sans-extension buffer-file-name))
+           "_"
+           (file-name-extension buffer-file-name)))
+         "#ifndef " str n "#define " str n n
+         (if (string= "hpp" (file-name-extension buffer-file-name)) 
+             '_
+           "#ifdef __cplusplus")
+         & n & "extern \"C\" {\n" & "#endif" & n & n & _ 
+         (unless (string= "hpp" (file-name-extension buffer-file-name)) 
+             'n
+           ) & "\n#ifdef __cplusplus\n" & "}" & n  & "#endif"
+         "\n\n#endif\n"))
+
+     (define-auto-insert '("\\.\\([Cc]\\|cc\\|cpp\\)\\'" . "C / C++ program")
+      '(
+        "Short description: "
+        "/**\n * "
+        (file-name-nondirectory (buffer-file-name))
+        " -- " str \n
+        " *" \n
+        " * Written on " (let ((system-time-locale "en_US.utf8")) 
+                           (format-time-string "%Y-%m-%d %A")) \n
+        " */" > \n \n
+        "#include \""
+        (file-name-sans-extension
+         (file-name-nondirectory (buffer-file-name)))
+        (if (string= "cpp" (file-name-extension buffer-file-name))
+         ".hpp\""   
+         ".h\"") \n \n))
+     ))
+
+
 
 (provide 'my-packages)
