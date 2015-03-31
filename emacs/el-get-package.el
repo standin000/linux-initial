@@ -37,7 +37,10 @@
 ;; use eval-after-load to call :after function, it is annoy style.
 
 ;; Set el-get-sources and call el-get to init all those packages we need.
-(unless (is-version 24)
+(if (is-version 24)
+    ;; Plato Wu,2015/01/27: clojure-mode in raspberry need emacs 24
+    (setq el-get-sources 
+          '((:name clojure-mode :type elpa)))
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (setq el-get-sources
         '((:name cl-lib :type elpa))))
@@ -76,7 +79,6 @@
                              (when (getenv "DISPLAY")
                                (autoload 'turn-on-xclip "xclip" "exchange clip between X and emacs" t nil)
                                (turn-on-xclip)))) 
-                  (:name clojure-mode :type elpa)
       ;           (:name clojure-test-mode :type elpa)
                   ;; Plato Wu,2014/03/18: no this package in the latest el-get
 ;                  (:name nrepl) 
@@ -92,7 +94,8 @@
       ;            (:name session :features session :after session-configuration)
                   (:name redshank) 
                   (:name vkill)
-                  (:name cldoc)
+                  ;; Plato Wu,2015/01/27: no cldoc now in el-get?
+;                  (:name cldoc)
       ;           (:name dpans2texi)
                   )))
   (when (executable-find "w3m") 
