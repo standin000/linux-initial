@@ -209,6 +209,8 @@ winscp() { echo -ne "\033];__ws:${PWD}\007"; }
 shopt -s cdspell
 
 # perl -MCPAN -e shell
+# "install CPAN"  "reload cpan" are used to  update CPAN
+
 if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ]); then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi
