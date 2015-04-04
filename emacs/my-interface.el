@@ -83,6 +83,9 @@
 
 (setq vc-follow-symlinks t)
 
+;; Plato Wu,2014/09/22: ignore space change
+(setq vc-git-diff-switches "-b")
+(setq diff-switches "-b")
 ;; Plato Wu,2015/01/19: vc-ediff is good than svn diff
 (eval-after-load "vc-hooks"
   '(define-key vc-prefix-map "=" 'vc-ediff))

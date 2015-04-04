@@ -40,7 +40,10 @@
 (if (is-version 24)
     ;; Plato Wu,2015/01/27: clojure-mode in raspberry need emacs 24
     (setq el-get-sources 
-          '((:name clojure-mode :type elpa)))
+          ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin
+          ;'((:name clojure-mode :type elpa))
+          nil
+          )
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (setq el-get-sources
         '((:name cl-lib :type elpa))))
