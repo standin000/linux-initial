@@ -1,0 +1,29 @@
+[ui]
+username = Plato Wu <gtalk000@gmail.com>
+verbose = True
+ignore = ~/.hgignore
+# Plato Wu,2015/01/23: for merge warning
+merge=internal:merge 
+[trusted]
+# it is needed by get source code from mystic
+users = *
+groups = *
+[diff]
+git = True
+[extensions]
+hgext.mq =
+# Plato Wu,2010/10/14: remove alias sentence for it don't work in latest mercurial and
+# it seems alias works without it.
+# alias =
+[alias]
+qstatus = status --rev -2:.
+%include .hgauth
+[web]
+# Plato Wu,2011/06/25: To silence the warning: certificate not verified, hg 1.8 will report it.
+# Plato Wu,2011/07/05: need copy it into cygwin.
+cacerts = /etc/ssl/certs/ca-certificates.crt
+# Plato Wu,2014/08/18: export http_proxy=http://192.168.1.1:8118
+#[http_proxy]
+#host = http://192.168.1.1:8118/
+# Plato Wu,2015/04/01: http of code.google.com will report http 502 error.
+#push_ssl = false
