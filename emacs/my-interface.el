@@ -84,8 +84,9 @@
 (setq vc-follow-symlinks t)
 
 ;; Plato Wu,2015/01/19: vc-ediff is good than svn diff
-(eval-after-load "vc-hooks"
-  '(define-key vc-prefix-map "=" 'vc-ediff))
+(if (is-version 24)
+    (eval-after-load "vc-hooks"
+      '(define-key vc-prefix-map "=" 'vc-ediff))) 
 ;; Plato Wu,2013/12/02: backup files under VC
 ;; (setq vc-make-backup-files t)
 
@@ -414,9 +415,10 @@
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
 ;; Plato Wu,2014/12/10: for DR Series Chemical database
-(modify-coding-system-alist 'file "\\.lst\\'" 'macintosh-mac)
-(modify-coding-system-alist 'file "\\.lsx\\'" 'macintosh-mac)
-
+(when (is-version 24)
+  (modify-coding-system-alist 'file "\\.lst\\'" 'macintosh-mac)
+  (modify-coding-system-alist 'file "\\.lsx\\'" 'macintosh-mac)
+)
 ;; Plato Wu,2011/09/02: support End key in emacs of myhost
 (global-set-key (quote [select]) 'move-end-of-line)
 
