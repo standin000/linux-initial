@@ -1572,7 +1572,7 @@ to the position where the property exists."
                 (add-to-list 'ac-sources 'ac-source-semantic)))))
 
 (eval-after-load 'autoinsert
-  '(progn 
+  '(when (is-version 24) 
      ;; Plato Wu,2014/08/26: define-auto-insert can't delete ("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C / C++ header") case
      (setq auto-insert-alist
            (cl-delete-if #'(lambda (elt) (equal (car elt) '("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C / C++ header"))) 

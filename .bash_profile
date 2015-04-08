@@ -208,12 +208,25 @@ winscp() { echo -ne "\033];__ws:${PWD}\007"; }
 # Plato Wu,2013/06/27: spell checking for cd command
 shopt -s cdspell
 
-# perl -MCPAN -e shell
-# "install CPAN"  "reload cpan" are used to  update CPAN
-
+# Plato Wu,2015/04/08: local::lib method
+# download local::lib
+# perl Makefile.PL --bootstrap
+# make
+# make test
+# make install
+# it is installed into $HOME/perl5/lib/perl5
 if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ]); then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi
+# perl -MCPAN -e shell
+# "install CPAN"  "reload cpan" are used to update CPAN
+
+
+# perlbrew method
+#\wget -O - http://install.perlbrew.pl | bash or \curl -L http://install.perlbrew.pl | bash
+# perlbrew install-cpanm
+# cpanm install
+# cpanm --uninstall
 
 if [ "$HOSTNAME" = "nabla" ]; then
   TZ='Asia/Shanghai'; export TZ
