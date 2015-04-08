@@ -112,9 +112,9 @@
           (append el-get-sources
                   '((:name emms :type elpa :after (emms-configuration)))))))
 
-(el-get 'sync (append
-               '("el-get")
-               (mapcar 'el-get-source-name el-get-sources)))
+;; (el-get 'sync (append
+;;                '("el-get")
+;;                (mapcar 'el-get-source-name el-get-sources)))
 
 
 (provide 'el-get-package)
