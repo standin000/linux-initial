@@ -174,7 +174,8 @@ export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
 # connect to it if one is not found running
 export ALTERNATE_EDITOR=
 
-if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ]); then
+if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "plato-PC" ]); then
+    # Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
  alias emacs='emacsclient -t'
  export NODE_PATH=/home/plato/node_modules/
 fi

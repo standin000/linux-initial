@@ -41,15 +41,18 @@ clean_old(){
         find $1 -maxdepth 1 ! -type d -mtime +90 -exec ls -l {} \; > trash_items.txt
         # Plato Wu,2009/07/27: use mindepth avoid delete itself
         find $1 -mindepth 1 -maxdepth 1 -type d -mtime +90 -exec ls -l -d {} \; >> trash_items.txt
+        # Plato Wu,2015/02/03: use trash_items.txt to skip driver which need be clean_old
         if [ -s trash_items.txt ]; then
           cat trash_items.txt  
           doContinue=n
-          echo -n "Are you sure clean $1 them all (y/n)"
+          echo -n "Are you sure clean $1 them all (y/n) "
           read doContinue
           if [ "$doContinue" != "y" ]; then
               echo "Quitting..."
+              rm trash_items.txt
               exit
           fi
+          rm trash_items.txt
           clean_old $1
        fi
     else
@@ -89,4 +92,3 @@ else
     done
 fi
 
-rm trash_items.txt

@@ -84,7 +84,9 @@
     (save-buffers-kill-emacs arg)))
 
 ;; Plato Wu,2008/10/08 "^X^C" is not "" which is inputed by C-q C-x C-q C-c
-(unless (or (is-system "cygwin") window-system)
+;; Plato Wu,2015/04/27: cygwin is OK for client/server mode
+; (is-system "cygwin")
+(unless (or window-system)
   (define-key global-map "" 'save-buffers-kill-client))
 
 
@@ -584,49 +586,49 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 (global-set-key [f9] 'next-error-cycle)
 
 (require 'grep)
+;; Plato Wu,2015/04/27: cygwin & emacs 24.5.1 clash with this function.
+;; (defun read-regexp (prompt &optional defaults history)
+;;   "Read and return a regular expression as a string.
+;; When PROMPT doesn't end with a colon and space, it adds a final \": \".
+;; If DEFAULTS is non-nil, it displays the first default in the prompt.
 
-(defun read-regexp (prompt &optional defaults history)
-  "Read and return a regular expression as a string.
-When PROMPT doesn't end with a colon and space, it adds a final \": \".
-If DEFAULTS is non-nil, it displays the first default in the prompt.
+;; Non-nil optional arg DEFAULTS is a string or a list of strings that
+;; are prepended to a list of standard default values, which include the
+;; string at point, the last isearch regexp, the last isearch string, and
+;; the last replacement regexp.
 
-Non-nil optional arg DEFAULTS is a string or a list of strings that
-are prepended to a list of standard default values, which include the
-string at point, the last isearch regexp, the last isearch string, and
-the last replacement regexp.
-
-Non-nil HISTORY is a symbol to use for the history list.
-If HISTORY is nil, `regexp-history' is used."
-  (let* ((default (if (consp defaults) (car defaults) defaults))
-	 (defaults
-	   (append
-	    (if (listp defaults) defaults (list defaults))
-	    (list (regexp-quote
-		   (or (funcall (or find-tag-default-function
-				    (get major-mode 'find-tag-default-function)
-				    'find-tag-default))
-		       ""))
-		  (car regexp-search-ring)
-		  (regexp-quote (or (car search-ring) ""))
-		  (car (symbol-value
-			query-replace-from-history-variable)))))
-	 (defaults (delete-dups (delq nil (delete "" defaults))))
-	 ;; Do not automatically add default to the history for empty input.
-     ;; Plato Wu,2014/03/27: why not remember defaults?
-;;	 (history-add-new-input nil)
-	 (input (read-from-minibuffer
-		 (cond ((string-match-p ":[ \t]*\\'" prompt)
-			prompt)
-		       (default
-			 (format "%s (default %s): " prompt
-				 (query-replace-descr default)))
-		       (t
-			(format "%s: " prompt)))
-		 nil nil nil (or history 'regexp-history) defaults t)))
-    (if (equal input "")
-	(or default input)
-      (prog1 input
-	(add-to-history (or history 'regexp-history) input)))))
+;; Non-nil HISTORY is a symbol to use for the history list.
+;; If HISTORY is nil, `regexp-history' is used."
+;;   (let* ((default (if (consp defaults) (car defaults) defaults))
+;; 	 (defaults
+;; 	   (append
+;; 	    (if (listp defaults) defaults (list defaults))
+;; 	    (list (regexp-quote
+;; 		   (or (funcall (or find-tag-default-function
+;; 				    (get major-mode 'find-tag-default-function)
+;; 				    'find-tag-default))
+;; 		       ""))
+;; 		  (car regexp-search-ring)
+;; 		  (regexp-quote (or (car search-ring) ""))
+;; 		  (car (symbol-value
+;; 			query-replace-from-history-variable)))))
+;; 	 (defaults (delete-dups (delq nil (delete "" defaults))))
+;; 	 ;; Do not automatically add default to the history for empty input.
+;;      ;; Plato Wu,2014/03/27: why not remember defaults?
+;; ;;	 (history-add-new-input nil)
+;; 	 (input (read-from-minibuffer
+;; 		 (cond ((string-match-p ":[ \t]*\\'" prompt)
+;; 			prompt)
+;; 		       (default
+;; 			 (format "%s (default %s): " prompt
+;; 				 (query-replace-descr default)))
+;; 		       (t
+;; 			(format "%s: " prompt)))
+;; 		 nil nil nil (or history 'regexp-history) defaults t)))
+;;     (if (equal input "")
+;; 	(or default input)
+;;       (prog1 input
+;; 	(add-to-history (or history 'regexp-history) input)))))
 
 (defun project-grep-ignore-case ()
   "regexp must be all low case for rgrep case insensitive"

@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 pause_print_error(){
   read -n1 -p "Press any key to continue..."
   exit $1

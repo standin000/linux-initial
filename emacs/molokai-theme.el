@@ -82,8 +82,9 @@
 
    ;; font lock
    `(font-lock-builtin-face ((t (:foreground ,molokai-chartreuse))))
-   `(font-lock-comment-face ((t (:foreground ,molokai-base01))))
-   `(font-lock-comment-delimiter-face ((t (:foreground ,molokai-base01))))
+   ;; Plato Wu,2015/02/27: use molokai-slateblue intead molokai-base01 in comment and delimiter
+   `(font-lock-comment-face ((t (:foreground ,molokai-slateblue))))
+   `(font-lock-comment-delimiter-face ((t (:foreground ,molokai-slateblue))))
    `(font-lock-constant-face ((t (:foreground ,molokai-purple))))
    `(font-lock-doc-string-face ((t (:foreground ,molokai-darkgoldenrod))))
    `(font-lock-function-name-face ((t (:foreground ,molokai-chartreuse))))

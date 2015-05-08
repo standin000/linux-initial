@@ -208,7 +208,7 @@
   (setq ido-use-filename-at-point nil)
   (ido-mode t))
 
-(ido-configuration)
+;(ido-configuration)
 
 (defun psvn-configuration ()
   ;; Plato Wu,2009/03/31: This code is used in PMP project in Kinpo
@@ -248,34 +248,7 @@
 ;; ibuffer-and-update now and ibuffer update automatically
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-(setq ibuffer-default-sorting-mode 'major-mode)
-
-(setq ibuffer-saved-filter-groups
-      (quote (("default"
-;               ("dired" (mode . dired-mode))
-;               ("perl" (mode . perl-mode))
-;               ("erc" (mode . erc-mode))
-               ("elisp" (mode . emacs-lisp-mode))
-               ("C&C++" (or (mode . c-mode)
-                            (mode . c++-mode)))
-               ("emacs" (or
-                         (name . "^\\*scratch\\*$")
-                         (name . "^\\*Messages\\*$")
-                         (mode . eshell-mode)))
-               ("gnus" (or
-                        (mode . message-mode)
-                        (mode . bbdb-mode)
-                        (mode . mail-mode)
-                        (mode . gnus-group-mode)
-                        (mode . gnus-summary-mode)
-                        (mode . gnus-article-mode)
-                        (name . "^\\.bbdb$")
-                        (name . "^\\.newsrc-dribble")))
-               ))))
-
-(add-hook 'ibuffer-mode-hook
-          #'(lambda ()
-            (ibuffer-switch-to-saved-filter-groups "default")))
+;(setq ibuffer-default-sorting-mode 'major-mode)
 
 (setq ibuffer-maybe-show-predicates 
       `(,(lambda (buf)
@@ -283,6 +256,179 @@
                  (null buffer-file-name))
                ;; Plato Wu,2011/05/22: show http buffer of url-request-data for debug syncml
                (not (string-match "^ \\*http" (buffer-name buf)))))))
+;; Plato Wu,2015/04/13: there is helm-configuration first.
+(defun my-helm-configuration ()
+  (helm-mode 1)
+  ;; If you don't want the Helm window to be resized, but a smaller Helm window, you can set helm-autoresize-max-height equal to helm-autoresize-min-height.
+
+  ;  (helm-autoresize-mode t)
+
+;; If you use golden-ratio, you have to disable its interference with Helm window:
+
+;; (defun pl/helm-alive-p ()
+;;   (if (boundp 'helm-alive-p)
+;;       (symbol-value 'helm-alive-p)))
+
+;; (add-to-list 'golden-ratio-inhibit-functions 'pl/helm-alive-p)
+
+  ;helm-ff-transformer-show-only-basename nil
+  ;helm-adaptive-history-file             "~/.emacs.d/helm-history"
+  ;helm-ff-auto-update-initial-value      t
+  (setq helm-yank-symbol-first                t
+;       it can not jump between buffers and recentf
+;        helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+        helm-buffers-fuzzy-matching           t ; fuzzy matching buffer names when non--nil
+        helm-recentf-fuzzy-match              t
+        helm-quick-update                     t ; do not display invisible candidates
+        helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+        helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+        helm-ff-file-name-history-use-recentf t
+        helm-M-x-fuzzy-match                  t
+        )
+  ;; (defun helm-find-files-sensitive-backspace ()
+  ;;   "Deletes whole directory in helm find files mode on backspace."
+  ;;   (interactive)
+  ;;   (if (char-equal ?/ (char-before))
+  ;;       (helm-find-files-up-one-level 1)
+  ;;     (backward-delete-char 1)))
+  ;; ;; helm better navigation
+  ;; (define-key helm-find-files-map (kbd "<backspace>") 'helm-find-files-sensitive-backspace)
+  ;; (define-key helm-find-files-map (kbd "<DEL>") 'helm-find-files-sensitive-backspace)
+  ;; (define-key helm-find-files-map (kbd "C-h") 'helm-find-files-sensitive-backspace)
+  ;; (define-key helm-map (kbd "C-h") 'delete-backward-char)
+  (defun fu/helm-find-files-navigate-forward (orig-fun &rest args)
+    (if (file-directory-p (helm-get-selection))
+        (apply orig-fun args)
+      (helm-maybe-exit-minibuffer)))
+  (advice-add 'helm-execute-persistent-action :around #'fu/helm-find-files-navigate-forward)
+;  (kbd "<return>")
+  (define-key helm-find-files-map (kbd "RET") 'helm-execute-persistent-action)
+  (defun fu/helm-find-files-navigate-back (orig-fun &rest args)
+    (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
+        (helm-find-files-up-one-level 1)
+      (apply orig-fun args)))
+  (advice-add 'helm-ff-delete-char-backward :around #'fu/helm-find-files-navigate-back)
+  (setq helm-ff-skip-boring-files t)
+  ;; (autoload 'helm-descbinds      "helm-descbinds" t)
+  ;; (autoload 'helm-eshell-history "helm-eshell"    t)
+  ;; (autoload 'helm-esh-pcomplete  "helm-eshell"    t)
+  (global-set-key (kbd "C-h a")    #'helm-apropos)
+  (global-set-key (kbd "C-h i")    #'helm-info-emacs)
+  (global-set-key (kbd "C-h b")    #'helm-descbinds)
+
+  (global-set-key (kbd "C-x C-f")  #'helm-find-files)
+  (global-set-key (kbd "C-x b") #'helm-mini)
+  (require 'helm-projectile)
+  ;; Plato Wu,2015/04/30: no suitable switch projectile buffer function
+  (global-set-key (kbd "C-x n") #'helm-projectile-find-file)
+;  (global-set-key (kbd "C-x b") 'helm-projectile-switch-to-buffer)
+;  (global-set-key (kbd "C-x b") 'projectile-project-buffers-other-buffer)
+
+;  (global-set-key (kbd "C-x C-m") #'helm-M-x)
+;  (global-set-key (kbd "C-x C-f") #'helm-find-files)
+  (global-set-key (kbd "C-x C-r") #'helm-recentf)
+  (global-set-key (kbd "C-x r l") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "M-y")     #'helm-show-kill-ring)
+  (global-set-key (kbd "M-s o")   #'helm-swoop)
+  (global-set-key (kbd "M-s /")   #'helm-multi-swoop)
+  ;(global-set-key (kbd "M-x") 'helm-M-x)
+
+  (global-set-key (kbd "C-x c!")  #'helm-calcul-expression)
+  (global-set-key (kbd "C-x c:")  #'helm-eval-expression-with-eldoc)
+
+  (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)  ; make TAB works in terminal
+  ;; Plato Wu,2015/04/20: <DEL> is used to del character too.
+                                        ;  (define-key helm-find-files-map (kbd "<DEL>") 'helm-find-files-up-one-level)
+
+
+  (define-key helm-map (kbd "M-o") #'helm-previous-source)
+
+  (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+  (when (executable-find "curl")
+    (setq helm-google-suggest-use-curl-p t))
+
+  (global-set-key (kbd "M-s s")   #'helm-ag)
+
+  (setq helm-projectile-sources-list (cons 'helm-source-projectile-files-list
+                                           (remove 'helm-source-projectile-files-list 
+                                                   helm-projectile-sources-list)))
+
+  (define-key projectile-mode-map (kbd "C-c p /")
+    #'(lambda ()
+        (interactive)
+        (helm-ag (projectile-project-root))))
+
+  (define-key org-mode-map (kbd "C-x c o h") #'helm-org-headlines)
+
+  (projectile-global-mode)
+  (setq projectile-completion-system 'helm)
+  (helm-projectile-on)
+  ;; Plato Wu,2015/03/20: don't use helm for describe function and variable.
+  (setq helm-completing-read-handlers-alist '((describe-function . nil)
+                                              (describe-variable . nil)
+                                              (debug-on-entry . helm-completing-read-symbols)
+                                              (find-function . helm-completing-read-symbols)
+                                              (find-tag . helm-completing-read-with-cands-in-buffer)
+                                              (ffap-alternate-file)
+                                              (tmm-menubar)))) 
+
+
+(defun projectile-configuration ()
+  (projectile-global-mode)
+  (setq projectile-globally-ignored-file-suffixes '("~"))
+  ;; (global-set-key [remap find-file] 'projectile-find-file)
+  ;; (global-set-key [remap switch-to-buffer] 'projectile-switch-to-buffer)
+  (setq projectile-require-project-root nil)
+  (setq projectile-project-root-files 
+        (append '(".svn") projectile-project-root-files))
+  (setq projectile-globally-ignored-directories
+        (append '(".svn") projectile-globally-ignored-directories))
+
+  ; Define ibuffer filter groups for each known project
+  (defun my/define-projectile-filter-groups ()
+    (when (boundp 'projectile-known-projects)
+      (setq my/project-filter-groups
+            (mapcar
+             (lambda (it)
+               (let ((name (file-name-nondirectory (directory-file-name it))))
+                 `(,name (filename . ,(expand-file-name it)))))
+             projectile-known-projects))))
+
+  ;; Set up default ibuffer filter groups
+  (setq ibuffer-saved-filter-groups
+        (list
+         (cons "default"
+               (append
+                (my/define-projectile-filter-groups)
+                ;; ... whatever other groups you want, e.g.
+                '(("elisp" (mode . emacs-lisp-mode))
+                  ("C&C++" (or (mode . c-mode)
+                               (mode . c++-mode)))
+                  ("emacs" (or
+                            (name . "^\\*scratch\\*$")
+                            (name . "^\\*Messages\\*$")
+                            (mode . eshell-mode)))
+                  ("gnus" (or
+                           (mode . message-mode)
+                           (mode . bbdb-mode)
+                           (mode . mail-mode)
+                           (mode . gnus-group-mode)
+                           (mode . gnus-summary-mode)
+                           (mode . gnus-article-mode)
+                           (name . "^\\.bbdb$")
+                           (name . "^\\.newsrc-dribble")))))))))
+
+;; Enable default groups by default
+(add-hook 'ibuffer-mode-hook
+              (lambda ()
+                (ibuffer-switch-to-saved-filter-groups "default")))
+
+;; You probably don't want to see empty project groups
+(setq ibuffer-show-empty-filter-groups nil)
+
+
 
 (defun emms-configuration ()
   (require 'emms-setup)
@@ -1617,7 +1763,5 @@ to the position where the property exists."
          ".hpp\""   
          ".h\"") \n \n))
      ))
-
-
 
 (provide 'my-packages)

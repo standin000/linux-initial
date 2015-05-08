@@ -36,8 +36,9 @@
 ;;Toggle incremental minibuffer completion.
 (icomplete-mode 1)
 
+;; Plato Wu,2015/04/30: there is not this variable in emacs 24, it use max-mini-window-height
 ; allow the minibuffer to be resized when it needs the space for a long message
-(setq resize-minibuffer-mode t)
+;;(setq resize-minibuffer-mode t)
 
 ;;All question are asked by y/n, not yes/no
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -90,6 +91,22 @@
 (if (is-version 24)
     (eval-after-load "vc-hooks"
       '(define-key vc-prefix-map "=" 'vc-ediff))) 
+;; Plato Wu,2015/02/27: highlight diffs which is not focus caues it disappear under default ediff colors
+;; use it in the future.
+;; Please note: to set Ediff's faces, use only copy-face or set/make-face-... as shown above. Emacs's low-level face-manipulation functions should be avoided.
+;;(add-hook 'ediff-load-hook
+;; (lambda ()
+;;   (set-face-foreground
+;;     ediff-current-diff-face-B "blue")
+;;   (set-face-background
+;;     ediff-current-diff-face-B "red")
+;;   (make-face-italic
+;;     ediff-current-diff-face-B))
+(setq ediff-highlight-all-diffs nil)
+
+;; Plato Wu,2013/11/13: ediff for utf16 file
+(setq ediff-diff-options "--text")
+
 ;; Plato Wu,2013/12/02: backup files under VC
 ;; (setq vc-make-backup-files t)
 
@@ -107,6 +124,7 @@
 ;; Plato Wu,2011/05/14: avoid saving *Music*
 (setq desktop-buffers-not-to-save "^*.*")
 
+;; Plato Wu,2015/03/25: desktop will open many mode in backgroud, so set mode variables maybe overwrite.
 (cond 
  ((is-version 21)
   (progn
@@ -148,7 +166,7 @@
 (if (display-mouse-p)
     (mouse-avoidance-mode 'jump))
 
-(when window-system 
+(when window-system ; or (boundp 'x-display-name) 
   ;;auto open & display image
   (auto-image-file-mode)'
   ;; Plato Wu,2012/10/09: it is void in emacs 24.1.1
@@ -160,7 +178,9 @@
     (set-default-font "-apple-courier-medium-r-normal--18-180-72-72-m-180-iso10646-1"))
    ((is-system "windows-nt")
     nil)
-   (t (progn 
+   ;; Plato Wu,2015/04/24: cygwin don't support this font
+   ((is-system "gnu/linux")
+    (progn 
         (create-fontset-from-fontset-spec 
          (concat
           "-*-fixed-*-*-*-*-*-200-*-*-*-*-fontset-courier," 
@@ -178,6 +198,7 @@
 (savehist-mode 1)
 
 ;;; M-q to auto fill paragraph
+;;; fill-region call fill-paragraph by region
 ;(setq fill-column 70)
 
 ;;display column number
@@ -249,23 +270,6 @@
      global-mode-string))
    #("-%-" 0 3
      (help-echo "mouse-1: select (drag to resize), mouse-2 = C-x 1, mouse-3 = C-x 0"))))
-
-(when window-system; or (boundp 'x-display-name)
-  (cond 
-   ((string= system-type "darwin")
-      (set-default-font "-apple-courier-medium-r-normal--18-180-72-72-m-180-iso10646-1"))
-   ((string= system-type "windows-nt")
-      ;(set-default-font "-apple-courier-medium-r-normal--18-180-72-72-m-180-iso10646-1")
-      nil)
-   (t (progn 
-      (create-fontset-from-fontset-spec 
-       (concat
-	"-*-fixed-*-*-*-*-*-200-*-*-*-*-fontset-courier," 
-	"chinese-gb2312:-ISAS-Fangsong ti-Medium-R-Normal--16-*-*-*-c-*-GB2312*-*,"))
-      (set-default-font "fontset-courier")
-      (setq default-frame-alist
-	        (append
-		      '((font . "fontset-courier")) default-frame-alist))))))
 
 (when window-system 
   (defun toggle-fullscreen ()
@@ -455,9 +459,6 @@
 ;; (load "~/linux-backup/.emacs")
 ;; (server-start)
 ;; (setq kill-buffer-query-functions nil)
-
-;; Plato Wu,2013/11/13: ediff for utf16 file
-(setq ediff-diff-options "--text")
 
 ;; Plato Wu,2014/01/10: when emacs halt, C-g will show where it is
 ;; (toggle-debug-on-quit)
