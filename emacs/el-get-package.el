@@ -2,7 +2,10 @@
 (unless (is-version 24)
   (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
     (let ((buffer (url-retrieve-synchronously
-               "http://tromey.com/elpa/package-install.el")))
+                   "http://git.savannah.gnu.org/gitweb/?p=emacs.git;a=blob_plain;hb=ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09;f=lisp/emacs-lisp/package.el"
+                   ;; Plato Wu,2015/05/26: this file is obsolete
+                   ;; "http://tromey.com/elpa/package-install.el"
+               )))
       (save-excursion
         (set-buffer buffer)
         (goto-char (point-min))
@@ -11,10 +14,10 @@
         (kill-buffer (current-buffer)))))
   (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
-(package-initialize)
-
 ;; Plato Wu,2015/02/28: for communitiy elpa 
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+
+(package-initialize)
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
@@ -45,6 +48,8 @@
     (setq el-get-sources 
           ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
           ;'((clojure-mode :type elpa))
+          (:name helm :type elpa)
+          (:name helm-projectile :type elpa)
           nil
           )
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
@@ -55,8 +60,6 @@
       (append el-get-sources 
               '((:name magit :type elpa (global-set-key (kbd "C-x C-z") 'magit-status))
                 (:name projectile :type elpa)
-                (:name helm :type elpa)
-                (:name helm-projectile :type elpa)
                 (:name org :type elpa)
                 (:name paredit :type elpa)
                 ;;        (:name smart-tab (smart-tab-configuration))
@@ -92,7 +95,8 @@
       ;           (:name auctex auctex-configuration)
                   (:name htmlize :type elpa)
                   (:name muse :type elpa)
-                  (:name sawfish :type elpa (sawfish-configuration))
+                  ;; Plato Wu,2015/05/11: no this package in emacs of raspberrypi
+;                  (:name sawfish :type elpa (sawfish-configuration))
                   ;; Plato Wu,2014/03/18: it is very old, need a good replacement
                  ;(:name dired-single :features dired-single (dired-single-configuration))
                   (:name multi-term :type elpa)
@@ -124,15 +128,21 @@
              (unless 
                  (or 
                   (el-get-package-is-installed (cadr package))
-                  (member (symbol-name (cadr package)) (el-get-read-all-recipe-names)))
+                  (member (symbol-name (cadr package)) (el-get-read-all-recipe-names))
+                  )
                  ;; Plato Wu,2013/06/03: emacs 24 support ELPA natively, but it need refresh package list
                  (package-refresh-contents))
                (eval (cons 'el-get-bundle! (cdr package))) 
                )
          el-get-sources)
- 
-(my-helm-configuration)
-(projectile-configuration)
+
+(if (is-version 23)
+    (ido-configuration)
+  ;; Plato Wu,2015/05/26: helm need emacs 24
+  (my-helm-configuration)
+  (projectile-configuration)
+  )
+
 (paredit-configuration)
 (org-configuration)
 (c-mode-configuration)

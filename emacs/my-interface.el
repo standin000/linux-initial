@@ -191,7 +191,9 @@
                '((font . "fontset-courier")) default-frame-alist))))))
 ;Plato Wu,2011/06/12: debug-on-entry invoke the debugger each time the function is called
 ; and cancel-debug-on-entry will undo the effect
-(setq debug-on-error t)
+;; Plato Wu,2015/05/26: el-get update marmalade in raspberrypi will cause overflow error for repo version like 201203310931,
+;; so diable it.
+;(setq debug-on-error t)
 
 (require 'savehist)
 

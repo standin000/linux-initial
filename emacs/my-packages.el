@@ -208,8 +208,6 @@
   (setq ido-use-filename-at-point nil)
   (ido-mode t))
 
-;(ido-configuration)
-
 (defun psvn-configuration ()
   ;; Plato Wu,2009/03/31: This code is used in PMP project in Kinpo
 ;; to handle svn user name which includes blanks
