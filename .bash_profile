@@ -62,7 +62,9 @@ fi
  alias l='ls -CF'                              #
  alias free='free -m'                          # show output in MB
  # Plato Wu,2011/11/21: curl -O 127.0.0.1:8888 will return Remote file name has no length!
- alias curl='curl -C - -O'                     # resume download and use remote file name
+ # Plato Wu,2015/01/25: -L means follow redirect
+ alias curl='curl -L -C - -O'                     # resume download and use remote file name 
+
  alias proxy-curl='curl -x 192.168.1.1:8118'
  alias aria2c='aria2c -c --file-allocation=none'
 
@@ -216,7 +218,7 @@ shopt -s cdspell
 # make test
 # make install
 # it is installed into $HOME/perl5/lib/perl5
-if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ]); then
+if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi
 # perl -MCPAN -e shell
@@ -226,9 +228,13 @@ fi
 # perlbrew method
 #\wget -O - http://install.perlbrew.pl | bash or \curl -L http://install.perlbrew.pl | bash
 # perlbrew install-cpanm
+# cpanm --local-lib=~/perl5 local::lib
 # cpanm install
 # cpanm --uninstall
 
+if [ "$HOSTNAME" = "raspberrypi" ]; then
+    source ~/perl5/perlbrew/etc/bashrc
+fi
 if [ "$HOSTNAME" = "nabla" ]; then
   TZ='Asia/Shanghai'; export TZ
 fi

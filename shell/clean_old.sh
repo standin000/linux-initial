@@ -37,7 +37,7 @@ clean_old(){
     # Plato Wu,2009/05/31: all trash item must be level 1
     # Plato Wu,2009/09/26: use mtime is more accurate in Cygwin.
     # Plato Wu,2010/08/28: print and confirm before delete
-    if [  $2 ]; then
+    if [ $2 ]; then
         find $1 -maxdepth 1 ! -type d -mtime +90 -exec ls -l {} \; > trash_items.txt
         # Plato Wu,2009/07/27: use mindepth avoid delete itself
         find $1 -mindepth 1 -maxdepth 1 -type d -mtime +90 -exec ls -l -d {} \; >> trash_items.txt
@@ -65,30 +65,23 @@ clean_old(){
 clean_old ~/Trash/ try
 
 if [  $1 ]; then
-    # doContinue=n
-    # echo -n "Are you sure clean $1 (y/n)"
-    # read doContinue
-    # if [ "$doContinue" != "y" ]; then
-    #   echo "Quitting..."
-    #   exit
-    # fi
-
     clean_old $1 try
 else
-    if [ "$OSTYPE" = "cygwin" ]; then
-	mount_point=/cygdrive
-    else
-	mount_point=/mnt
-    fi
-
-    for dir in $mount_point/*; do
-	trash=$dir/Trash/
-   # Plato Wu,2009/05/18: Wuala has a hidden Trash directory
-	if ([ -d $trash ] && [ "$trash" != "/cygdrive/w/Trash/" ])
-	    then
-#       cd $trash
-	    clean_old $trash try
-	fi
+#     if [ "$OSTYPE" = "cygwin" ]; then
+# 	    mount_point=/cygdrive
+#     else
+# 	    mount_point=/mnt
+#     fi
+#     for dir in $mount_point/*; do
+# Plato Wu,2015/02/27:  mount_dirs 
+    mount_dirs=`df | awk 'FNR > 1 {print $6}'`
+    for dir in $mount_dirs; do
+	    trash=$dir/Trash/
+        # Plato Wu,2009/05/18: Wuala has a hidden Trash directory
+	    if ([ -d $trash ] && [ "$trash" != "/cygdrive/w/Trash/" ]);  then
+            #       cd $trash
+	        clean_old $trash try
+	    fi
     done
 fi
 

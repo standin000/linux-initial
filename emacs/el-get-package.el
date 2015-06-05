@@ -43,14 +43,14 @@
 ;; use eval-after-load to call :after function, it is annoy style.
 
 ;; Set el-get-sources and call el-get to init all those packages we need.
-(if (is-version 24)
+(if ;(is-version 24)
+    (> (compare-version "24.4") 0)
     ;; Plato Wu,2015/01/27: clojure-mode in raspberry need emacs 24
     (setq el-get-sources 
           ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
           ;'((clojure-mode :type elpa))
           (:name helm :type elpa)
           (:name helm-projectile :type elpa)
-          nil
           )
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (setq el-get-sources
@@ -135,12 +135,13 @@
                (eval (cons 'el-get-bundle! (cdr package))) 
                )
          el-get-sources)
-
-(if (is-version 23)
+;; advice-add need 24.4
+(if (> (compare-version "24.4") 0)
+    (progn 
+        ;; Plato Wu,2015/05/26: helm need emacs 24.4
+      (my-helm-configuration)
+      (projectile-configuration))
     (ido-configuration)
-  ;; Plato Wu,2015/05/26: helm need emacs 24
-  (my-helm-configuration)
-  (projectile-configuration)
   )
 
 (paredit-configuration)
