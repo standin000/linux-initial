@@ -153,10 +153,6 @@
   (defadvice ielm-eval-input (after ielm-paredit activate)
     "Begin each IELM prompt with a ParEdit parenthesis pair."
     (paredit-open-round))
-  (add-hook 'ielm-mode-hook
-            #'(lambda () 
-               (setq comint-input-ring-file-name "~/.ielm.history")
-               (turn-on-eldoc-mode)))
   ;; Plato Wu,2009/12/09: enable eldoc mode.
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode))
 

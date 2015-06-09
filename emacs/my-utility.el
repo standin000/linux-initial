@@ -14,6 +14,13 @@
 (defun is-version (no)
   (string= (substring emacs-version 0 2) (number-to-string no)))
 
+(defun compare-version (no)
+  (let ((result (compare-strings emacs-version nil nil no nil nil))) 
+    (if (booleanp result) 
+        0
+      result)))
+
+
 (defun mycomment (arg)
   (interactive "*P")
   ;; ;; Plato Wu,2009/11/12: emacs 21.2.1 in cygwin does not have this code passage.
@@ -781,6 +788,12 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 Switches to the buffer `*ielm*' *in other window*, or creates it if it does not exist."
   (interactive)
   (load "ielm")
+
+  (add-hook 'kill-buffer-hook 'comint-write-input-ring)
+  (add-hook 'inferior-emacs-lisp-mode-hook
+            '(lambda ()
+               (turn-on-comint-history)
+               (turn-on-eldoc-mode)))
   (let (old-point)
     (unless (comint-check-proc "*ielm*")
       (with-current-buffer (get-buffer-create "*ielm*")
@@ -873,6 +886,35 @@ BEG and END (region to sort)."
                (format "^%s" (regexp-quote (car kill-ring))) nil t)
             (replace-match "" nil nil))
           (goto-char next-line))))))
+;; Plato Wu,2014/08/21: persistent command history in interactive interpreters 
+ (defun comint-write-history-on-exit (process event)
+  (comint-write-input-ring)
+  (let ((buf (process-buffer process)))
+    (when (buffer-live-p buf)
+      (with-current-buffer buf
+        (insert (format "\nProcess %s %s" process event))))))
+ 
+ (defun turn-on-comint-history ()
+  (let ((process (get-buffer-process (current-buffer))))
+    (when process
+      (setq comint-input-ring-file-name
+            (format "~/.emacs.d/inferior-%s-history"
+                    (process-name process)))
+      (comint-read-input-ring)
+      (set-process-sentinel process
+                            #'comint-write-history-on-exit))))
 
+;; Plato Wu,2014/08/21:   case kill emacs, don't use provisional
+
+;; (defun mapc-buffers (fn)
+;;   (mapc (lambda (buffer)
+;;           (with-current-buffer buffer
+;;             (funcall fn)))
+;;         (buffer-list)))
+
+;; (defun comint-write-input-ring-all-buffers ()
+;;   (mapc-buffers 'comint-write-input-ring))
+
+;; (add-hook 'kill-emacs-hook 'comint-write-input-ring-all-buffers)
 
 (provide 'my-utility)
