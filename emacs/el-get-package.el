@@ -14,10 +14,14 @@
         (kill-buffer (current-buffer)))))
   (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
+(package-initialize)
+;; (setq package-archive '(("melpa" . "http://melpa.org/packages/")
+;;  ("gnu" . "http://elpa.gnu.org/packages/")
+;;  ("ELPA" . "http://tromey.com/elpa/")
+;;  ("marmalade" . "http://marmalade-repo.org/packages/")
+;;  ("SC" . "http://joseito.republika.pl/sunrise-commander/")))
 ;; Plato Wu,2015/02/28: for communitiy elpa 
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-
-(package-initialize)
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
@@ -48,18 +52,25 @@
     (setq el-get-sources 
           ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
           ;'((clojure-mode :type elpa))
-          (:name helm :type elpa)
-          (:name helm-projectile :type elpa)
-          nil
-          )
+          '((:name helm :type elpa)
+            (:name helm-projectile :type elpa)))
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (setq el-get-sources
         '((:name cl-lib :type elpa))))
 
 (setq el-get-sources 
       (append el-get-sources 
-              '((:name magit :type elpa (global-set-key (kbd "C-x C-z") 'magit-status))
+              '((:name magit :type elpa
+                       (progn
+                         (global-set-key (kbd "C-x C-z") 'magit-status)
+                         ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert.
+                         (setq magit-auto-revert-mode nil)
+                         ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert warning.
+                         (setq magit-last-seen-setup-instructions "1.4.0")))
                 (:name projectile :type elpa)
+                ;;Plato Wu,2015/06/05: for org package, when installing from ELPA, please do so from a fresh Emacs
+                ;;session where no org function has been called, use list-packages and press d & x to delete old version
+                ;; and i & x to install new one.
                 (:name org :type elpa)
                 (:name paredit :type elpa)
                 ;;        (:name smart-tab (smart-tab-configuration))
