@@ -159,8 +159,9 @@ elif [ "$SSH_CONNECTION" != '' ]; then
     # Plato Wu,2012/04/22: \007 for BEL \033 for ESC
 #  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}"'
 else
-
-  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}"'
+    # Plato Wu,2015/07/28: for mintty, echo -ne "\e]0;Title\a"' is OK for title
+  export  PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}:${PWD/#$HOME/~}\007"'
+ # export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}"'
 fi
 
 # Plato Wu,2010/03/14: For command prompt.

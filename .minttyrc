@@ -10,3 +10,4 @@ Charset=
 CopyOnSelect=yes
 RightClickAction=paste
 BoldAsFont=no
+CopyAsRTF=no
