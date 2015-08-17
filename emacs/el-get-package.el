@@ -14,10 +14,10 @@
         (kill-buffer (current-buffer)))))
   (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
+(package-initialize)
+
 ;; Plato Wu,2015/02/28: for communitiy elpa 
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-
-(package-initialize)
 
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
@@ -67,7 +67,7 @@
                 (:name psvn :type elpa)
                 (:name ascii :type elpa)
                 ;; Plato Wu,2015/02/28: it is obsolete?
-                                        ;        (:name smart-compile (compile-configuration))
+                (:name smart-compile (compile-configuration))
                 ;;        (:name ggtags :type elpa :features ggtags (ggtags-configuration))
 
                 (:name popup :type elpa)
