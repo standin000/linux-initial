@@ -173,14 +173,14 @@ alias ls='ls -hF --show-control-chars --color=auto'
 
 export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
  
+# Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
+if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "plato-PC" ] ||
+    [ "$HOSTNAME" = "raspberrypi" ] ); then
 # Plato Wu,2010/01/26: let emacsclient -t automatically start an emacs in deamon mode and
 # connect to it if one is not found running
-export ALTERNATE_EDITOR=
-
-if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "plato-PC" ]); then
-    # Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
- alias emacs='emacsclient -t'
- export NODE_PATH=/home/plato/node_modules/
+  export ALTERNATE_EDITOR=
+  alias emacs='emacsclient -t'
+  export NODE_PATH=/home/plato/node_modules/
 fi
 # Plato Wu,2010/02/21: proxy setting for chromium
 # Plato Wu,2012/04/11: swtichy sharp instead
