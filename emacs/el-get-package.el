@@ -1,17 +1,19 @@
 ;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs
 (unless (is-version 24)
   (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
-    (let ((buffer (url-retrieve-synchronously
-                   "http://git.savannah.gnu.org/gitweb/?p=emacs.git;a=blob_plain;hb=ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09;f=lisp/emacs-lisp/package.el"
-                   ;; Plato Wu,2015/05/26: this file is obsolete
-                   ;; "http://tromey.com/elpa/package-install.el"
-               )))
-      (save-excursion
-        (set-buffer buffer)
-        (goto-char (point-min))
-        (re-search-forward "^$" nil 'move)
-        (eval-region (point) (point-max))
-        (kill-buffer (current-buffer)))))
+    ;; Plato Wu,2015/05/26: this site is obsolete for it only support single elpa archive
+    ;; (let ((buffer (url-retrieve-synchronously
+    ;;                "http://tromey.com/elpa/package-install.el"
+    ;;            )))
+    ;;   (save-excursion
+    ;;     (set-buffer buffer)
+    ;;     (goto-char (point-min))
+    ;;     (re-search-forward "^$" nil 'move)
+    ;;     (eval-region (point) (point-max))
+    ;;     (kill-buffer (current-buffer))))
+    (mkdir "~/.emacs.d/elpa/")
+    (url-copy-file "http://git.savannah.gnu.org/gitweb/?p=emacs.git;a=blob_plain;hb=ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09;f=lisp/emacs-lisp/package.el" "~/.emacs.d/elpa/package.el")
+    )
   (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
 (package-initialize)
@@ -29,7 +31,7 @@
   (with-current-buffer
       (url-retrieve-synchronously
        ;; Plato Wu,2014/03/18: nintfloor don't support TLS
-       "http://raw.github.com/dimitri/el-get/master/el-get-install.el")
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
     (end-of-buffer)
     (eval-print-last-sexp)))
 
