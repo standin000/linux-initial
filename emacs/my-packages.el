@@ -1075,6 +1075,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
       (require 'org-crypt)
       (require 'org-table)
       (require 'ox-beamer)
+      ;; Plato Wu,2011/04/22: use xelatex to do better with Chinese, and use system font.
       ;; Plato Wu,2013/07/10: @todo maybe use org-latex-text-markup-alist instead org-export-latex-emphasis-alist
       (setq org-latex-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
                                    "xelatex -output-directory  log/ %f" 
@@ -1090,9 +1091,8 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
                ("\\subsection{%s}" . "\\subsection{%s}"))))
     (require 'org-crypt)
     (require 'org-latex)
-;    Plato Wu,2013/07/15: org-verison < 8.0 don't support BEAMER_THEME and ATTR_BEAMER
+;Plato Wu,2013/07/15: org-verison < 8.0 don't support BEAMER_THEME and ATTR_BEAMER
 ;    (require 'org-beamer)
-    ;; Plato Wu,2011/04/22: use xelatext to do better with Chinese, and use system font.
     (setq org-latex-to-pdf-process '(" [ ! -d log/ ] && mkdir log || echo 0"
                                    "xelatex -output-directory  log/ %f" 
                                    ;; moving intermediate tex file
@@ -1747,7 +1747,7 @@ to the position where the property exists."
         (file-name-nondirectory (buffer-file-name))
         " -- " str \n
         " *" \n
-        " * Written on " (let ((system-time-locale "en_US.utf8")) 
+        " * Written by " (user-full-name) " on " (let ((system-time-locale "en_US.utf8"))
                            (format-time-string "%Y-%m-%d %A")) \n
         " */" > \n \n
         "#include \""
