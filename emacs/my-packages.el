@@ -1747,7 +1747,7 @@ to the position where the property exists."
         (file-name-nondirectory (buffer-file-name))
         " -- " str \n
         " *" \n
-        " * Written on " (let ((system-time-locale "en_US.utf8")) 
+        " * Written by " (user-full-name) " on " (let ((system-time-locale "en_US.utf8"))
                            (format-time-string "%Y-%m-%d %A")) \n
         " */" > \n \n
         "#include \""
