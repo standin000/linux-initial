@@ -219,9 +219,9 @@ shopt -s cdspell
 # make test
 # make install
 # it is installed into $HOME/perl5/lib/perl5
-if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
-  eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
-fi
+# if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
+#   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
+# fi
 # perl -MCPAN -e shell
 # "install CPAN"  "reload cpan" are used to update CPAN
 
@@ -233,10 +233,9 @@ fi
 # cpanm install
 # cpanm --uninstall
 
-if [ "$HOSTNAME" = "raspberrypi" ]; then
+if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
     source ~/perl5/perlbrew/etc/bashrc
 fi
 if [ "$HOSTNAME" = "nabla" ]; then
   TZ='Asia/Shanghai'; export TZ
 fi
-
