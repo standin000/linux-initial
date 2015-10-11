@@ -1,17 +1,19 @@
 ;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs
 (unless (is-version 24)
   (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
-    (let ((buffer (url-retrieve-synchronously
-                   "http://git.savannah.gnu.org/gitweb/?p=emacs.git;a=blob_plain;hb=ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09;f=lisp/emacs-lisp/package.el"
-                   ;; Plato Wu,2015/05/26: this file is obsolete
-                   ;; "http://tromey.com/elpa/package-install.el"
-               )))
-      (save-excursion
-        (set-buffer buffer)
-        (goto-char (point-min))
-        (re-search-forward "^$" nil 'move)
-        (eval-region (point) (point-max))
-        (kill-buffer (current-buffer)))))
+    ;; Plato Wu,2015/05/26: this site is obsolete for it only support single elpa archive
+    ;; (let ((buffer (url-retrieve-synchronously
+    ;;                "http://tromey.com/elpa/package-install.el"
+    ;;            )))
+    ;;   (save-excursion
+    ;;     (set-buffer buffer)
+    ;;     (goto-char (point-min))
+    ;;     (re-search-forward "^$" nil 'move)
+    ;;     (eval-region (point) (point-max))
+    ;;     (kill-buffer (current-buffer))))
+    (mkdir "~/.emacs.d/elpa/")
+    (url-copy-file "http://git.savannah.gnu.org/gitweb/?p=emacs.git;a=blob_plain;hb=ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09;f=lisp/emacs-lisp/package.el" "~/.emacs.d/elpa/package.el")
+    )
   (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
 (package-initialize)
@@ -20,6 +22,7 @@
 ;;  ("ELPA" . "http://tromey.com/elpa/")
 ;;  ("marmalade" . "http://marmalade-repo.org/packages/")
 ;;  ("SC" . "http://joseito.republika.pl/sunrise-commander/")))
+
 ;; Plato Wu,2015/02/28: for communitiy elpa 
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 
@@ -29,7 +32,7 @@
   (with-current-buffer
       (url-retrieve-synchronously
        ;; Plato Wu,2014/03/18: nintfloor don't support TLS
-       "http://raw.github.com/dimitri/el-get/master/el-get-install.el")
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
     (end-of-buffer)
     (eval-print-last-sexp)))
 
@@ -81,7 +84,7 @@
                 (:name psvn :type elpa)
                 (:name ascii :type elpa)
                 ;; Plato Wu,2015/02/28: it is obsolete?
-                                        ;        (:name smart-compile (compile-configuration))
+                (:name smart-compile (compile-configuration))
                 ;;        (:name ggtags :type elpa :features ggtags (ggtags-configuration))
 
                 (:name popup :type elpa)
@@ -163,6 +166,14 @@
 (c-mode-configuration)
 (auto-complete-configure)
 
+;; el-get allows you to install and manage elisp code for Emacs. It supports lots of differents types of sources (git, svn, apt, elpa, etc) and is able to install them, update them and remove them, but more importantly it will init them for you.
+
+;; That means it will require the features you need, load the necessary files, set the Info paths so that C-h i shows the new documentation you now depend on, and finally call your own :post-init function for you to setup the extension. Or call it a package.
+
+;; you can now easily checkout a stable branch from a
+;; git repository (thanks to the :checkout property) and you can even
+;; setup which checksum you want installed.
+
 ;(el-get-bundle 'magit :type elpa (global-set-key (kbd "C-x C-z") 'magit-status))
 ;(macroexpand '(el-get-bundle 'magit :type elpa))
 ;(el-get-elpa-symlink-package 'epl)
@@ -178,5 +189,30 @@
 ;; ;; ;;                         (el-get-list-package-names-with-status "installed")))
 
 (provide 'el-get-package)
+
+;; (defvar prelude-packages
+;;   '(ack-and-a-half auctex clojure-mode coffee-mode deft expand-region
+;;                    gist groovy-mode haml-mode haskell-mode inf-ruby
+;;                    magit magithub markdown-mode paredit projectile python
+;;                    sass-mode rainbow-mode scss-mode solarized-theme
+;;                    volatile-highlights yaml-mode yari zenburn-theme)
+;;   "A list of packages to ensure are installed at launch.")
+
+;; (defun prelude-packages-installed-p ()
+;;   (loop for p in prelude-packages
+;;         when (not (package-installed-p p)) do (return nil)
+;;         finally (return t)))
+
+;; (unless (prelude-packages-installed-p)
+;;   ;; check for new packages (package versions)
+;;   (message "%s" "Emacs Prelude is now refreshing its package database...")
+;;   (package-refresh-contents)
+;;   (message "%s" " done.")
+;;   ;; install the missing packages
+;;   (dolist (p prelude-packages)
+;;     (when (not (package-installed-p p))
+;;       (package-install p))))
+
+;; (provide 'prelude-packages)
 
 ;(el-get-clear-status-cache)

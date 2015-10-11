@@ -78,8 +78,10 @@
    kill Emacs itself, otherwise kill the current connection"
   (interactive "P")
   (if (boundp 'server-clients)
-      (if (> (length server-clients) 1)
-          (server-save-buffers-kill-terminal arg)
+      ;; Plato Wu,2015/07/27: emacs 24.5.1 don't need it
+      ;; (if (> (length server-clients) 1)
+      ;;     (server-save-buffers-kill-terminal arg)
+      (if t
         (progn 
           (remove-hook 'kill-emacs-query-functions 'server-kill-emacs-query-function)
           (if (functionp 'quit-slime)
@@ -89,13 +91,11 @@
               (gnus-group-exit))
           (save-buffers-kill-emacs arg)))
     (save-buffers-kill-emacs arg)))
-
-;; Plato Wu,2008/10/08 "^X^C" is not "" which is inputed by C-q C-x C-q C-c
-;; Plato Wu,2015/04/27: cygwin is OK for client/server mode
-; (is-system "cygwin")
-(unless (or window-system)
-  (define-key global-map "" 'save-buffers-kill-client))
-
+;; ;; Plato Wu,2008/10/08 "^X^C" is not "" which is inputed by C-q C-x C-q C-c
+;; ;; Plato Wu,2015/04/27: cygwin is OK for client/server mode
+;; ; (is-system "cygwin")
+;; (unless (or window-system)
+(define-key global-map "" 'save-buffers-kill-client)
 
 
 ;; set the following var to t if you like a newline to the end of copied text.
@@ -916,5 +916,7 @@ BEG and END (region to sort)."
 ;;   (mapc-buffers 'comint-write-input-ring))
 
 ;; (add-hook 'kill-emacs-hook 'comint-write-input-ring-all-buffers)
+
+(defun copy-lines-matching-re (re)                                                                                                                                                              "find all lines matching the regexp RE in the current buffer                                                                                                                               putting the matching lines in a buffer named *matching*"                                                                                                                                       (interactive "sRegexp to match: ")                                                                                                                                                           (let ((result-buffer (get-buffer-create "*matching*")))                                                                                                                                        (with-current-buffer result-buffer                                                                                                                                                             (erase-buffer))                                                                                                                                                                            (save-match-data                                                                                                                                                                               (save-excursion                                                                                                                                                                                (goto-char (point-min))                                                                                                                                                                      (while (re-search-forward re nil t)                                                                                                                                                            (princ (buffer-substring-no-properties (line-beginning-position)                                                                                                                                                                    (line-beginning-position 2))                                                                                                                                 result-buffer))))                                                                                                                                                               (pop-to-buffer result-buffer)))
 
 (provide 'my-utility)
