@@ -33,6 +33,8 @@
     (end-of-buffer)
     (eval-print-last-sexp)))
 
+(setq el-get-use-autoloads nil)
+
 (add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
 
 ;; Plato Wu,2011/05/07: remove it for require will search it first for package,
@@ -72,7 +74,7 @@
                 ;;Plato Wu,2015/06/05: for org package, when installing from ELPA, please do so from a fresh Emacs
                 ;;session where no org function has been called, use list-packages and press d & x to delete old version
                 ;; and i & x to install new one.
-                (:name org :type elpa)
+;                (:name org :type elpa)
                 (:name paredit :type elpa)
                 ;;        (:name smart-tab (smart-tab-configuration))
                 (:name google-c-style :type elpa)
