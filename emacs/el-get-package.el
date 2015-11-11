@@ -22,6 +22,7 @@
 ;;  ("ELPA" . "http://tromey.com/elpa/")
 ;;  ("marmalade" . "http://marmalade-repo.org/packages/")
 ;;  ("SC" . "http://joseito.republika.pl/sunrise-commander/")))
+
 ;; Plato Wu,2015/02/28: for communitiy elpa 
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 
@@ -34,6 +35,8 @@
        "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
     (end-of-buffer)
     (eval-print-last-sexp)))
+
+(setq el-get-use-autoloads nil)
 
 (add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
 
@@ -74,14 +77,14 @@
                 ;;Plato Wu,2015/06/05: for org package, when installing from ELPA, please do so from a fresh Emacs
                 ;;session where no org function has been called, use list-packages and press d & x to delete old version
                 ;; and i & x to install new one.
-                (:name org :type elpa)
+;                (:name org :type elpa)
                 (:name paredit :type elpa)
                 ;;        (:name smart-tab (smart-tab-configuration))
                 (:name google-c-style :type elpa)
                 (:name psvn :type elpa)
                 (:name ascii :type elpa)
                 ;; Plato Wu,2015/02/28: it is obsolete?
-                                        ;        (:name smart-compile (compile-configuration))
+                (:name smart-compile (compile-configuration))
                 ;;        (:name ggtags :type elpa :features ggtags (ggtags-configuration))
 
                 (:name popup :type elpa)

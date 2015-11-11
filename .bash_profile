@@ -159,10 +159,10 @@ elif [ "$SSH_CONNECTION" != '' ]; then
   export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}\007"'
 else
     # Plato Wu,2015/09/18: echo -n means PROMPT_COMMAND are the same line with PS1
-    # Plato Wu,2015/11/11: PROMPT_COMMAND method is OK for history 1
-    export PROMPT_COMMAND='echo -ne "\033]2;$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//g")\007"'
+    # export PROMPT_COMMAND='echo -ne "\033]2;$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//g")\007"'
     # Plato Wu,2015/09/21: BASH_COMMAND don't recognize bash alias command which shows, but history 1 is OK
-    # trap 'echo -ne "\033]2;$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//g")\007"' DEBUG
+    # Plato Wu,2015/11/11: trap show running command, PROMPT show finished command
+    trap 'echo -ne "\033]2;$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//g")\007"' DEBUG
     # Plato Wu,2015/11/11: PROMPT_COMMAND method is NG for $BASH_COMMAND, but trap is OK
     # trap 'echo -ne "\e]0;"; echo -n $BASH_COMMAND; echo -ne "\a"' DEBUG
 
@@ -180,11 +180,12 @@ export LESSCHARSET=latin1
 
 export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
  
-# Plato Wu,2010/01/26: let emacsclient -t automatically start an emacs in deamon mode and
-# connect to it if one is not found running
-export ALTERNATE_EDITOR=
-
-if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "plato-PC" ]); then
+# Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
+if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "plato-PC" ] ||
+    [ "$HOSTNAME" = "raspberrypi" ] );  then
+    # Plato Wu,2010/01/26: let emacsclient -t automatically start an emacs in deamon mode and
+    # connect to it if one is not found running
+    export ALTERNATE_EDITOR=
     # Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
     alias emacs='\emacsclient -t'
     # Plato Wu,2015/11/11: use -n to avoid kill-buffer-query-functions
