@@ -32,8 +32,8 @@ fi
  alias mv='mv -i'
  alias vi='vim'
  
-# # Don't put continuous duplicate lines in the history.
-#  export HISTCONTROL=ignoredups
+# Avoid duplicates
+ export HISTCONTROL=ignoredups:erasedups
 
 # Don't put duplicate lines in the whole history.
  export HISTCONTROL=erasedups
@@ -51,7 +51,7 @@ fi
  alias grep='grep --color'                     # show differences in colour
 
 # Some shortcuts for different directory listings
- alias ls='ls -hF --color=auto'                 # classify files in colour #tty
+ alias ls='ls -hF --show-control-chars --color=auto' # classify files in colour #tty
  alias dir='/bin/ls --format=vertical'              # for --color=auto will cause
 # problem in emacs, now I donot use --color=tty for ls, beacuse emacs use
 #color to solve color problem in shell mode.
@@ -138,10 +138,6 @@ esac
 # Ignore some controlling instructions
 export HISTIGNORE="[   ]*:&:bg:fg:exit"
 
-# Whenever displaying the prompt, write the previous line to disk
-#export PROMPT_COMMAND="history -a"
-
-
 # Plato Wu,2009/04/22: Do NOT put any commond in .bashrc for executing them after logining.
 
 # # Plato Wu,2009/06/07: If exist .bash_profile, bash does not execute .bash_login
@@ -156,20 +152,31 @@ if [ "$EMACS" != '' ]; then
 elif [ "$SSH_CONNECTION" != '' ]; then
 ## Plato Wu,2009/06/22: For putty windows title, it is identified for login by ssh
   export HOSTIP=`echo $SSH_CONNECTION |awk '{print $3}' |awk -F: '{if ($1 == "") print $4; else print $1}'`
-    # Plato Wu,2012/04/22: \007 for BEL \033 for ESC
-#  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}"'
+  # Plato Wu,2012/04/22: \007 or \a for BEL \033 or \e for ESC
+  # ESC]0;stringBEL -- Set icon name and window title to string
+  # ESC]1;stringBEL -- Set icon name to string
+  # ESC]2;stringBEL -- Set window title to string
+  export PROMPT_COMMAND='echo -ne "\033]0;${USER}@'$HOSTIP':[${HOSTNAME%%.*}]:${PWD/#$HOME/~}\007"'
 else
-    # Plato Wu,2015/07/28: for mintty, echo -ne "\e]0;Title\a"' is OK for title
-  export  PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}:${PWD/#$HOME/~}\007"'
- # export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}"'
+    # Plato Wu,2015/09/18: echo -n means PROMPT_COMMAND are the same line with PS1
+    # Plato Wu,2015/11/11: PROMPT_COMMAND method is OK for history 1
+    export PROMPT_COMMAND='echo -ne "\033]2;$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//g")\007"'
+    # Plato Wu,2015/09/21: BASH_COMMAND don't recognize bash alias command which shows, but history 1 is OK
+    # trap 'echo -ne "\033]2;$(history 1 | sed "s/^[ ]*[0-9]*[ ]*//g")\007"' DEBUG
+    # Plato Wu,2015/11/11: PROMPT_COMMAND method is NG for $BASH_COMMAND, but trap is OK
+    # trap 'echo -ne "\e]0;"; echo -n $BASH_COMMAND; echo -ne "\a"' DEBUG
+
+
 fi
+# Plato Wu,2015/11/11: sync frequently, don't use now
+# share bash history in multiple terminal windows, history -a append, -c clean -r read
+# export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # Plato Wu,2010/03/14: For command prompt.
 export PS1='\n\[\e[32m\]\t \u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
 
 # Plato Wu,2009/06/22: Add for cause Cygwin's less and ls show Chinese
 export LESSCHARSET=latin1
-alias ls='ls -hF --show-control-chars --color=auto'
 
 export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
  
@@ -179,17 +186,19 @@ export ALTERNATE_EDITOR=
 
 if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "plato-PC" ]); then
     # Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
- alias emacs='emacsclient -t'
- export NODE_PATH=/home/plato/node_modules/
+    alias emacs='\emacsclient -t'
+    # Plato Wu,2015/11/11: use -n to avoid kill-buffer-query-functions
+    alias emacsclient='emacsclient -n'
+    export NODE_PATH=/home/plato/node_modules/
 fi
 # Plato Wu,2010/02/21: proxy setting for chromium
 # Plato Wu,2012/04/11: swtichy sharp instead
 # Plato Wu,2012/04/21: chromium 18.0 don't work for pac
 #export auto_proxy="https://users.ninthfloor.org/~plato/localautoproxy.pac" or
-# Plato Wu,2013/01/02: certificate common name ‘*.ninthfloor.org’ doesn't 
-# match requested host name ‘plato.ninth.su, so don't use https for ninth.su
+# Plato Wu,2013/01/02: certificate common name *.ninthfloor.org doesn't 
+# match requested host name plato.ninth.su, so don't use https for ninth.su
 #export auto_proxy="http://plato.ninth.su/localautoproxy.pac"
-export GIT_EDITOR=emacs
+export GIT_EDITOR=emacsclient
 
 # Plato Wu,2010/10/24: xterm-256color can't support End key in emacs of myhost, so define it in .emacs
 export TERM=xterm-256color
@@ -199,7 +208,9 @@ export TERM=xterm-256color
 if [ "$OSTYPE" = "cygwin" ] ; then
     export LANG=zh_CN.GBK
 # Plato Wu,2013/06/27: so "cd d" is "cd /cygdrive/d"
-    export CDPATH=./:/cygdrive/    
+    export CDPATH=./:/cygdrive/
+else
+    export LANG=en_US.UTF-8
 fi
 
 if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
