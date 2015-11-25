@@ -455,9 +455,9 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 
 (define-key emacs-lisp-mode-map "\M-." 'find-tag-also-for-elisp)
 (define-key lisp-interaction-mode-map "\M-." 'find-tag-also-for-elisp)
-
-(unless (or (is-system "cygwin") 
-            (is-version 21))
+;; Plato Wu,2015/09/21: now cygwin support emacsclient.
+;; or (is-system "cygwin") 
+(unless (is-version 21)
   (defun my-done ()
     (interactive) 
     (server-edit)
@@ -638,6 +638,15 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 ;; 	(or default input)
 ;;       (prog1 input
 ;; 	(add-to-history (or history 'regexp-history) input)))))
+
+;; Plato Wu,2015/08/18: emacs 24.4.1 assume 'grep' supports GREP_OPTIONS, the latest grep will report a
+;; warning, emacs 25.1 fix it.
+;; Plato Wu,2015/08/17: grep V2.21 treats ISO-8859 text files as if they are binary, a workaroud is change
+;; LC_ALL=c, but don't put into .bash_profile, since it specifies the character set "US-ASCII".
+;; for grep-find
+(grep-apply-setting 'grep-find-command "export LC_ALL=C && find . -type f -exec grep -nH -e {} +")
+;; for rgrep 
+(grep-apply-setting 'grep-find-template "export LC_ALL=C && find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +")
 
 (defun project-grep-ignore-case ()
   "regexp must be all low case for rgrep case insensitive"
@@ -838,15 +847,14 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
   (interactive (list 
                 (completing-read "New name:"
                                  nil
-                                 nil nil (buffer-name))))
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (if (not filename)
-        (message "Buffer '%s' is not visiting a file!" name)
+                                 nil nil (file-name-nondirectory (buffer-file-name)))))
+  (let ((file-name  (file-name-nondirectory (buffer-file-name))))
+    (if (not (buffer-file-name))
+        (message "Buffer '%s' is not visiting a file!" (buffer-name))
       (if (get-buffer new-name)
           (message "A buffer named '%s' already exists!" new-name)
         (progn
-          (rename-file name new-name 1)
+          (rename-file file-name new-name t)
           (rename-buffer new-name)
           (set-visited-file-name new-name)
           (set-buffer-modified-p nil))))))
@@ -868,6 +876,7 @@ Switches to the buffer `*ielm*' *in other window*, or creates it if it does not 
     (when (< i 5) 
       (cd svn-file-name)
       (svn-status svn-file-name)
+      (svn-status-toggle-hide-unmodified)
       (cd old))))
 
 (defun uniq-lines (beg end)

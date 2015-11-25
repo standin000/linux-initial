@@ -1,4 +1,6 @@
 ;; Plato Wu,2009/11/29: ispell-word need aspell and aspell-en get installed.
+;; Plato Wu,2015/08/10: for cygwin gbk environment
+(setq ispell-dictionary "english")
 
 ;; uncomment this line to disable loading of "default.el" at startup
 ;; (setq inhibit-default-init t)
@@ -83,10 +85,11 @@
 (setq-default tab-width 4)
 
 (setq vc-follow-symlinks t)
-
+(setq vc-suppress-confirm t)
 ;; Plato Wu,2014/09/22: ignore space change
-(setq vc-git-diff-switches "-b")
-(setq diff-switches "-b")
+;; Plato Wu,2015/09/18: use vc-diff-switches, if it is nil will use diff-switches?
+(setq vc-git-diff-switches nil)
+(setq diff-switches "-w")
 ;; Plato Wu,2015/01/19: vc-ediff is good than svn diff
 (if (is-version 24)
     (eval-after-load "vc-hooks"
@@ -105,7 +108,7 @@
 (setq ediff-highlight-all-diffs nil)
 
 ;; Plato Wu,2013/11/13: ediff for utf16 file
-(setq ediff-diff-options "--text")
+(setq ediff-diff-options "--text -w")
 
 ;; Plato Wu,2013/12/02: backup files under VC
 ;; (setq vc-make-backup-files t)
@@ -361,14 +364,14 @@
 
 ;; (global-set-key [f9] 'my-search)
 
-;; (add-to-list 'grep-files-aliases
-;;              ;; Plato Wu,2010/02/27: Let ch match .c file first!
-;;              ;; Plato Wu,2013/01/25: hh take precdence over items below.
-;;              '("hh" .    "*.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++"))
 ;; Plato Wu,2013/08/26: project-grep will match (cdr aliaes) to determine search default files.
+;; Plato Wu,2015/11/05: (car aliaes) is just a title
+;; Plato Wu,2015/11/05: "cc" is only for c++ files, use cchh for c++ & c files.
+;; (delete-if #'(lambda (element) (equal "cc" (car element))) grep-files-aliasaes)
+;; (setcdr (assoc "cchh" grep-files-aliases) "*.[ch] *.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++")
+
 (add-to-list 'grep-files-aliases
              '("cchh" . "*.[ch] *.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++"))
-
 
 ;;C-x ( start-kbd-macro; C-x ) end-kbd-macro; C-x e call-last-kbd-macro
 ;; Dos to unix
@@ -461,6 +464,10 @@
 ;; (load "~/linux-backup/.emacs")
 ;; (server-start)
 ;; (setq kill-buffer-query-functions nil)
+
+;; Plato Wu,2015/08/11: skip warning about kill server-edit buffer
+;; Plato Wu,2015/09/07: use emacsclient -n to avoid this warning
+;(setq kill-buffer-query-functions (remove 'server-kill-buffer-query-function kill-buffer-query-functions))
 
 ;; Plato Wu,2014/01/10: when emacs halt, C-g will show where it is
 ;; (toggle-debug-on-quit)
