@@ -8,6 +8,8 @@
 	excludesfile = ~/.gitignore
 # Plato Wu,2012/09/08: support UTF-8
 quotepath = false
+# Plato Wu,2015/11/10: for git respository
+# gitproxy = ~/.ssh/proxy.sh
 
 [alias]
 co = checkout
@@ -30,6 +32,10 @@ sslVerify = false
 # 2. When using git pull on the master branch, with no remote and
 # branch specified, use the default remote (origin) and merge in the
 # changes from the master branch.
+
+# Plato Wu,2015/11/10: for http respository
+#     proxy = socks5://192.168.1.1:9050
+#     proxy = http://192.168.1.1:8118
 [branch "master"]
 	remote = origin
 	merge = refs/heads/master

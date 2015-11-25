@@ -149,20 +149,21 @@
                  (package-refresh-contents))
                (eval (cons 'el-get-bundle! (cdr package))) 
                )
-         el-get-sources)
+        el-get-sources)
+
+(paredit-configuration)
+(org-configuration)
+(c-mode-configuration)
+(auto-complete-configure)
+
 ;; advice-add need 24.4
 (if (> (compare-version "24.4") 0)
     (progn 
         ;; Plato Wu,2015/05/26: helm need emacs 24.4
       (my-helm-configuration)
       (projectile-configuration))
-    (ido-configuration)
-  )
+    (ido-configuration))
 
-(paredit-configuration)
-(org-configuration)
-(c-mode-configuration)
-(auto-complete-configure)
 
 ;; el-get allows you to install and manage elisp code for Emacs. It supports lots of differents types of sources (git, svn, apt, elpa, etc) and is able to install them, update them and remove them, but more importantly it will init them for you.
 

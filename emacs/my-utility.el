@@ -45,6 +45,7 @@
 ;; Plato Wu,2010/04/06: make sure putty use xterm-256color, so tramp can works
 ;; in putty
 ;; Plato Wu,2010/05/23: use list-colors-display to confirm if emacs can use 256 colors
+;; Plato Wu,2015/08/23: make sure sudo /bin/sh without password
 (defun xwl-revert-buffer-with-sudo ()
   "Revert buffer using tramp sudo.
     This will also reserve changes already made by a non-root user."
@@ -396,7 +397,8 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 (global-set-key "2" 'split-window-vertically-and-switch)
 
 (defun cg-erc ()
-    (interactive)
+  (interactive)
+  (require 'netrc)
     ;; Plato Wu,2010/04/01: use 7000 in China Telecom network and
     ;; 6667 in Greatwall network
     (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "irc.freenode.net" "6667")))
