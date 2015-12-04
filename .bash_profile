@@ -93,6 +93,9 @@ export CVS_RSH=ssh
 
 # Plato Wu,2009/05/19: proxy for git
 if [ -f ~/limited_network ]; then
+    # Plato Wu,2015/11/25: for ssh proxy
+    #    export GIT_SSH=~/.ssh/proxy.sh
+    # Plato Wu,2015/11/25: for git proxy
     export GIT_PROXY_COMMAND=~/.ssh/proxy.sh
 fi
 
@@ -246,7 +249,7 @@ shopt -s cdspell
 # cpanm --uninstall
 
 if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
-    source ~/perl5/perlbrew/etc/bashrc
+    source ~plato/perl5/perlbrew/etc/bashrc
 fi
 if [ "$HOSTNAME" = "nabla" ]; then
   TZ='Asia/Shanghai'; export TZ
