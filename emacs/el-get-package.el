@@ -89,6 +89,7 @@
 
                 (:name popup :type elpa)
                 (:name auto-complete :type elpa)
+                (:name csharp-mode :type elpa (lambda () (add-to-list 'auto-mode-alist '("\\.cs$" . csharp-mode))))
 
                 ;; (:name nxhtml)
                 ;; (:name dictionary-el    :type apt-get)
