@@ -67,6 +67,7 @@ fi
 
  alias proxy-curl='curl -x 192.168.1.1:8118'
  alias aria2c='aria2c -c --file-allocation=none'
+ alias proxy-aria2c='aria2c --all-proxy=http://192.168.1.1:8118'
 
  # Plato Wu,2009/06/07: use ssh's X11 forwarding
 # if [ -z "$DISPLAY" ]; then
@@ -219,6 +220,7 @@ if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
 fi
 
 # Plato Wu,2013/06/15: for Kitty to invoke winscp
+# Plato Wu,2015/12/15: Start Winscp(set path in kitty.ini) can't set path of server
 winscp() { echo -ne "\033];__ws:${PWD}\007"; }
 
 # Plato Wu,2013/06/27: spell checking for cd command
