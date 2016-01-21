@@ -15,3 +15,4 @@ TAGS
 id_rsa
 known_hosts
 authorized_keys2
+# add ! to negative rules

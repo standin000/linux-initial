@@ -487,21 +487,20 @@
   ;; (emms-history-load)
   ;; Plato Wu,2014/04/23: 
   (defun emms-history-load ()
-    "if .emms-history is empty, then load .emms-history.bak"
+    "restore `emms-history-file', if it is empty, then load `emms-history-file'bak."
     (interactive)
     (when (and (stringp emms-history-file)
              (file-exists-p emms-history-file))
-    (let (history buf playlists)
+    (let (history buf)
       (with-temp-buffer
-        (insert-file-contents emms-history-file)
+        (emms-insert-file-contents emms-history-file)
         (setq history (read (current-buffer)))
         (setq playlists (cadr history))
         (unless playlists 
           (erase-buffer)
-          (insert-file-contents "~/.emacs.d/.emms-history.bak")
-          (setq history (read (current-buffer)))
-          (setq playlists (cadr history)))
-        (dolist (playlist playlists)
+          (emms-insert-file-contents (concat emms-history-file ".bak"))
+          (setq history (read (current-buffer))))
+        (dolist (playlist (cadr history))
           (with-current-buffer (emms-playlist-new (car playlist))
             (setq emms-playlist-buffer (current-buffer))
             (if (string= (car playlist) (car history))
@@ -1186,18 +1185,19 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   
   (setq org-export-copy-to-kill-ring nil)
   (setq org-confirm-babel-evaluate nil)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((R . t)
-     (ditaa . t)
-     (dot . t)
-     (emacs-lisp . t)
-     (gnuplot . t)
-     (python . t)
-     (perl . t)
-     (sh . t)
-     (C . t)
-     (sqlite . t)))  
+  ;; Plato Wu,2015/11/25: not using org-babel now
+  ;; (org-babel-do-load-languages
+  ;;  'org-babel-load-languages
+  ;;  '((R . t)
+  ;;    (ditaa . t)
+  ;;    (dot . t)
+  ;;    (emacs-lisp . t)
+  ;;    (gnuplot . t)
+  ;;    (python . t)
+  ;;    (perl . t)
+  ;;    (sh . t)
+  ;;    (C . t)
+  ;;    (sqlite . t)))  
 
   (defun orgtbl-to-latex (table params)
   "Convert the orgtbl-mode TABLE to LaTeX.
