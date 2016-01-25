@@ -67,3 +67,5 @@ if [ $error != 0 ]; then
 fi
 
 done
+
+# Plato Wu,2015/12/09: -filename which start with - can not be rm, need  rm ./-file

@@ -17,7 +17,7 @@
   (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
 (package-initialize)
-;; (setq package-archive '(("melpa" . "http://melpa.org/packages/")
+;; (setq package-archives '(("melpa" . "http://melpa.org/packages/")
 ;;  ("gnu" . "http://elpa.gnu.org/packages/")
 ;;  ("ELPA" . "http://tromey.com/elpa/")
 ;;  ("marmalade" . "http://marmalade-repo.org/packages/")

@@ -444,7 +444,7 @@
 
 ;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
 ;; Plato Wu,2012/07/29: start cua-set-rectangle-mark and select the column, then press C-c
-;; copy the column, C-y will paste the column
+;; to copy the column, C-x to cut, C-y for paste
 (global-set-key (kbd "C-^") 'cua-set-rectangle-mark)
 ;; emacs 24.0.93 will close network driver write-protected problem, now I use fstab method
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
