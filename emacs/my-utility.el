@@ -1,12 +1,17 @@
 (defmacro try-function (function)
   `(if (functionp (car ,function))
       (eval ,function)
-    'NG))
+    'nil))
 
 (defmacro try-require (library)
   (condition-case nil
       (require library)
-    (error (message "%s is not existed"  library))))
+    (error (message "%s is not existed" library) nil)))
+
+(defmacro try-load-file (path)
+  (condition-case nil
+      (load-file path)
+    (error (message "%s is not existed" path) nil)))
 
 (defun is-system (type)
   (string= system-type type))

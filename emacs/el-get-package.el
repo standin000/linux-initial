@@ -71,6 +71,7 @@
       (append el-get-sources 
               '((:name magit :type elpa
                        (progn
+                         ;; Plato Wu,2016/01/25: @todo magit-push can not enter password for https link
                          ;; Plato Wu,2016/01/22: M-h & M-H to show only file(s)
                          (global-set-key (kbd "C-x C-z") 'magit-status)
                          ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert.

@@ -1643,15 +1643,18 @@ to the position where the property exists."
 ;; 			emacs-lisp-mode-hook) t)
 
 (defun cedet-configuration ()
-  (load-file "~/.emacs.d/el-get/cedet/cedet-devel-load.el")
+  (when
+      (try-load-file
+       "~/.emacs.d/el-get/cedet/cedet-devel-load.el")
                                         ; cogre-uml-quick-class for create uml diagram
-  (global-ede-mode 1)                      ; Enable the Project management system
-  (global-srecode-minor-mode 1)
-  (semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion
-  ;;(semantic-load-enable-gaudy-code-helpers)  ;ng for no menu emacs
-  ;;(semantic-load-enable-excessive-code-helpers); ng for no menu emacs
-  ;;(semantic-load-enable-semantic-debugging-helpers) ;for debug
-  ;;(require 'semantic/sb)
+    (global-ede-mode 1)                      ; Enable the Project management system
+    (global-srecode-minor-mode 1)
+    (semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion
+    ;;(semantic-load-enable-gaudy-code-helpers)  ;ng for no menu emacs
+    ;;(semantic-load-enable-excessive-code-helpers); ng for no menu emacs
+    ;;(semantic-load-enable-semantic-debugging-helpers) ;for debug
+    ;;(require 'semantic/sb)
+    )
   )
 
 (defun auto-complete-configure ()
