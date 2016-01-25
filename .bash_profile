@@ -210,7 +210,10 @@ export TERM=xterm-256color
 # Plato Wu,2011/07/08: cd z: is OK in cygwin
 # Plato Wu,2011/10/31: special for cygwin environment
 if [ "$OSTYPE" = "cygwin" ] ; then
-    export LANG=zh_CN.GBK
+#    export LANG=zh_CN.GBK
+    # Plato Wu,2015/12/21: Active UTF-8 page, so mintty can use UTF-8, but network card name is not utf-8, just little annoy
+    chcp.com 65001  > /dev/null
+    export LANG=en_US.UTF-8
 # Plato Wu,2013/06/27: so "cd d" is "cd /cygdrive/d"
     export CDPATH=./:/cygdrive/
 else

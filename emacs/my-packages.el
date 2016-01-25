@@ -323,7 +323,7 @@
 ;  (global-set-key (kbd "C-x C-f") #'helm-find-files)
   (global-set-key (kbd "C-x C-r") #'helm-recentf)
   (global-set-key (kbd "C-x r l") #'helm-filtered-bookmarks)
-  (global-set-key (kbd "M-y")     #'helm-show-kill-ring)
+;  (global-set-key (kbd "M-y")     #'helm-show-kill-ring)
   (global-set-key (kbd "M-s o")   #'helm-swoop)
   (global-set-key (kbd "M-s /")   #'helm-multi-swoop)
   ;(global-set-key (kbd "M-x") 'helm-M-x)
@@ -356,7 +356,6 @@
 
   (define-key org-mode-map (kbd "C-x c o h") #'helm-org-headlines)
 
-  (projectile-global-mode)
   (setq projectile-completion-system 'helm)
   (helm-projectile-on)
   ;; Plato Wu,2015/03/20: don't use helm for describe function and variable.
@@ -1643,11 +1642,20 @@ to the position where the property exists."
 ;;                         slime-repl-mode-hook
 ;; 			emacs-lisp-mode-hook) t)
 
-(defun auto-complete-configure ()
-  (add-hook 'mode-local-init-hook
-            (lambda ()  
-              ))
+(defun cedet-configuration ()
+  (load-file "~/.emacs.d/el-get/cedet/cedet-devel-load.el")
+                                        ; cogre-uml-quick-class for create uml diagram
+  (global-ede-mode 1)                      ; Enable the Project management system
+  (global-srecode-minor-mode 1)
+  (semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion
+  ;;(semantic-load-enable-gaudy-code-helpers)  ;ng for no menu emacs
+  ;;(semantic-load-enable-excessive-code-helpers); ng for no menu emacs
+  ;;(semantic-load-enable-semantic-debugging-helpers) ;for debug
+  ;;(require 'semantic/sb)
+  )
 
+(defun auto-complete-configure ()
+;  (add-hook 'mode-local-init-hook)
   (ac-config-default)
   (setq ac-auto-start 3)
   (add-hook 'c-mode-common-hook 

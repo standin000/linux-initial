@@ -640,7 +640,7 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 ;; 	(add-to-history (or history 'regexp-history) input)))))
 
 ;; Plato Wu,2015/08/18: emacs 24.4.1 assume 'grep' supports GREP_OPTIONS, the latest grep will report a
-;; warning, emacs 25.1 fix it.
+;; warning, emacs 25.1 fix it, not resolve it now.
 ;; Plato Wu,2015/08/17: grep V2.21 treats ISO-8859 text files as if they are binary, a workaroud is change
 ;; LC_ALL=c, but don't put into .bash_profile, since it specifies the character set "US-ASCII".
 ;; for grep-find

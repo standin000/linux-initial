@@ -1,4 +1,4 @@
-;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs
+;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs, texinfo(for makeinfo)
 (unless (is-version 24)
   (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
     ;; Plato Wu,2015/05/26: this site is obsolete for it only support single elpa archive
@@ -59,7 +59,10 @@
           ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
           ;'((clojure-mode :type elpa))
           '((:name helm :type elpa)
-            (:name helm-projectile :type elpa)))
+            (:name helm-projectile :type elpa)
+            ;; Plato Wu,2015/12/07: it will load built-in cedet first.
+            ;; (:name cedet :type elpa)
+	    ))
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (setq el-get-sources
         '((:name cl-lib :type elpa))))
@@ -68,6 +71,7 @@
       (append el-get-sources 
               '((:name magit :type elpa
                        (progn
+                         ;; Plato Wu,2016/01/22: M-h & M-H to show only file(s)
                          (global-set-key (kbd "C-x C-z") 'magit-status)
                          ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert.
                          (setq magit-auto-revert-mode nil)
@@ -88,7 +92,7 @@
                 ;;        (:name ggtags :type elpa :features ggtags (ggtags-configuration))
 
                 (:name popup :type elpa)
-                (:name auto-complete :type elpa)
+;                (:name auto-complete :type elpa)
                 (:name csharp-mode :type elpa (lambda () (add-to-list 'auto-mode-alist '("\\.cs$" . csharp-mode))))
 
                 ;; (:name nxhtml)
@@ -154,11 +158,6 @@
                )
         el-get-sources)
 
-(paredit-configuration)
-(org-configuration)
-(c-mode-configuration)
-(auto-complete-configure)
-
 ;; advice-add need 24.4
 (if (> (compare-version "24.4") 0)
     (progn 
@@ -167,6 +166,11 @@
       (projectile-configuration))
     (ido-configuration))
 
+(paredit-configuration)
+(org-configuration)
+(c-mode-configuration)
+(cedet-configuration)
+(auto-complete-configure)
 
 ;; el-get allows you to install and manage elisp code for Emacs. It supports lots of differents types of sources (git, svn, apt, elpa, etc) and is able to install them, update them and remove them, but more importantly it will init them for you.
 
