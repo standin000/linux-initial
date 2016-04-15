@@ -139,6 +139,16 @@
 
 (eshell-configuration)
 
+(defun magit-configuration ()
+  ;; Plato Wu,2016/01/25: @todo magit-push can not enter password for https link
+  ;; Plato Wu,2016/01/22: M-h & M-H to show only file(s)
+  (global-set-key (kbd "C-x C-z") 'magit-status)
+  ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert.
+  (setq magit-auto-revert-mode nil)
+  ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert warning.
+  (setq magit-last-seen-setup-instructions "1.4.0")
+  )
+
 (defun paredit-configuration ()
   ;; Plato Wu,2008/09/27, paredit will cause alt-s, ctrl-d can not used in ido mode
 ;;  (add-hook 'minibuffer-setup-hook #'(lambda () (paredit-mode +1)))
@@ -251,7 +261,7 @@
                ;; Plato Wu,2011/05/22: show http buffer of url-request-data for debug syncml
                (not (string-match "^ \\*http" (buffer-name buf)))))))
 ;; Plato Wu,2015/04/13: there is helm-configuration first.
-(defun my-helm-configuration ()
+(defun helm-config ()
   (helm-mode 1)
   ;; If you don't want the Helm window to be resized, but a smaller Helm window, you can set helm-autoresize-max-height equal to helm-autoresize-min-height.
 
@@ -313,10 +323,6 @@
 
   (global-set-key (kbd "C-x C-f")  #'helm-find-files)
   (global-set-key (kbd "C-x b") #'helm-mini)
-  (require 'helm-projectile)
-  ;; Plato Wu,2015/04/30: no suitable switch projectile buffer function
-  (global-set-key (kbd "C-x n") #'helm-projectile-find-file)
-;  (global-set-key (kbd "C-x b") 'helm-projectile-switch-to-buffer)
 ;  (global-set-key (kbd "C-x b") 'projectile-project-buffers-other-buffer)
 
 ;  (global-set-key (kbd "C-x C-m") #'helm-M-x)
@@ -345,10 +351,6 @@
 
   (global-set-key (kbd "M-s s")   #'helm-ag)
 
-  (setq helm-projectile-sources-list (cons 'helm-source-projectile-files-list
-                                           (remove 'helm-source-projectile-files-list 
-                                                   helm-projectile-sources-list)))
-
   (define-key projectile-mode-map (kbd "C-c p /")
     #'(lambda ()
         (interactive)
@@ -357,7 +359,6 @@
   (define-key org-mode-map (kbd "C-x c o h") #'helm-org-headlines)
 
   (setq projectile-completion-system 'helm)
-  (helm-projectile-on)
   ;; Plato Wu,2015/03/20: don't use helm for describe function and variable.
   (setq helm-completing-read-handlers-alist '((describe-function . nil)
                                               (describe-variable . nil)
@@ -365,7 +366,19 @@
                                               (find-function . helm-completing-read-symbols)
                                               (find-tag . helm-completing-read-with-cands-in-buffer)
                                               (ffap-alternate-file)
-                                              (tmm-menubar)))) 
+                                              (tmm-menubar))))
+
+(defun helm-projectile-configuration ()
+  ;; Plato Wu,2016/03/29: why need require for el-get
+  ;(require 'helm-projectile)
+  ;; Plato Wu,2015/04/30: no suitable switch projectile buffer function
+  (global-set-key (kbd "C-x n") #'helm-projectile-find-file)
+  (setq helm-projectile-sources-list (cons 'helm-source-projectile-files-list
+                                           (remove 'helm-source-projectile-files-list
+                                                   helm-projectile-sources-list)))
+  ;  (global-set-key (kbd "C-x b") 'helm-projectile-switch-to-buffer)
+  (helm-projectile-on)
+  )
 
 
 (defun projectile-configuration ()
@@ -572,7 +585,7 @@ See  `emms-repeat-track'."
 (defvar my-authinfo "~/.authinfo")
 
 (defun auctex-configuration ()
-  (require 'preview-latex)
+;  (require 'preview-latex)
   (setq TeX-auto-save t)
   (setq Te-parse-self t)
   (setq-default TeX-master nil)
@@ -1061,7 +1074,7 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   ;; Plato Wu,2010/10/08: C-c C-c is used in org-mode
   (define-key org-mode-map (kbd "C-M-x")   'org-toodledo-sync-task))
 
-(defun org-configuration ()
+(defun org-mode-configuration ()
   ;; Plato Wu,2010/08/29: use C-u C-c $ org-archive-subtree to archive DONE items
   ;; (require 'org-archive)
   ;; (require 'org-publish)
@@ -1239,8 +1252,8 @@ this function is called."
     (orgtbl-to-generic table (org-combine-plists params2 params))))
   )
 
-(defun c-mode-configuration () 
-  (autoload 'google-set-c-style "google-c-style" nil t)
+(defun google-c-style-configuration ()
+;  (autoload 'google-set-c-style "google-c-style" nil t)
   (add-hook 'c-mode-common-hook 
             #'(lambda () 
                 (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
@@ -1286,8 +1299,8 @@ this function is called."
 ;;             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
 ;;               (ggtags-mode 1)))))
 
-(defun compile-configuration ()
-  (autoload 'smart-compile "smart-compile" "load smart compile")
+(defun smart-compile-configuration ()
+;  (autoload 'smart-compile "smart-compile" "load smart compile")
 ;Plato Wu,2013/04/15: use (symbol-function 'cc-mode) to get autoload for eval-after-load
 ;Plato Wu,2013/05/14: there is cc-mode.el) to get autoload for eval-after-load
  (eval-after-load
@@ -1626,8 +1639,8 @@ to the position where the property exists."
 	 (next-single-property-change (point) 'w3m-href-anchor))
 	" +\\'" ""))))
 
-(defun ascii-configuration ()
-  (autoload 'ascii-on "ascii" "Turn on ASCII code display." t))
+;; (defun ascii-configuration ()
+;;   (autoload 'ascii-on "ascii" "Turn on ASCII code display." t))
 
 ;; (if (try-require 'jabber)
 ;;     (let ((netrc-data (netrc-machine (netrc-parse my-authinfo) "talk.google.com" "ssl")))
@@ -1643,22 +1656,22 @@ to the position where the property exists."
 ;; 			emacs-lisp-mode-hook) t)
 
 (defun cedet-configuration ()
-  (when
-      (try-load-file
-       "~/.emacs.d/el-get/cedet/cedet-devel-load.el")
+  ;; (when
+  ;;     (try-load-file
+  ;;      "~/.emacs.d/el-get/cedet/cedet-devel-load.el")
                                         ; cogre-uml-quick-class for create uml diagram
-    (global-ede-mode 1)                      ; Enable the Project management system
+    (global-ede-mode 1)        ; Enable the Project management system
     (global-srecode-minor-mode 1)
     (semantic-load-enable-code-helpers)      ; Enable prototype help and smart completion
     ;;(semantic-load-enable-gaudy-code-helpers)  ;ng for no menu emacs
     ;;(semantic-load-enable-excessive-code-helpers); ng for no menu emacs
     ;;(semantic-load-enable-semantic-debugging-helpers) ;for debug
     ;;(require 'semantic/sb)
-    )
+    ;; )
   )
 
-(defun auto-complete-configure ()
-;  (add-hook 'mode-local-init-hook)
+(defun auto-complete-configuration ()
+  ;'mode-local-init-hook
   (ac-config-default)
   (setq ac-auto-start 3)
   (add-hook 'c-mode-common-hook 
@@ -1768,5 +1781,14 @@ to the position where the property exists."
          ".hpp\""   
          ".h\"") \n \n))
      ))
+
+(defun webblogger-configuration ()
+ (eval-after-load "muse-mode" '(blogger-configuration)))
+
+(defun xclip-configuration ()
+  (when (getenv "DISPLAY")
+    ;(autoload 'turn-on-xclip "xclip" "exchange clip between X and emacs" t nil)
+    (turn-on-xclip)))
+
 
 (provide 'my-packages)

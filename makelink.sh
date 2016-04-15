@@ -1,7 +1,7 @@
 #!/bin/bash
 
 linkfiles=".emacs .bash_profile .sbclrc .bash_logout .gnus.el .vimrc
-.ssh .subversion/config .sawfishrc .screenrc .hgrc .hgignore .tmux.conf
+.ssh .subversion/config .subversion/config .sawfishrc .screenrc .hgrc .hgignore .tmux.conf
 .gitconfig .gitignore .inputrc .bashrc .Xresources .stumpwmrc .minttyrc emacs texmf"
 #linkfiles="test test1 test2/test2"
 #echo $linkfiles

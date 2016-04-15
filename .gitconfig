@@ -34,8 +34,10 @@ sslVerify = false
 # changes from the master branch.
 
 # Plato Wu,2015/11/10: for http respository
-#     proxy = socks5://192.168.1.1:9050
-#     proxy = http://192.168.1.1:8118
+# Plato Wu,2016/04/15: it don't effect git svn
+# proxy = socks5://192.168.1.1:9050
+# proxy = socks5://127.0.0.1:7070
+# proxy = http://127.0.0.1:8118
 [branch "master"]
 	remote = origin
 	merge = refs/heads/master

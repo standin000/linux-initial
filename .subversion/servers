@@ -142,7 +142,7 @@
 [global]
 # http-proxy-exceptions = *.exception.com, www.internal-site.org
 # Plato Wu,2015/03/29: use http proxy
-# http-proxy-host = 192.168.1.1
+# http-proxy-host = 127.0.0.1
 # http-proxy-port = 8118
 # http-proxy-username = defaultusername
 # http-proxy-password = defaultpassword
