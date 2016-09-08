@@ -49,6 +49,10 @@
 ;;   (require 'package)
 ;;   (add-to-list 'package-archives
 ;;                '("melpa" . "http://melpa.org/packages/"))
+;;  ("gnu" . "http://elpa.gnu.org/packages/")
+;;  ("ELPA" . "http://tromey.com/elpa/")
+;;  ("marmalade" . "http://marmalade-repo.org/packages/")
+;;  ("SC" . "http://joseito.republika.pl/sunrise-commander/")))
 ;;   (package-refresh-contents)
 ;;   (package-initialize)
 ;;   (package-install 'el-get)
@@ -60,38 +64,58 @@
    "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el"
    (lambda (s)
      (goto-char (point-max))
-        (eval-print-last-sexp))))
+     ;; Plato Wu,2016/09/07: @todo need wait evaluation
+     (eval-print-last-sexp))))
+;; @todo
+    ;;  Control whether el-get should generate autoloads for this
+    ;; package. Setting this to nil prevents el-get from generating
+    ;; autoloads for the package. Default is t. Setting this to a
+    ;; string or a list of string will load the named autoload
+    ;; files.
+
+(setq el-get-use-autoloads nil)
+
 ; install process running at background, so this report error when first time.
 (add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
 
 ;; `(setq my-packages
 ;;       ',(mapcar #'el-get-as-symbol
 ;;                 (el-get-list-package-names-with-status "installed")))
-                                        ;(setq my-packages (quote (ascii auto-complete cedet helm helm-projectile magit org-mode package paredit popup projectile psvn smart-compile)))
+;; Plato Wu,2011/05/19: we must change the usage of el-get, don't use :after option to
+;; call package configuration, but run it after el-get finished its task. since el-get
+;; use eval-after-load to call :after function, it is annoy style.
+; So anyway, if you make a change to el-get-sources, el-get insist use (el-get-package-status-recipes)
+; you will have to use either el-get-update or el-get-reinstall on that package
 
-;org-wunderlist ; csharp-mode of code.google.com is NG  
+;(setq my-packages (quote (ascii auto-complete cedet helm helm-projectile magit org-mode package paredit popup projectile psvn smart-compile)))
+;; smart-tab, ggtags, nxhtml 
+;; org-wunderlist ; csharp-mode of code.google.com is NG  (lambda () (add-to-list 'auto-mode-alist '("\\.cs$" . csharp-mode)))
 ;; Plato Wu,2016/03/28: magit need popup, auto-complete+ need auto-complete
-(setq my-packages '(popup magit org-mode paredit google-c-style psvn ascii smart-compile auto-complete))
+;; (:name dictionary-el    :type apt-get)
+;; (:name emacs-goodies-el :type apt-get)
+;; Plato Wu,2011/01/30: both lisppaste and weblogger require xml-rpc, el-get can't
+;; deal with correctly, it report xml-rpc existed when try to install weblogger after
+;; lisppaste, so disable lisppaste first, it is not useful for me.
+;; (:name lisppaste :type elpa)        
+;; Plato Wu,2011/05/07: remove it for require will search it first for package,
+;; and the recipe file name is the same as package file name; 2015/03/02: it is obsolete now
+;; (setq load-path 
+;;       (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
+
+(setq my-packages '(popup magit paredit google-c-style psvn ascii smart-compile (:name auto-complete :type elpa)
+                          (:name org-mode :after (org-mode-configuration))))
 
 (if (> (compare-version "24.4") 0)
     (progn
       (setq my-packages  
-           ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
-            (append my-packages '(projectile ))))
+            ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
+            ;; make sure (el-get-package-or-source 'helm) don't contain helm, then el-get-install 'helm
+            ;; Plato Wu,2016/04/06: there is helm-configuration in helm package.
+            (append my-packages '(projectile (:name helm :after (helm-config)) helm-projectile))))
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (ido-configuration)
   (setq my-packages
         (append my-packages '(cl-lib))))
-
-(setq el-get-sources
-      (mapcar
-       (lambda (pkg-name)
-         `(:name ,pkg-name
-           :after ,(let ((after-func (intern (concat (symbol-name pkg-name) "-configuration"))))
-				     (if (functionp after-func)
-					 (list after-func)
-                     nil)))) 
-       my-packages))
 
 (when (not (is-system "cygwin"))
   (setq my-packages
@@ -129,24 +153,64 @@
     (setq my-packages
           (append my-packages
                   '(emms)))))
+;; (mapcar #'(lambda (package)
+;;              (unless 
+;;                  (or 
+;;                   (el-get-package-is-installed (cadr package))
+;;                   (member (symbol-name (cadr package)) (el-get-read-all-recipe-names))
+;;                   )
+;;                  ;; Plato Wu,2013/06/03: emacs 24 support ELPA natively, but it need refresh package list
+;;                  (package-refresh-contents))
+;;                (eval (cons 'el-get-bundle! (cdr package))) 
+;;                ))
 
-;; (setq el-get-sources
-;;       (append el-get-sources '(:name cedet :feature )))
+(setq el-get-sources
+      (mapcar
+       (lambda (pkg-name)
+	 (if (listp pkg-name)
+	     pkg-name
+	   `(:name ,pkg-name
+		  :after ,(let ((after-func (intern (concat (symbol-name pkg-name) "-configuration"))))
+			    (if (functionp after-func)
+				(list after-func)
+			      nil))
+		  :features ,pkg-name)))
+       my-packages))
 
 ; ensures that any currently installed packages will be initialized and any
 ; required packages will be installed.
-(el-get 'sync my-packages)
-(require 'el-get-bundle)
+(el-get 'sync
+	(mapcar
+	 (lambda (pkg-name)
+	   (if (listp pkg-name)
+	       (plist-get pkg-name :name)
+	     pkg-name
+	   ))
+	 my-packages))
+;; (require 'el-get-bundle)
 
-; So anyway, if you make a change to el-get-sources, el-get insist use (el-get-package-status-recipes)
-; you will have to use either el-get-update or el-get-reinstall on that package
-(when (> (compare-version "24.4") 0)
-  ; make sure (el-get-package-or-source 'helm) don't contain helm, then el-get-install 'helm
-  ;; Plato Wu,2016/04/06: there is helm-configuration in helm package.
-  (el-get-bundle helm (helm-config))
-  ;; Plato Wu,2016/04/07: helm-projectile need require obviously
-  (el-get-bundle! helm-projectile (helm-projectile-configuration))
-)
+;; el-get allows you to install and manage elisp code for Emacs. It supports lots of differents types of sources (git, svn, apt, elpa, etc) and is able to install them, update them and remove them, but more importantly it will init them for you.
+
+;; That means it will require the features you need, load the necessary files, set the Info paths so that C-h i shows the new documentation you now depend on, and finally call your own :post-init function for you to setup the extension. Or call it a package.
+
+;; you can now easily checkout a stable branch from a
+;; git repository (thanks to the :checkout property) and you can even
+;; setup which checksum you want installed.
+
+;(el-get-bundle 'magit :type elpa (global-set-key (kbd "C-x C-z") 'magit-status))
+;(macroexpand '(el-get-bundle 'magit :type elpa))
+;(el-get-elpa-symlink-package 'epl)
+;; (defun package-dependency (name)
+;;   (package-compute-transaction (list name)
+;;                                (package-desc-reqs (cdr (assq name package-archive-contents)))))
+;; (package-desc-reqs (cdr (assq 'projectile package-archive-contents)))
+
+
+;; ;; ;; Plato Wu,2015/02/28: Transfer all packages to new emacs
+;; ;; ;; (setq my-packages
+;; ;; ;;               ',(mapcar #'el-get-as-symbol
+;; ;; ;;                         (el-get-list-package-names-with-status "installed")))
+
 ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-devel-load at features
 (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration))
 ;;(featurep 'cedet-devel-load)

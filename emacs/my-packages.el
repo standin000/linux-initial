@@ -143,9 +143,8 @@
   ;; Plato Wu,2016/01/25: @todo magit-push can not enter password for https link
   ;; Plato Wu,2016/01/22: M-h & M-H to show only file(s)
   (global-set-key (kbd "C-x C-z") 'magit-status)
-  ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert.
-  (setq magit-auto-revert-mode nil)
   ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert warning.
+  (setq magit-auto-revert-mode nil)
   (setq magit-last-seen-setup-instructions "1.4.0")
   )
 
@@ -301,12 +300,12 @@
   ;; (define-key helm-find-files-map (kbd "<DEL>") 'helm-find-files-sensitive-backspace)
   ;; (define-key helm-find-files-map (kbd "C-h") 'helm-find-files-sensitive-backspace)
   ;; (define-key helm-map (kbd "C-h") 'delete-backward-char)
-  (defun fu/helm-find-files-navigate-forward (orig-fun &rest args)
-    (if (file-directory-p (helm-get-selection))
-        (apply orig-fun args)
-      (helm-maybe-exit-minibuffer)))
-  (advice-add 'helm-execute-persistent-action :around #'fu/helm-find-files-navigate-forward)
-;  (kbd "<return>")
+  ;; Plato Wu,2016/09/08: it report errors when hit tab at C-x b
+  ;; (defun fu/helm-find-files-navigate-forward (orig-fun &rest args)
+  ;;   (if (file-directory-p (helm-get-selection))
+  ;;       (apply orig-fun args)
+  ;;     (helm-maybe-exit-minibuffer)))
+  ;; (advice-add 'helm-execute-persistent-action :around #'fu/helm-find-files-navigate-forward)
   (define-key helm-find-files-map (kbd "RET") 'helm-execute-persistent-action)
   (defun fu/helm-find-files-navigate-back (orig-fun &rest args)
     (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
@@ -1075,6 +1074,9 @@ Date: <lisp>(muse-publishing-directive \"date\")</lisp>
   (define-key org-mode-map (kbd "C-M-x")   'org-toodledo-sync-task))
 
 (defun org-mode-configuration ()
+  ;;Plato Wu,2015/06/05: for org package, when installing from ELPA, please do so from a fresh Emacs
+  ;;session where no org function has been called, use list-packages and press d & x to delete old version
+  ;; and i & x to install new one.
   ;; Plato Wu,2010/08/29: use C-u C-c $ org-archive-subtree to archive DONE items
   ;; (require 'org-archive)
   ;; (require 'org-publish)
@@ -1671,7 +1673,6 @@ to the position where the property exists."
   )
 
 (defun auto-complete-configuration ()
-  ;'mode-local-init-hook
   (ac-config-default)
   (setq ac-auto-start 3)
   (add-hook 'c-mode-common-hook 
@@ -1790,5 +1791,7 @@ to the position where the property exists."
     ;(autoload 'turn-on-xclip "xclip" "exchange clip between X and emacs" t nil)
     (turn-on-xclip)))
 
+;; 'mode-local-init-hook
+;; (autoloadp (symbol-function 'ascii-on))
 
 (provide 'my-packages)

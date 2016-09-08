@@ -259,3 +259,6 @@ fi
 if [ "$HOSTNAME" = "nabla" ]; then
   TZ='Asia/Shanghai'; export TZ
 fi
+
+# getfacl/setfacl Modify file and directory access control lists (ACLs)
+# umask 0022 for file create default mode

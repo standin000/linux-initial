@@ -10,6 +10,8 @@
 quotepath = false
 # Plato Wu,2015/11/10: for git respository
 # gitproxy = ~/.ssh/proxy.sh
+# ignore file permission in Windows
+filemode = false
 
 [alias]
 co = checkout
