@@ -47,10 +47,12 @@
 ;; no default recipes
 ;; (unless (require 'el-get nil 'noerror)
 ;;   (require 'package)
-;;   (add-to-list 'package-archives
-;;                '("melpa" . "http://melpa.org/packages/"))
-;;  ("gnu" . "http://elpa.gnu.org/packages/")
-;;  ("ELPA" . "http://tromey.com/elpa/")
+
+(setq package-archives
+      '(("melpa" . "http://melpa.org/packages/")
+        ("gnu" . "http://elpa.gnu.org/packages/")
+        ("ELPA" . "http://tromey.com/elpa/")))
+
 ;;  ("marmalade" . "http://marmalade-repo.org/packages/")
 ;;  ("SC" . "http://joseito.republika.pl/sunrise-commander/")))
 ;;   (package-refresh-contents)
@@ -101,9 +103,26 @@
 ;; and the recipe file name is the same as package file name; 2015/03/02: it is obsolete now
 ;; (setq load-path 
 ;;       (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
+;; google-c-style need https
+(setq my-packages '(popup paredit psvn ascii smart-compile 
+			  (:name auto-complete :type elpa :after (auto-complete-configuration) :features auto-complete-config)
+                          (:name magit :minimum-emacs-version "23"
+                                 :after (magit-configuration)
+                                 :features magit
+                                 :checkout "1.4.2"
+                                 ;; Plato Wu,2016/09/11: it need git-commit-mode and git-rebase-mode, but they are removed now, copy from old repostory
+                                 :depends (cl-lib)
+                                 :compile "magit.*\\.el\\'"
+                                 :load-path "."
+                                 :info "."
+                                 :build `(("make" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
+                                 :build/berkeley-unix (("gmake" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
+                                 ;; assume windows lacks make and makeinfo
+                                 :build/windows-nt (progn nil)
+                                 )
 
-(setq my-packages '(popup magit paredit google-c-style psvn ascii smart-compile (:name auto-complete :type elpa)
-                          (:name org-mode :after (org-mode-configuration))))
+;                          (:name org-mode :after (org-mode-configuration))
+				 ))
 
 (if (> (compare-version "24.4") 0)
     (progn
@@ -111,7 +130,11 @@
             ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
             ;; make sure (el-get-package-or-source 'helm) don't contain helm, then el-get-install 'helm
             ;; Plato Wu,2016/04/06: there is helm-configuration in helm package.
-            (append my-packages '(projectile (:name helm :after (helm-config)) helm-projectile))))
+            (append my-packages '(projectile (:name helm :after (helm-config)) helm-projectile)))
+      ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-devel-load at features
+      (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration))
+      ;;(featurep 'cedet-devel-load)
+      )
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (ido-configuration)
   (setq my-packages
@@ -123,7 +146,8 @@
                 '(xclip
                   ;; Plato Wu,2014/03/18: no this package in the latest el-get
                   ; (:name nrepl) 
-                  auctex
+		  ;; Plato Wu,2016/09/09: auctex NG now
+;                  auctex
                   htmlize
                   muse 
                   ;; Plato Wu,2015/05/11: no this package in emacs of raspberrypi
@@ -143,8 +167,9 @@
                         )))
   (when (executable-find "w3m") 
     (setq my-packages
-          (append my-package
-                  '(w3m 
+          (append my-packages
+                  '(;Plato Wu,2016/09/09: there is not w3m in el-get
+                    (:name w3m :type elpa) 
                     ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
                     ;; get installed to pass error.
                     xml-rpc
@@ -164,30 +189,30 @@
 ;;                (eval (cons 'el-get-bundle! (cdr package))) 
 ;;                ))
 
-(setq el-get-sources
-      (mapcar
-       (lambda (pkg-name)
-	 (if (listp pkg-name)
-	     pkg-name
-	   `(:name ,pkg-name
-		  :after ,(let ((after-func (intern (concat (symbol-name pkg-name) "-configuration"))))
-			    (if (functionp after-func)
-				(list after-func)
-			      nil))
-		  :features ,pkg-name)))
-       my-packages))
-
+(progn
+ (setq el-get-sources
+       (mapcar
+        (lambda (pkg-name)
+          (if (listp pkg-name)
+              pkg-name
+            `(:name ,pkg-name
+                    :after ,(let ((after-func (intern (concat (symbol-name pkg-name) "-configuration"))))
+                              (if (functionp after-func)
+                                  (list after-func)
+                                nil))
+                    :features ,pkg-name)))
+        my-packages))
 ; ensures that any currently installed packages will be initialized and any
 ; required packages will be installed.
-(el-get 'sync
-	(mapcar
-	 (lambda (pkg-name)
-	   (if (listp pkg-name)
-	       (plist-get pkg-name :name)
-	     pkg-name
-	   ))
-	 my-packages))
-;; (require 'el-get-bundle)
+ (el-get 'sync
+         (mapcar
+          (lambda (pkg-name)
+            (if (listp pkg-name)
+                (plist-get pkg-name :name)
+              pkg-name
+              ))
+          my-packages))
+ ) ;; (require 'el-get-bundle)
 
 ;; el-get allows you to install and manage elisp code for Emacs. It supports lots of differents types of sources (git, svn, apt, elpa, etc) and is able to install them, update them and remove them, but more importantly it will init them for you.
 
@@ -211,8 +236,5 @@
 ;; ;; ;;               ',(mapcar #'el-get-as-symbol
 ;; ;; ;;                         (el-get-list-package-names-with-status "installed")))
 
-;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-devel-load at features
-(el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration))
-;;(featurep 'cedet-devel-load)
 (provide 'el-get-package)
 ;;; el-get-packagenew.el ends here

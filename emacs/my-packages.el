@@ -1673,6 +1673,8 @@ to the position where the property exists."
   )
 
 (defun auto-complete-configuration ()
+  ;; Plato Wu,2016/09/11: don't require features before :after function?
+  (require 'auto-complete-config)
   (ac-config-default)
   (setq ac-auto-start 3)
   (add-hook 'c-mode-common-hook 
