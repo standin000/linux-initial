@@ -258,7 +258,8 @@
            (and (and (string-match "^ " (buffer-name buf))
                  (null buffer-file-name))
                ;; Plato Wu,2011/05/22: show http buffer of url-request-data for debug syncml
-               (not (string-match "^ \\*http" (buffer-name buf)))))))
+                (not (string-match "^ \\*http" (buffer-name buf)))))))
+
 ;; Plato Wu,2015/04/13: there is helm-configuration first.
 (defun helm-config ()
   (helm-mode 1)
@@ -298,15 +299,17 @@
   ;; ;; helm better navigation
   ;; (define-key helm-find-files-map (kbd "<backspace>") 'helm-find-files-sensitive-backspace)
   ;; (define-key helm-find-files-map (kbd "<DEL>") 'helm-find-files-sensitive-backspace)
+  ;; Plato Wu,2015/04/20: <DEL> is used to del character too.
+  ;;  (define-key helm-find-files-map (kbd "<DEL>") 'helm-find-files-up-one-level)
   ;; (define-key helm-find-files-map (kbd "C-h") 'helm-find-files-sensitive-backspace)
   ;; (define-key helm-map (kbd "C-h") 'delete-backward-char)
   ;; Plato Wu,2016/09/08: it report errors when hit tab at C-x b
-  ;; (defun fu/helm-find-files-navigate-forward (orig-fun &rest args)
-  ;;   (if (file-directory-p (helm-get-selection))
-  ;;       (apply orig-fun args)
-  ;;     (helm-maybe-exit-minibuffer)))
-  ;; (advice-add 'helm-execute-persistent-action :around #'fu/helm-find-files-navigate-forward)
-  (define-key helm-find-files-map (kbd "RET") 'helm-execute-persistent-action)
+  (defun fu/helm-find-files-navigate-forward (orig-fun &rest args)
+    (if (file-directory-p (helm-get-selection))
+        (apply orig-fun args)
+      (helm-exit-minibuffer)))
+  (advice-add 'helm-execute-persistent-action :around #'fu/helm-find-files-navigate-forward)
+;  (define-key helm-find-files-map (kbd "RET") 'helm-execute-persistent-action)
   (defun fu/helm-find-files-navigate-back (orig-fun &rest args)
     (if (= (length helm-pattern) (length (helm-find-files-initial-input)))
         (helm-find-files-up-one-level 1)
@@ -337,9 +340,6 @@
   (global-set-key (kbd "C-x c:")  #'helm-eval-expression-with-eldoc)
 
   (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)  ; make TAB works in terminal
-  ;; Plato Wu,2015/04/20: <DEL> is used to del character too.
-                                        ;  (define-key helm-find-files-map (kbd "<DEL>") 'helm-find-files-up-one-level)
-
 
   (define-key helm-map (kbd "M-o") #'helm-previous-source)
 
