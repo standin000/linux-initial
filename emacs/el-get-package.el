@@ -106,22 +106,7 @@
 ;; google-c-style need https
 (setq my-packages '(popup paredit psvn ascii smart-compile 
 			  (:name auto-complete :type elpa :after (auto-complete-configuration) :features auto-complete-config)
-                          (:name magit :minimum-emacs-version "23"
-                                 :after (magit-configuration)
-                                 :features magit
-                                 :checkout "1.4.2"
-                                 ;; Plato Wu,2016/09/11: it need git-commit-mode and git-rebase-mode, but they are removed now, copy from old repostory
-                                 :depends (cl-lib)
-                                 :compile "magit.*\\.el\\'"
-                                 :load-path "."
-                                 :info "."
-                                 :build `(("make" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
-                                 :build/berkeley-unix (("gmake" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
-                                 ;; assume windows lacks make and makeinfo
-                                 :build/windows-nt (progn nil)
-                                 )
-
-;                          (:name org-mode :after (org-mode-configuration))
+                          (:name org-mode :after (org-mode-configuration))
 				 ))
 
 (if (> (compare-version "24.4") 0)
@@ -130,7 +115,8 @@
             ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
             ;; make sure (el-get-package-or-source 'helm) don't contain helm, then el-get-install 'helm
             ;; Plato Wu,2016/04/06: there is helm-configuration in helm package.
-            (append my-packages '(projectile (:name helm :after (helm-config)) helm-projectile)))
+            (append my-packages '(projectile (:name helm :after (helm-config)
+						    :features helm) helm-projectile magit)))
       ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-devel-load at features
       (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration))
       ;;(featurep 'cedet-devel-load)
@@ -138,7 +124,24 @@
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (ido-configuration)
   (setq my-packages
-        (append my-packages '(cl-lib))))
+        (append my-packages '(cl-lib
+			      (:name magit
+				     ;; Plato Wu,2016/09/11: latest magit need emacs 24
+				     :minimum-emacs-version "23"
+				     :after (magit-configuration)
+				     :features magit
+				     :checkout "1.4.2"
+				     ;; Plato Wu,2016/09/11: it need git-commit-mode and git-rebase-mode, but they are removed now, copy from old repostory
+				     :depends (cl-lib)
+				     :compile "magit.*\\.el\\'"
+				     :load-path "."
+				     :info "."
+				     :build `(("make" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
+				     :build/berkeley-unix (("gmake" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
+				     ;; assume windows lacks make and makeinfo
+				     :build/windows-nt (progn nil)
+                                 )
+			      ))))
 
 (when (not (is-system "cygwin"))
   (setq my-packages
@@ -158,8 +161,9 @@
                  ;; Plato Wu,2011/07/02: it seems there is a problem with session
                   ;; recipe in el-get
                    ;  (:name session :features session session-configuration)
-                        ;;A collection of code-wrangling Emacs macros mostly geared towards Common Lisp, but some are useful for other Lisp dialects, too.
-                   redshank
+		 ;;A collection of code-wrangling Emacs macros mostly geared towards Common Lisp, but some are useful for other Lisp dialects, too.
+		 ;; Plato Wu,2016/09/11: NG now
+;;                   redshank
                    vkill
                   ;; Plato Wu,2015/01/27: no cldoc now in el-get?
                 ;                  (:name cldoc)
@@ -173,7 +177,14 @@
                     ;; Plato Wu,2011/01/03: when I start emacs as a daemon, it require ImageMagick
                     ;; get installed to pass error.
                     xml-rpc
-                    weblogger))))
+                    ;; Plato Wu,2016/09/11: NG now
+                    ;; Please get a current version from https://launchpad.net/weblogger-el
+
+                    ;; This software is not able to deal with blogs on Blogger.com,
+                    ;; as you can read on this thread:
+                    ;; http://thread.gmane.org/gmane.emacs.blogging/76
+                    ;;weblogger
+		    ))))
   (when (executable-find "mpd")
     (setq my-packages
           (append my-packages

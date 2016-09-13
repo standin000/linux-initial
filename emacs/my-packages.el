@@ -262,6 +262,7 @@
 ;; Plato Wu,2015/04/13: there is helm-configuration first.
 (defun helm-config ()
   (helm-mode 1)
+;  (require 'projectile)
   ;; If you don't want the Helm window to be resized, but a smaller Helm window, you can set helm-autoresize-max-height equal to helm-autoresize-min-height.
 
   ;  (helm-autoresize-mode t)
