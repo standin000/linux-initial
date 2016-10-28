@@ -137,8 +137,8 @@
    (desktop-read)
    (unless (file-readable-p "~/.emacs.desktop")
      (desktop-save "~/"))))
- ((is-system "windows-nt")
-  (desktop-read "~/w32.emacs"))
+ ;; ((is-system "windows-nt")
+ ;;  (desktop-read "~/w32.emacs"))
  (t (desktop-save-mode 1)))
 
 (add-hook 'desktop-after-read-hook 'clean-buffer-list)
@@ -171,6 +171,7 @@
 
 (when window-system ; or (boundp 'x-display-name) 
   ;;auto open & display image
+;;  (face-attribute 'default :font) get current font
   (auto-image-file-mode)'
   ;; Plato Wu,2012/10/09: it is void in emacs 24.1.1
   (unless (is-version "24")
@@ -180,6 +181,9 @@
    ((is-system "darwin")
     (set-default-font "-apple-courier-medium-r-normal--18-180-72-72-m-180-iso10646-1"))
    ((is-system "windows-nt")
+      (set-face-attribute 'default (selected-frame) :font "-outline-Courier New-normal-normal-normal-mono-13-*-*-*-c-*-iso8859-1")
+     ;(set-frame-font "-outline-Courier New-normal-normal-normal-mono-13-*-*-*-c-*-iso8859-1")
+     (set-face-attribute 'default nil :height 200)
     nil)
    ;; Plato Wu,2015/04/24: cygwin don't support this font
    ((is-system "gnu/linux")

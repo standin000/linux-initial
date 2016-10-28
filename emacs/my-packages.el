@@ -1790,7 +1790,8 @@ to the position where the property exists."
  (eval-after-load "muse-mode" '(blogger-configuration)))
 
 (defun xclip-configuration ()
-  (when (getenv "DISPLAY")
+  (when (and (getenv "DISPLAY")
+             (not (is-system "windows-nt")))
     ;(autoload 'turn-on-xclip "xclip" "exchange clip between X and emacs" t nil)
     (turn-on-xclip)))
 
