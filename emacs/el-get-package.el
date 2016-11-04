@@ -77,6 +77,8 @@
 
 (setq el-get-use-autoloads nil)
 
+(setq el-get-verbose t)
+
 ; install process running at background, so this report error when first time.
 (add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
 
@@ -104,10 +106,8 @@
 ;; (setq load-path 
 ;;       (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
 ;; google-c-style need https
-(setq my-packages '(popup paredit psvn ascii smart-compile 
-			  (:name auto-complete :type elpa :after (auto-complete-configuration) :features auto-complete-config)
-                          (:name org-mode :after (org-mode-configuration))
-				 ))
+(setq my-packages '(popup paredit psvn ascii smart-compile auto-complete google-c-style
+                          (:name org-mode :after (org-mode-configuration))))
 
 (if (> (compare-version "24.4") 0)
     (progn
@@ -115,10 +115,13 @@
             ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
             ;; make sure (el-get-package-or-source 'helm) don't contain helm, then el-get-install 'helm
             ;; Plato Wu,2016/04/06: there is helm-configuration in helm package.
-            (append my-packages '(projectile (:name helm :after (helm-config)
-						    :features helm) helm-projectile magit)))
-      ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-devel-load at features
-      (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration))
+            (append my-packages '(projectile helm-core
+				  (:name helm :after (helm-config) :post-init (require 'helm-config) :type elpa)
+  ;				  (:name cedet :after (cedet-configuration)  :features cedet-devel-load  :type elpa)
+                  ;; Plato Wu,2016/11/04: need specify all dependes of magit in elpa, or require maigt is not OK in el-get
+				  helm-projectile dash async with-editor git-commit magit-popup magit)))
+      ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-develp-load at features
+;      (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration) :type elpa)
       ;;(featurep 'cedet-devel-load)
       )
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
@@ -211,7 +214,13 @@
                               (if (functionp after-func)
                                   (list after-func)
                                 nil))
-                    :features ,pkg-name)))
+                    :post-init
+		    (condition-case nil
+			(require (quote ,pkg-name))
+		      (error (message "%s is not existed" (quote ,pkg-name)) nil))
+		    ;; Plato Wu,2016/10/26: elpa method don't support features
+                    :features (,pkg-name)
+                    :type elpa)))
         my-packages))
 ; ensures that any currently installed packages will be initialized and any
 ; required packages will be installed.
