@@ -142,6 +142,7 @@
 (defun magit-configuration ()
   ;; Plato Wu,2016/01/25: @todo magit-push can not enter password for https link
   ;; Plato Wu,2016/01/22: M-h & M-H to show only file(s)
+;  (require 'magit)
   (global-set-key (kbd "C-x C-z") 'magit-status)
   ;; Plato Wu,2015/06/01: stop 1.4.0 auto revert warning.
   (setq magit-auto-revert-mode nil)
@@ -153,7 +154,8 @@
 ;;  (add-hook 'minibuffer-setup-hook #'(lambda () (paredit-mode +1)))
 ;; Plato, 08/09/04, fundamental mode is a base mode, so it doesn't have
 ;; a mode hook, it only run change-major-mode-hook but enter others mode
-;; should enter fundamental mode first, so this hook would be run always.
+  ;; should enter fundamental mode first, so this hook would be run always.
+;  (require 'paredit)
   (mapc #'(lambda (mode)
 	  (let ((hook (intern (concat (symbol-name mode)
 				      "-mode-hook"))))
@@ -262,7 +264,9 @@
 
 ;; Plato Wu,2015/04/13: there is helm-configuration first.
 (defun helm-config ()
+  (require 'helm-config)
   (helm-mode 1)
+;  (require 'projectile)
   ;; If you don't want the Helm window to be resized, but a smaller Helm window, you can set helm-autoresize-max-height equal to helm-autoresize-min-height.
 
   ;  (helm-autoresize-mode t)
@@ -355,7 +359,7 @@
         (interactive)
         (helm-ag (projectile-project-root))))
 
-  (define-key org-mode-map (kbd "C-x c o h") #'helm-org-headlines)
+;;  (define-key org-mode-map (kbd "C-x c o h") #'helm-org-headlines)
 
   (setq projectile-completion-system 'helm)
   ;; Plato Wu,2015/03/20: don't use helm for describe function and variable.
@@ -368,8 +372,7 @@
                                               (tmm-menubar))))
 
 (defun helm-projectile-configuration ()
-  ;; Plato Wu,2016/03/29: why need require for el-get
-  ;(require 'helm-projectile)
+;  (require 'helm-projectile)
   ;; Plato Wu,2015/04/30: no suitable switch projectile buffer function
   (global-set-key (kbd "C-x n") #'helm-projectile-find-file)
   (setq helm-projectile-sources-list (cons 'helm-source-projectile-files-list
@@ -381,6 +384,7 @@
 
 
 (defun projectile-configuration ()
+;  (require 'projectile)
   (projectile-global-mode)
   (setq projectile-globally-ignored-file-suffixes '("~"))
   ;; (global-set-key [remap find-file] 'projectile-find-file)
@@ -1255,6 +1259,7 @@ this function is called."
   )
 
 (defun google-c-style-configuration ()
+;  (require 'google-c-style)
 ;  (autoload 'google-set-c-style "google-c-style" nil t)
   (add-hook 'c-mode-common-hook 
             #'(lambda () 
@@ -1673,7 +1678,8 @@ to the position where the property exists."
   )
 
 (defun auto-complete-configuration ()
-  ;; Plato Wu,2016/09/11: don't require features before :after function?
+  ;; Plato Wu,2016/11/04: need require auto-complete-config,
+  ;; require auto-complete is not enough
   (require 'auto-complete-config)
   (ac-config-default)
   (setq ac-auto-start 3)
@@ -1789,7 +1795,8 @@ to the position where the property exists."
  (eval-after-load "muse-mode" '(blogger-configuration)))
 
 (defun xclip-configuration ()
-  (when (getenv "DISPLAY")
+  (when (and (getenv "DISPLAY")
+             (not (is-system "windows-nt")))
     ;(autoload 'turn-on-xclip "xclip" "exchange clip between X and emacs" t nil)
     (turn-on-xclip)))
 
