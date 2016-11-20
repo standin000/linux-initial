@@ -106,8 +106,12 @@
 ;; (setq load-path 
 ;;       (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
 ;; google-c-style need https
-(setq my-packages '(popup paredit psvn ascii smart-compile auto-complete google-c-style
-                          (:name org-mode :after (org-mode-configuration))))
+
+(setq my-packages '(popup paredit psvn ascii smart-compile google-c-style
+                          ;(:name org-mode :after (org-mode-configuration))
+                          ))
+
+(org-mode-configuration)
 
 (if (> (compare-version "24.4") 0)
     (progn
@@ -115,11 +119,16 @@
             ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
             ;; make sure (el-get-package-or-source 'helm) don't contain helm, then el-get-install 'helm
             ;; Plato Wu,2016/04/06: there is helm-configuration in helm package.
-            (append my-packages '(projectile helm-core
+            (append my-packages '(s
+				  dash
+				  epl
+				  pkg-info
+				  projectile
+				  helm-core
 				  (:name helm :after (helm-config) :post-init (require 'helm-config) :type elpa)
   ;				  (:name cedet :after (cedet-configuration)  :features cedet-devel-load  :type elpa)
                   ;; Plato Wu,2016/11/04: need specify all dependes of magit in elpa, or require maigt is not OK in el-get
-				  helm-projectile dash async with-editor git-commit magit-popup magit)))
+				  helm-projectile async with-editor git-commit magit-popup magit)))
       ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-develp-load at features
 ;      (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration) :type elpa)
       ;;(featurep 'cedet-devel-load)
@@ -145,7 +154,10 @@
 				     :build/windows-nt (progn nil)
                                  )
 			      ))))
-
+;; Plato Wu,2016/11/20: auto-complete need cl-lib when < 24.3, so put it after cl-lib.
+(setq my-packages
+        (append my-packages '(auto-complete)))
+  
 (when (not (is-system "cygwin"))
   (setq my-packages
         (append my-packages
@@ -172,7 +184,7 @@
                 ;                  (:name cldoc)
             ;           (:name dpans2texi)
                         )))
-  (when (executable-find "w3m") 
+(when (executable-find "w3m") 
     (setq my-packages
           (append my-packages
                   '(;Plato Wu,2016/09/09: there is not w3m in el-get
