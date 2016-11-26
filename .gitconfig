@@ -45,3 +45,12 @@ sslVerify = false
 	merge = refs/heads/master
 [push]
 	default = matching
+
+# # Plato Wu,2016/09/14: save git password for git>1.7.0
+# [credential]
+# 	helper = cache --timeout=3600
+# or, vi .git-credentials add https://account:password@github.com
+# [credential]
+# helper = store
+# or add into netrc(authinfo)?
+#
