@@ -135,6 +135,8 @@
       )
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (ido-configuration)
+  (load "~/linux-initial/emacs/recipes/git-commit-mode.el")
+  (load "~/linux-initial/emacs/recipes/git-rebase-mode.el")
   (setq my-packages
         (append my-packages '(cl-lib
 			      (:name magit
