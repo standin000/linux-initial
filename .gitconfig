@@ -1,11 +1,11 @@
 [user]
-	name = Plato Wu
-	email = gtalk000@gmail.com
+    name = Plato Wu
+    email = xiwu@hach.com
 [core]
 # Plato Wu,2009/05/22: Absolute path is needed with git version 1.6.2.1
 # Plato Wu,2010/06/03: it doesn't work at cywin, have to use .gitignore in project directory.
 # Plato Wu,2014/07/08: use ~ to unify linux & cygwin
-	excludesfile = ~/.gitignore
+    excludesfile = ~/.gitignore
 # Plato Wu,2012/09/08: support UTF-8
 quotepath = false
 # Plato Wu,2015/11/10: for git respository
@@ -41,10 +41,20 @@ sslVerify = false
 # proxy = socks5://127.0.0.1:7070
 # proxy = http://127.0.0.1:8118
 [branch "master"]
-	remote = origin
-	merge = refs/heads/master
+    remote = origin
+    merge = refs/heads/master
+    rebase = true
 [push]
-	default = matching
+    default = matching # push all branch to remote
+    followTags = true  # don't work for lightweight tag, only for annotated tag
+
+# [branch]
+#   autosetuprebase = always
+
+[remote "origin"]
+fetch = +refs/heads/*:refs/remotes/origin/*
+push = +refs/heads/*
+push = +refs/tags/*
 
 # # Plato Wu,2016/09/14: save git password for git>1.7.0
 # [credential]
@@ -53,4 +63,3 @@ sslVerify = false
 # [credential]
 # helper = store
 # or add into netrc(authinfo)?
-#

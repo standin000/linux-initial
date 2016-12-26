@@ -200,7 +200,7 @@
 ; and cancel-debug-on-entry will undo the effect
 ;; Plato Wu,2015/05/26: el-get update marmalade in raspberrypi will cause overflow error for repo version like 201203310931,
 ;; so diable it.
-;(setq debug-on-error t)
+(setq debug-on-error t)
 
 (require 'savehist)
 

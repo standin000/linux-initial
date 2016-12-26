@@ -1686,36 +1686,36 @@ to the position where the property exists."
   (add-hook 'c-mode-common-hook 
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                (require 'semantic/ia)
-                (require 'semantic/mru-bookmark)
-                (semantic-mode 1)
-                (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
-                (defun semantic-ia-find-tag (point)
-                  "Try semantic-ia-fast-jump first, then try find-tag"
-                  (interactive "d")
-;;                  (semantic-ia-fast-jump point)
-                  (condition-case nil
-                      (semantic-ia-fast-jump point)
-                    (error
-                     (vj-find-tag)))
-                  )
-                (setq semantic-symref-auto-expand-results t)
-                (defun semantic-ia-find-reference (regexp)
-                  (interactive
-                   (let ((regexp (grep-read-regexp)))
-                     (list regexp)))
-                  (semantic-symref-symbol regexp))
-;;                (define-key  (keymap-symbol (current-local-map)) "\M-]"  )
-                (define-key (current-local-map) "\M-." 'semantic-ia-find-tag)
-                (define-key (current-local-map) "\M-]" 'semantic-ia-find-reference)
-                ;; Plato Wu,2014/03/21: after 23.3, there is no push-tag-mark in etags.el
-                ;; but semantic-ia-fast-jump need it.
-                (unless (fboundp 'push-tag-mark)
-                  (defun push-tag-mark ()
-                    "Push the current position to the ring of markers so that
-                   \\[pop-tag-mark] can be used to come back to current position."
-                    (interactive)
-                    (ring-insert find-tag-marker-ring (point-marker))))
+;;                 (require 'semantic/ia)
+;;                 (require 'semantic/mru-bookmark)
+;;                 (semantic-mode 1)
+;;                 (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+;;                 (defun semantic-ia-find-tag (point)
+;;                   "Try semantic-ia-fast-jump first, then try find-tag"
+;;                   (interactive "d")
+;; ;;                  (semantic-ia-fast-jump point)
+;;                   (condition-case nil
+;;                       (semantic-ia-fast-jump point)
+;;                     (error
+;;                      (vj-find-tag)))
+;;                   )
+;;                 (setq semantic-symref-auto-expand-results t)
+;;                 (defun semantic-ia-find-reference (regexp)
+;;                   (interactive
+;;                    (let ((regexp (grep-read-regexp)))
+;;                      (list regexp)))
+;;                   (semantic-symref-symbol regexp))
+;; ;;                (define-key  (keymap-symbol (current-local-map)) "\M-]"  )
+;;                 (define-key (current-local-map) "\M-." 'semantic-ia-find-tag)
+;;                 (define-key (current-local-map) "\M-]" 'semantic-ia-find-reference)
+;;                 ;; Plato Wu,2014/03/21: after 23.3, there is no push-tag-mark in etags.el
+;;                 ;; but semantic-ia-fast-jump need it.
+;;                 (unless (fboundp 'push-tag-mark)
+;;                   (defun push-tag-mark ()
+;;                     "Push the current position to the ring of markers so that
+;;                    \\[pop-tag-mark] can be used to come back to current position."
+;;                     (interactive)
+;;                     (ring-insert find-tag-marker-ring (point-marker))))
 
                ;; Plato Wu,2014/03/14: no pulse highlight
                (setq pulse-flag 'never)
