@@ -25,7 +25,7 @@
 ;;; Code:
 
 ;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs, texinfo(for makeinfo)
-(unless (> (compare-version "24") 0)
+(unless (higher-version 24)
   (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
     ;; Plato Wu,2015/05/26: this site is obsolete for it only support single elpa archive
     ;; (let ((buffer (url-retrieve-synchronously
@@ -88,8 +88,14 @@
 ;; Plato Wu,2011/05/19: we must change the usage of el-get, don't use :after option to
 ;; call package configuration, but run it after el-get finished its task. since el-get
 ;; use eval-after-load to call :after function, it is annoy style.
+
+
 ; So anyway, if you make a change to el-get-sources, el-get insist use (el-get-package-status-recipes)
 ; you will have to use either el-get-update or el-get-reinstall on that package
+; you can check (el-get-package-def 'magit)
+;;
+;; (el-get-post-install 'magit) can run after install faile
+
 
 ;(setq my-packages (quote (ascii auto-complete cedet helm helm-projectile magit org-mode package paredit popup projectile psvn smart-compile)))
 ;; smart-tab, ggtags, nxhtml 
@@ -105,7 +111,6 @@
 ;; and the recipe file name is the same as package file name; 2015/03/02: it is obsolete now
 ;; (setq load-path 
 ;;       (remove (expand-file-name "~/.emacs.d/el-get/el-get/recipes") load-path))
-;; google-c-style need https
 
 (setq my-packages '(popup paredit psvn ascii smart-compile google-c-style
                           ;(:name org-mode :after (org-mode-configuration))
@@ -113,7 +118,7 @@
 
 (org-mode-configuration)
 
-(if (> (compare-version "24.4") 0)
+(if (higher-version 24.4)
     (progn
       (setq my-packages  
             ;; Plato Wu,2015/04/04: clojure-mode is NG in cygwin & ninthfloor.org
@@ -128,32 +133,35 @@
 				  (:name helm :after (helm-config) :post-init (require 'helm-config) :type elpa)
   ;				  (:name cedet :after (cedet-configuration)  :features cedet-devel-load  :type elpa)
                   ;; Plato Wu,2016/11/04: need specify all dependes of magit in elpa, or require maigt is not OK in el-get
-				  helm-projectile async with-editor git-commit magit-popup magit)))
+				  helm-projectile emacs-async with-editor git-commit magit-popup magit)))
       ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-develp-load at features
 ;      (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration) :type elpa)
       ;;(featurep 'cedet-devel-load)
       )
   ;; Plato Wu,2013/06/13: emacs below 24.3 need it
   (ido-configuration)
+  ;; Plato Wu,2016/09/11: it need git-commit-mode and git-rebase-mode, but they are removed now, copy from old repostory
   (load "~/linux-initial/emacs/recipes/git-commit-mode.el")
   (load "~/linux-initial/emacs/recipes/git-rebase-mode.el")
   (setq my-packages
         (append my-packages '(cl-lib
-			      (:name magit
-				     ;; Plato Wu,2016/09/11: latest magit need emacs 24
-				     :minimum-emacs-version "23"
-				     :after (magit-configuration)
-				     :features magit
-				     :checkout "1.4.2"
-				     ;; Plato Wu,2016/09/11: it need git-commit-mode and git-rebase-mode, but they are removed now, copy from old repostory
-				     :depends (cl-lib)
-				     :compile "magit.*\\.el\\'"
-				     :load-path "."
-				     :info "."
-				     :build `(("make" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
-				     :build/berkeley-unix (("gmake" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
-				     ;; assume windows lacks make and makeinfo
-				     :build/windows-nt (progn nil)
+ 			      (:name magit
+ 				     ;; Plato Wu,2016/09/11: latest magit need emacs 24
+ 				     :minimum-emacs-version "23"
+ 				     :after (magit-configuration)
+ 				     :features magit
+ 				     :checkout "1.4.2"
+ 				     :depends (cl-lib)
+ 				     :compile "magit.*\\.el\\'"
+ 				     :load-path "."
+                     ;; Plato Wu,2017/01/05: build magit docs ng, so clear this step by check these command
+                     ;; (el-get-build-commands 'magit) (el-get-install-or-init-info 'magit 'build)
+  				     :info nil
+  				     :build (progn nil)
+                     ;; `(("make" ,(format "EMACSBIN=%s" el-get-emacs) "docs")) 
+                     ;; :build/berkeley-unix (("gmake" ,(format "EMACSBIN=%s" el-get-emacs) "docs"))
+                     ;; ;; assume windows lacks make and makeinfo
+                     ;; :build/windows-nt (progn nil)
                                  )
 			      ))))
 ;; Plato Wu,2016/11/20: auto-complete need cl-lib when < 24.3, so put it after cl-lib.
@@ -246,7 +254,8 @@
               pkg-name
               ))
           my-packages))
- ) ;; (require 'el-get-bundle)
+ )
+ ;; (require 'el-get-bundle)
 
 ;; el-get allows you to install and manage elisp code for Emacs. It supports lots of differents types of sources (git, svn, apt, elpa, etc) and is able to install them, update them and remove them, but more importantly it will init them for you.
 
