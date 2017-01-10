@@ -133,7 +133,7 @@
 				  (:name helm :after (helm-config) :post-init (require 'helm-config) :type elpa)
   ;				  (:name cedet :after (cedet-configuration)  :features cedet-devel-load  :type elpa)
                   ;; Plato Wu,2016/11/04: need specify all dependes of magit in elpa, or require maigt is not OK in el-get
-				  helm-projectile emacs-async with-editor git-commit magit-popup magit)))
+				  helm-projectile async with-editor git-commit magit-popup magit)))
       ;; Plato Wu,2015/12/07: it will load built-in cedet first, so use cedet-develp-load at features
 ;      (el-get-bundle 'cedet :features cedet-devel-load (cedet-configuration) :type elpa)
       ;;(featurep 'cedet-devel-load)

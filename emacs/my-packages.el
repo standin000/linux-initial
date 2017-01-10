@@ -540,36 +540,37 @@
                ad-do-it
                (emms-pause))
       ad-do-it))
-  ;; global key-map
-  ;; all global keys prefix is C-c e
-  ;; compatible with emms-playlist mode keybindings
-  ;; you can view emms-playlist-mode.el to get details about 
-  ;; emms-playlist mode keys map
-  (global-set-key (kbd "C-c e s") 'emms-stop)
-  (global-set-key (kbd "C-c e P") 'emms-pause)
-  (global-set-key (kbd "C-c e n") 'emms-next)
-  (global-set-key (kbd "C-c e p") 'emms-previous)
-  (global-set-key (kbd "C-c e f") 'emms-show)
-  (global-set-key (kbd "C-c e >") 'emms-seek-forward)
-  (global-set-key (kbd "C-c e <") 'emms-seek-backward)
-  ;; these keys maps were derivations of above keybindings
-  (global-set-key (kbd "C-c e S") 'emms-start)
-  (global-set-key (kbd "C-c e g") 'emms-playlist-mode-go)
-  (global-set-key (kbd "C-c e t") 'emms-play-directory-tree)
-  (global-set-key (kbd "C-c e h") 'emms-shuffle)
-  (global-set-key (kbd "C-c e e") 'emms-play-file)
-  (global-set-key (kbd "C-c e l") 'emms-play-playlist)
-  (global-set-key (kbd "C-c e r") 'emms-toggle-repeat-track)
-  (global-set-key (kbd "C-c e R") 'emms-toggle-repeat-playlist)
-  (global-set-key (kbd "C-c e u") 'emms-score-up-playing)
-  (global-set-key (kbd "C-c e d") 'emms-score-down-playing)
-  (global-set-key (kbd "C-c e o") 'emms-score-show-playing)    
+  ;; ;; global key-map
+  ;; ;; all global keys prefix is C-c e
+  ;; ;; compatible with emms-playlist mode keybindings
+  ;; ;; you can view emms-playlist-mode.el to get details about 
+  ;; ;; emms-playlist mode keys map
+  ;; (global-set-key (kbd "C-c e s") 'emms-stop)
+  ;; (global-set-key (kbd "C-c e P") 'emms-pause)
+  ;; (global-set-key (kbd "C-c e n") 'emms-next)
+  ;; (global-set-key (kbd "C-c e p") 'emms-previous)
+  ;; (global-set-key (kbd "C-c e f") 'emms-show)
+  ;; (global-set-key (kbd "C-c e >") 'emms-seek-forward)
+  ;; (global-set-key (kbd "C-c e <") 'emms-seek-backward)
+  ;; ;; these keys maps were derivations of above keybindings
+  ;; (global-set-key (kbd "C-c e S") 'emms-start)
+  ;; (global-set-key (kbd "C-c e g") 'emms-playlist-mode-go)
+  ;; (global-set-key (kbd "C-c e t") 'emms-play-directory-tree)
+  ;; (global-set-key (kbd "C-c e h") 'emms-shuffle)
+  ;; (global-set-key (kbd "C-c e e") 'emms-play-file)
+  ;; (global-set-key (kbd "C-c e l") 'emms-play-playlist)
+  ;; (global-set-key (kbd "C-c e r") 'emms-toggle-repeat-track)
+  ;; (global-set-key (kbd "C-c e R") 'emms-toggle-repeat-playlist)
+  ;; (global-set-key (kbd "C-c e u") 'emms-score-up-playing)
+  ;; (global-set-key (kbd "C-c e d") 'emms-score-down-playing)
+  ;; (global-set-key (kbd "C-c e o") 'emms-score-show-playing)
 
 (defadvice emms-history-save (before emm-history-save-set-repeat-flag activate)
   "set emms-repeat-track nil for mpd which restart without remember repeating"
   (setq emms-repeat-track nil))
 
-  ;; Plato Wu,2013/07/23: let emms-player-mpd support single track-repeat.
+;; Plato Wu,2013/07/23: let emms-player-mpd support single track-repeat.
+;; Plato Wu,2017/01/07: emms-toggle-repeat-track is NG.
 (defun emms-mpd-toggle-repeat-track ()
   "Toggle whether emms repeats the current track.
 See  `emms-repeat-track'."
