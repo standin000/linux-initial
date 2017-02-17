@@ -185,7 +185,7 @@ export LESSCHARSET=latin1
 export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
  
 # Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
-if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "plato-PC" ] ||
+if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "yazh" ] || [ "$HOSTNAME" = "plato-PC" ] ||
     [ "$HOSTNAME" = "raspberrypi" ] );  then
     # Plato Wu,2010/01/26: let emacsclient -t automatically start an emacs in deamon mode and
     # connect to it if one is not found running
@@ -239,7 +239,7 @@ shopt -s cdspell
 # make test
 # make install
 # it is installed into $HOME/perl5/lib/perl5
-# if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
+# if ([ "$HOSTNAME" = "yazh" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
 #   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 # fi
 # perl -MCPAN -e shell
@@ -253,10 +253,10 @@ shopt -s cdspell
 # cpanm install
 # cpanm --uninstall
 
-if ([ "$HOSTNAME" = "nabla" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
+if ([ "$HOSTNAME" = "yazh" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
     source ~plato/perl5/perlbrew/etc/bashrc
 fi
-if [ "$HOSTNAME" = "nabla" ]; then
+if [ "$HOSTNAME" = "yazh" ]; then
   TZ='Asia/Shanghai'; export TZ
 fi
 
