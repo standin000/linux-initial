@@ -16,15 +16,17 @@
 (defun is-system (type)
   (string= system-type type))
 
-(defun is-version (no)
-  (string= (substring emacs-version 0 2) (number-to-string no)))
+;; (defun is-version (no)
+;;   (string= (substring emacs-version 0 2) (number-to-string no)))
 
-(defun compare-version (no)
-  (let ((result (compare-strings emacs-version nil nil no nil nil))) 
-    (if (booleanp result) 
-        0
-      result)))
+;; (defun compare-version (no)
+;;   (let ((result (compare-strings emacs-version nil nil no nil nil))) 
+;;     (if (booleanp result) 
+;;         0
+;;       result)))
 
+(defun higher-version (no)
+  (>= (string-to-int emacs-version) no))
 
 (defun mycomment (arg)
   (interactive "*P")
@@ -222,9 +224,15 @@ that was stored with ska-point-to-register."
         (set-register 8 tmp)))
 
 ;; Plato Wu,2009/12/25: emacs 23 has rgrep now
-(unless (is-version 23)
-                                        ;grep-find's pro version which filters files which does not blong current
-                                        ;file's class
+(unless (higher-version 23)
+
+  (defun file-name-base (&optional filename)
+    "Return the base name of the FILENAME: no directory, no extension.
+FILENAME defaults to `buffer-file-name'."
+    (file-name-sans-extension
+     (file-name-nondirectory (or filename (buffer-file-name)))))
+  ;grep-find's pro version which filters files which does not blong current
+  ;file's class
   (defvar wcy-find-grep-file-class
     '(
       ;; Plato Wu,2009/12/08: Dos prompt use | as key word so it can not be used at regrex expression
@@ -348,7 +356,7 @@ that was stored with ska-point-to-register."
                                               body)))))))))
 ;;; use (clean-buffer-list) to clean old buffer which is not visited by 3 day.
 ;;; it need run after desktop-read
-(when (and (is-system "cygwin") (is-version 21))
+(when (and (is-system "cygwin") (not (higher-version 22)))
   (require 'midnight)
   (defun clean-buffer-list ()
     "Kill old buffers that have not been displayed recently.
@@ -462,7 +470,7 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 (define-key lisp-interaction-mode-map "\M-." 'find-tag-also-for-elisp)
 ;; Plato Wu,2015/09/21: now cygwin support emacsclient.
 ;; or (is-system "cygwin") 
-(unless (is-version 21)
+(if (higher-version 21)
   (defun my-done ()
     (interactive) 
     (server-edit)
@@ -579,7 +587,7 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 ;;(add-hook 'after-change-major-mode-hook 'define-my-indent)
 
 ;; emacs 22 has this function
-(if (is-version 21)
+(unless (higher-version 22)
  (defadvice comment-or-uncomment-region (before slickcomment activate compile)
    "When called interactively with no active region, toggle comment on current line instead."
    (interactive

@@ -57,7 +57,7 @@
 (setq calendar-week-start-day 1)
 
 ;; Plato Wu,2009/12/25: emacs 23 in cygwin does know the correct time zone.
-(if (and (is-system "cygwin") (is-version 23))
+(if (and (is-system "cygwin") (not (higher-version 24)))
  (set-time-zone-rule "GMT-8"))
 
 ;;Delete Christian,Hebrew,Islam's holidays
@@ -91,7 +91,7 @@
 (setq vc-git-diff-switches nil)
 (setq diff-switches "-w")
 ;; Plato Wu,2015/01/19: vc-ediff is good than svn diff
-(if (is-version 24)
+(if (higher-version 24)
     (eval-after-load "vc-hooks"
       '(define-key vc-prefix-map "=" 'vc-ediff))) 
 ;; Plato Wu,2015/02/27: highlight diffs which is not focus caues it disappear under default ediff colors
@@ -129,7 +129,7 @@
 
 ;; Plato Wu,2015/03/25: desktop will open many mode in backgroud, so set mode variables maybe overwrite.
 (cond 
- ((is-version 21)
+ ((not (higher-version 22))
   (progn
    ;; Plato Wu,2009/02/27: desktop-load-default is obsolete since 22.1
    ;; use desktop-save-mode
@@ -174,7 +174,7 @@
 ;;  (face-attribute 'default :font) get current font
   (auto-image-file-mode)'
   ;; Plato Wu,2012/10/09: it is void in emacs 24.1.1
-  (unless (is-version "24")
+  (unless (higher-version "24")
     (pc-selection-mode))			; use shift to select region
   (setq pc-select-selection-keys-only t)
   (cond 
@@ -200,7 +200,7 @@
 ; and cancel-debug-on-entry will undo the effect
 ;; Plato Wu,2015/05/26: el-get update marmalade in raspberrypi will cause overflow error for repo version like 201203310931,
 ;; so diable it.
-;(setq debug-on-error t)
+;;(setq debug-on-error t)
 
 (require 'savehist)
 
@@ -333,9 +333,9 @@
 
 ;;=============
 ;; Plato Wu,2009/11/23: In Windows, Most of source code file are used with gb2312
-;; (if (string= system-type "windows-nt")
+;; (if (is-system "windows-nt")
 ;;     (prefer-coding-system 'gb2312))
-(if (string= system-type "cygwin")
+(if (is-system "cygwin")
     (prefer-coding-system 'gbk-dos))
 
 ;;==================
@@ -410,9 +410,9 @@
 
 
 ; show the current function when possible
-(if (is-version 24)
-    (which-function-mode 1)
-    (which-func-mode 1))
+;; if (higher-version 24)
+(which-function-mode 1)
+(which-func-mode 1)
 
 ;; Plato Wu,2009/11/26: get rid of warning for not safe variables
 ;;(setq enable-local-variables :safe)
@@ -431,10 +431,10 @@
 (add-to-list 'auto-mode-alist '("\\.m$" . octave-mode))
 
 ;; Plato Wu,2014/12/10: for DR Series Chemical database
-(when (is-version 24)
+(when (is-system "cygwin")
   (modify-coding-system-alist 'file "\\.lst\\'" 'macintosh-mac)
   (modify-coding-system-alist 'file "\\.lsx\\'" 'macintosh-mac)
-)
+  )
 ;; Plato Wu,2011/09/02: support End key in emacs of myhost
 (global-set-key (quote [select]) 'move-end-of-line)
 
@@ -449,16 +449,15 @@
 ;; Plato Wu,2011/10/24: define C-Enter in cygwin for using cua-mode 
 ;; Plato Wu,2012/07/29: start cua-set-rectangle-mark and select the column, then press C-c
 ;; to copy the column, C-x to cut, C-y for paste
+;; Plato Wu,2016/10/15: delete to delete the column, C-x is NG.
 (global-set-key (kbd "C-^") 'cua-set-rectangle-mark)
 ;; emacs 24.0.93 will close network driver write-protected problem, now I use fstab method
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
 ;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line
 
-(when (is-version 24)
- (add-to-list 'custom-theme-load-path
-                  (file-name-as-directory
-                   (file-name-directory load-file-name)))
- (load-theme 'molokai t nil))
+;; (when (higher-version 24)
+;; Plato Wu,2017/01/05: molokai theme is not suitable
+;;  (load-theme 'molokai t nil))
 
 
 ;; Plato Wu,2013/06/29: for emacs w32

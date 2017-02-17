@@ -1,7 +1,7 @@
 (defun eshell-configuration ()
   ;emacs21 uses eshell-ask-to-save-history but emacs 22 & 23 uses
   ;eshell-save-history-on-exit
-  (if (is-version 21)
+  (unless (higher-version 22)
     (setq eshell-ask-to-save-history 'always)
     (setq eshell-save-history-on-exit t))
   (setq eshell-prompt-function 
@@ -540,36 +540,37 @@
                ad-do-it
                (emms-pause))
       ad-do-it))
-  ;; global key-map
-  ;; all global keys prefix is C-c e
-  ;; compatible with emms-playlist mode keybindings
-  ;; you can view emms-playlist-mode.el to get details about 
-  ;; emms-playlist mode keys map
-  (global-set-key (kbd "C-c e s") 'emms-stop)
-  (global-set-key (kbd "C-c e P") 'emms-pause)
-  (global-set-key (kbd "C-c e n") 'emms-next)
-  (global-set-key (kbd "C-c e p") 'emms-previous)
-  (global-set-key (kbd "C-c e f") 'emms-show)
-  (global-set-key (kbd "C-c e >") 'emms-seek-forward)
-  (global-set-key (kbd "C-c e <") 'emms-seek-backward)
-  ;; these keys maps were derivations of above keybindings
-  (global-set-key (kbd "C-c e S") 'emms-start)
-  (global-set-key (kbd "C-c e g") 'emms-playlist-mode-go)
-  (global-set-key (kbd "C-c e t") 'emms-play-directory-tree)
-  (global-set-key (kbd "C-c e h") 'emms-shuffle)
-  (global-set-key (kbd "C-c e e") 'emms-play-file)
-  (global-set-key (kbd "C-c e l") 'emms-play-playlist)
-  (global-set-key (kbd "C-c e r") 'emms-toggle-repeat-track)
-  (global-set-key (kbd "C-c e R") 'emms-toggle-repeat-playlist)
-  (global-set-key (kbd "C-c e u") 'emms-score-up-playing)
-  (global-set-key (kbd "C-c e d") 'emms-score-down-playing)
-  (global-set-key (kbd "C-c e o") 'emms-score-show-playing)    
+  ;; ;; global key-map
+  ;; ;; all global keys prefix is C-c e
+  ;; ;; compatible with emms-playlist mode keybindings
+  ;; ;; you can view emms-playlist-mode.el to get details about 
+  ;; ;; emms-playlist mode keys map
+  ;; (global-set-key (kbd "C-c e s") 'emms-stop)
+  ;; (global-set-key (kbd "C-c e P") 'emms-pause)
+  ;; (global-set-key (kbd "C-c e n") 'emms-next)
+  ;; (global-set-key (kbd "C-c e p") 'emms-previous)
+  ;; (global-set-key (kbd "C-c e f") 'emms-show)
+  ;; (global-set-key (kbd "C-c e >") 'emms-seek-forward)
+  ;; (global-set-key (kbd "C-c e <") 'emms-seek-backward)
+  ;; ;; these keys maps were derivations of above keybindings
+  ;; (global-set-key (kbd "C-c e S") 'emms-start)
+  ;; (global-set-key (kbd "C-c e g") 'emms-playlist-mode-go)
+  ;; (global-set-key (kbd "C-c e t") 'emms-play-directory-tree)
+  ;; (global-set-key (kbd "C-c e h") 'emms-shuffle)
+  ;; (global-set-key (kbd "C-c e e") 'emms-play-file)
+  ;; (global-set-key (kbd "C-c e l") 'emms-play-playlist)
+  ;; (global-set-key (kbd "C-c e r") 'emms-toggle-repeat-track)
+  ;; (global-set-key (kbd "C-c e R") 'emms-toggle-repeat-playlist)
+  ;; (global-set-key (kbd "C-c e u") 'emms-score-up-playing)
+  ;; (global-set-key (kbd "C-c e d") 'emms-score-down-playing)
+  ;; (global-set-key (kbd "C-c e o") 'emms-score-show-playing)
 
 (defadvice emms-history-save (before emm-history-save-set-repeat-flag activate)
   "set emms-repeat-track nil for mpd which restart without remember repeating"
   (setq emms-repeat-track nil))
 
-  ;; Plato Wu,2013/07/23: let emms-player-mpd support single track-repeat.
+;; Plato Wu,2013/07/23: let emms-player-mpd support single track-repeat.
+;; Plato Wu,2017/01/07: emms-toggle-repeat-track is NG.
 (defun emms-mpd-toggle-repeat-track ()
   "Toggle whether emms repeats the current track.
 See  `emms-repeat-track'."
@@ -1686,36 +1687,36 @@ to the position where the property exists."
   (add-hook 'c-mode-common-hook 
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-                (require 'semantic/ia)
-                (require 'semantic/mru-bookmark)
-                (semantic-mode 1)
-                (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
-                (defun semantic-ia-find-tag (point)
-                  "Try semantic-ia-fast-jump first, then try find-tag"
-                  (interactive "d")
-;;                  (semantic-ia-fast-jump point)
-                  (condition-case nil
-                      (semantic-ia-fast-jump point)
-                    (error
-                     (vj-find-tag)))
-                  )
-                (setq semantic-symref-auto-expand-results t)
-                (defun semantic-ia-find-reference (regexp)
-                  (interactive
-                   (let ((regexp (grep-read-regexp)))
-                     (list regexp)))
-                  (semantic-symref-symbol regexp))
-;;                (define-key  (keymap-symbol (current-local-map)) "\M-]"  )
-                (define-key (current-local-map) "\M-." 'semantic-ia-find-tag)
-                (define-key (current-local-map) "\M-]" 'semantic-ia-find-reference)
-                ;; Plato Wu,2014/03/21: after 23.3, there is no push-tag-mark in etags.el
-                ;; but semantic-ia-fast-jump need it.
-                (unless (fboundp 'push-tag-mark)
-                  (defun push-tag-mark ()
-                    "Push the current position to the ring of markers so that
-                   \\[pop-tag-mark] can be used to come back to current position."
-                    (interactive)
-                    (ring-insert find-tag-marker-ring (point-marker))))
+;;                 (require 'semantic/ia)
+;;                 (require 'semantic/mru-bookmark)
+;;                 (semantic-mode 1)
+;;                 (add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+;;                 (defun semantic-ia-find-tag (point)
+;;                   "Try semantic-ia-fast-jump first, then try find-tag"
+;;                   (interactive "d")
+;; ;;                  (semantic-ia-fast-jump point)
+;;                   (condition-case nil
+;;                       (semantic-ia-fast-jump point)
+;;                     (error
+;;                      (vj-find-tag)))
+;;                   )
+;;                 (setq semantic-symref-auto-expand-results t)
+;;                 (defun semantic-ia-find-reference (regexp)
+;;                   (interactive
+;;                    (let ((regexp (grep-read-regexp)))
+;;                      (list regexp)))
+;;                   (semantic-symref-symbol regexp))
+;; ;;                (define-key  (keymap-symbol (current-local-map)) "\M-]"  )
+;;                 (define-key (current-local-map) "\M-." 'semantic-ia-find-tag)
+;;                 (define-key (current-local-map) "\M-]" 'semantic-ia-find-reference)
+;;                 ;; Plato Wu,2014/03/21: after 23.3, there is no push-tag-mark in etags.el
+;;                 ;; but semantic-ia-fast-jump need it.
+;;                 (unless (fboundp 'push-tag-mark)
+;;                   (defun push-tag-mark ()
+;;                     "Push the current position to the ring of markers so that
+;;                    \\[pop-tag-mark] can be used to come back to current position."
+;;                     (interactive)
+;;                     (ring-insert find-tag-marker-ring (point-marker))))
 
                ;; Plato Wu,2014/03/14: no pulse highlight
                (setq pulse-flag 'never)
@@ -1745,7 +1746,7 @@ to the position where the property exists."
                 (add-to-list 'ac-sources 'ac-source-semantic)))))
 
 (eval-after-load 'autoinsert
-  '(when (is-version 24) 
+  '(when (higher-version 24)
      ;; Plato Wu,2014/08/26: define-auto-insert can't delete ("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C / C++ header") case
      (setq auto-insert-alist
            (cl-delete-if #'(lambda (elt) (equal (car elt) '("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C / C++ header"))) 
