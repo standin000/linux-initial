@@ -208,6 +208,7 @@
 
 ;;; M-q to auto fill paragraph
 ;;; fill-region call fill-paragraph by region
+;;; C-x TAB to left/right move region
 ;(setq fill-column 70)
 
 ;;display column number
@@ -465,6 +466,10 @@
 ;; in cygwin, so if Emacs w32 can not use .emacs in home directory.
 ;; Plato Wu,2009/11/23: HOME variable must set in Windows first.
 ;; (load "~/linux-backup/.emacs")
+;; Plato Wu,2017/03/07: chmod server-socket-dir(/tmp/emacs(userid) ) 700
+;; windows reports permission are incorrectly orded, skip it.
+;; (setq server-socket-dir "~/.emacs.d/server") or EMACS_SERVER_FILE in bashrc
+;; emasclient -s socket-name
 ;; (server-start)
 ;; (setq kill-buffer-query-functions nil)
 

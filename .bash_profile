@@ -185,8 +185,9 @@ export LESSCHARSET=latin1
 export PATH=$PATH:/opt/java/jre/bin/:/usr/local/bin/
  
 # Plato Wu,2015/04/24: cygwin in plato-PC support emacsclient
-if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "yazh" ] || [ "$HOSTNAME" = "plato-PC" ] ||
-    [ "$HOSTNAME" = "raspberrypi" ] );  then
+# Plato Wu,2016/01/16: all emacs support emacsclient
+# if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" = "yazh" ] || [ "$HOSTNAME" = "plato-PC" ] ||
+#     [ "$HOSTNAME" = "raspberrypi" ] );  then
     # Plato Wu,2010/01/26: let emacsclient -t automatically start an emacs in deamon mode and
     # connect to it if one is not found running
     export ALTERNATE_EDITOR=
@@ -195,7 +196,8 @@ if ([ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "myhost" ] || [ "$HOSTNAME" 
     # Plato Wu,2015/11/11: use -n to avoid kill-buffer-query-functions
     alias emacsclient='emacsclient -n'
     export NODE_PATH=/home/plato/node_modules/
-fi
+# fi
+
 # Plato Wu,2010/02/21: proxy setting for chromium
 # Plato Wu,2012/04/11: swtichy sharp instead
 # Plato Wu,2012/04/21: chromium 18.0 don't work for pac
