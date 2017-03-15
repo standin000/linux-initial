@@ -470,7 +470,7 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 (define-key lisp-interaction-mode-map "\M-." 'find-tag-also-for-elisp)
 ;; Plato Wu,2015/09/21: now cygwin support emacsclient.
 ;; or (is-system "cygwin") 
-(if (higher-version 21)
+(when (higher-version 21)
   (defun my-done ()
     (interactive) 
     (server-edit)

@@ -241,26 +241,33 @@ shopt -s cdspell
 # make test
 # make install
 # it is installed into $HOME/perl5/lib/perl5
-# if ([ "$HOSTNAME" = "yazh" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
-#   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
-# fi
-# perl -MCPAN -e shell
 # "install CPAN"  "reload cpan" are used to update CPAN
 
 
 # perlbrew method
-#\wget -O - http://install.perlbrew.pl | bash or \curl -L http://install.perlbrew.pl | bash
+# \wget -O - http://install.perlbrew.pl | bash
+# \curl -L http://install.perlbrew.pl | bash
 # perlbrew install-cpanm
 # cpanm --local-lib=~/perl5 local::lib
-# cpanm install
-# cpanm --uninstall
+# source ~/perl5/perlbrew/etc/bashrc
 
-if ([ "$HOSTNAME" = "yazh" ] || [ "$HOSTNAME" = "myserver" ] || [ "$HOSTNAME" = "raspberrypi" ]); then
-    source ~plato/perl5/perlbrew/etc/bashrc
+# or 
+# wget -O- http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+# eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+# echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.profile
+# echo 'export MANPATH=$HOME/perl5/man:$MANPATH' >> ~/.profile
+
+# cpanm Module(*/*.pm, *::*)
+# cpanm Module --uninstall
+# cpanm Module --look
+
+if perl < /dev/null > /dev/null 2>&1  ; then
+  eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi
-if [ "$HOSTNAME" = "yazh" ]; then
-  TZ='Asia/Shanghai'; export TZ
-fi
+
+# perl -MCPAN -e shell
+
+TZ='Asia/Shanghai'; export TZ
 
 # getfacl/setfacl Modify file and directory access control lists (ACLs)
 # umask 0022 for file create default mode
