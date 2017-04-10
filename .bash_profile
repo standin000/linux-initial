@@ -260,8 +260,8 @@ shopt -s cdspell
 # cpanm Module(*/*.pm, *::*)
 # cpanm Module --uninstall
 # cpanm Module --look
-
-if perl < /dev/null > /dev/null 2>&1  ; then
+if [ -d "$HOME/perl5/lib/perl5" ] ; then
+#if perl < /dev/null > /dev/null 2>&1  ; then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi
 

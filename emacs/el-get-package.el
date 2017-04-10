@@ -25,62 +25,13 @@
 ;;; Code:
 
 ;; Plato Wu,2014/04/20: el-get need git, make, mercurial, subversion, cvs, texinfo(for makeinfo)
-(unless (higher-version 24)
-  (unless (file-directory-p (expand-file-name "~/.emacs.d/elpa/"))
-    ;; Plato Wu,2015/05/26: this site is obsolete for it only support single elpa archive
-    ;; (let ((buffer (url-retrieve-synchronously
-    ;;                "http://tromey.com/elpa/package-install.el"
-    ;;            )))
-    ;;   (save-excursion
-    ;;     (set-buffer buffer)
-    ;;     (goto-char (point-min))
-    ;;     (re-search-forward "^$" nil 'move)
-    ;;     (eval-region (point) (point-max))
-    ;;     (kill-buffer (current-buffer))))
-    (mkdir "~/.emacs.d/elpa/")
-    (url-copy-file "http://git.savannah.gnu.org/gitweb/?p=emacs.git;a=blob_plain;hb=ba08b24186711eaeb3748f3d1f23e2c2d9ed0d09;f=lisp/emacs-lisp/package.el" "~/.emacs.d/elpa/package.el")
-    )
-  (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
-;(package-initialize)
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-;; no default recipes
-;; (unless (require 'el-get nil 'noerror)
-;;   (require 'package)
-
-(setq package-archives
-      '(("melpa" . "http://melpa.org/packages/")
-        ("gnu" . "http://elpa.gnu.org/packages/")
-        ("ELPA" . "http://tromey.com/elpa/")))
-
-;;  ("marmalade" . "http://marmalade-repo.org/packages/")
-;;  ("SC" . "http://joseito.republika.pl/sunrise-commander/")))
-;;   (package-refresh-contents)
-;;   (package-initialize)
-;;   (package-install 'el-get)
-;;   (require 'el-get))
-
-(unless (require 'el-get nil 'noerror)
-  (url-retrieve
-   ;; Plato Wu,2014/03/18: ninthfloor don't support TLS
-   "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el"
-   (lambda (s)
-     (goto-char (point-max))
-     ;; Plato Wu,2016/09/07: @todo need wait evaluation
-     (eval-print-last-sexp))))
 ;; @todo
     ;;  Control whether el-get should generate autoloads for this
     ;; package. Setting this to nil prevents el-get from generating
     ;; autoloads for the package. Default is t. Setting this to a
     ;; string or a list of string will load the named autoload
     ;; files.
-
-(setq el-get-use-autoloads nil)
-
-(setq el-get-verbose t)
-
-; install process running at background, so this report error when first time.
-(add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
 
 ;; `(setq my-packages
 ;;       ',(mapcar #'el-get-as-symbol

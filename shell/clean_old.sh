@@ -73,7 +73,8 @@ else
 # 	    mount_point=/mnt
 #     fi
 #     for dir in $mount_point/*; do
-# Plato Wu,2015/02/27:  mount_dirs 
+    # Plato Wu,2017/04/08: df of cygwin64 don't list all partion, df -a can not
+    # run at busybox, so consider mount ?
     mount_dirs=`df | awk 'FNR > 1 {print $6}'`
     for dir in $mount_dirs; do
 	    trash=$dir/Trash/
