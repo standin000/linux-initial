@@ -540,11 +540,11 @@
                ad-do-it
                (emms-pause))
       ad-do-it))
-  ;; ;; global key-map
-  ;; ;; all global keys prefix is C-c e
-  ;; ;; compatible with emms-playlist mode keybindings
-  ;; ;; you can view emms-playlist-mode.el to get details about 
-  ;; ;; emms-playlist mode keys map
+  ;; global key-map
+  ;; all global keys prefix is C-c e
+  ;; compatible with emms-playlist mode keybindings
+  ;; you can view emms-playlist-mode.el to get details about
+  ;; emms-playlist mode keys map
   ;; (global-set-key (kbd "C-c e s") 'emms-stop)
   ;; (global-set-key (kbd "C-c e P") 'emms-pause)
   ;; (global-set-key (kbd "C-c e n") 'emms-next)
