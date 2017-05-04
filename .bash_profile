@@ -242,16 +242,18 @@ shopt -s cdspell
 # make install
 # it is installed into $HOME/perl5/lib/perl5
 # "install CPAN"  "reload cpan" are used to update CPAN
+# perl -MCPAN -e shell
 
+# or use cpanm
 
-# perlbrew method
+# perlbrew
 # \wget -O - http://install.perlbrew.pl | bash
 # \curl -L http://install.perlbrew.pl | bash
 # perlbrew install-cpanm
 # cpanm --local-lib=~/perl5 local::lib
 # source ~/perl5/perlbrew/etc/bashrc
 
-# or 
+# without perlbrew
 # wget -O- http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
 # eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
 # echo 'eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`' >> ~/.profile
@@ -260,14 +262,20 @@ shopt -s cdspell
 # cpanm Module(*/*.pm, *::*)
 # cpanm Module --uninstall
 # cpanm Module --look
+
 if [ -d "$HOME/perl5/lib/perl5" ] ; then
 #if perl < /dev/null > /dev/null 2>&1  ; then
   eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
 fi
 
-# perl -MCPAN -e shell
+
 
 TZ='Asia/Shanghai'; export TZ
 
 # getfacl/setfacl Modify file and directory access control lists (ACLs)
 # umask 0022 for file create default mode
+
+# Load RVM into a shell session *as a function*
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" ; export PATH="$PATH:$HOME/.rvm/bin"
+

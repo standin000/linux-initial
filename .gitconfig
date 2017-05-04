@@ -44,7 +44,8 @@ sslVerify = false
 # Plato Wu,2017/01/10: don't put two remote in config.
 #    remote = origin
     merge = refs/heads/master
-    rebase = true
+    # Plato Wu,2017/04/17: always rebase will overwrite repository history with local automaticlly
+#    rebase = true
 [push]
     default = matching # push all branch to remote
     followTags = true  # don't work for lightweight tag, only for annotated tag
