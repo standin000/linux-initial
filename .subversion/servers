@@ -146,6 +146,7 @@
 # http-proxy-port = 8118
 # http-proxy-username = defaultusername
 # http-proxy-password = defaultpassword
+# Plato Wu,2017/10/27: open it for E120104 error
 # http-compression = no
 # http-auth-types = basic;digest;negotiate
 # No http-timeout, so just use the builtin default.
