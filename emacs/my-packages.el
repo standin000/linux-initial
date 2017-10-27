@@ -1801,6 +1801,34 @@ to the position where the property exists."
     ;(autoload 'turn-on-xclip "xclip" "exchange clip between X and emacs" t nil)
     (turn-on-xclip)))
 
+(defun org-trello-configuration ()
+  (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+   '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
+   '(org-trello-files (quote ("~/org/GTD.org")) nil (org-trello))
+   ;; '(package-selected-packages
+   ;;   (quote
+   ;;    (smart-compile psvn paredit org-trello magit helm-projectile google-c-style auto-complete ascii)))
+   )
+  ;; Plato Wu,2017/08/10: need cycle board to DONE directly
+;; (defun orgtrello-controller--properties-compute-todo-keywords-as-string
+;;     (board-lists-hash-name-id)
+;;   "Compute org keywords from the BOARD-LISTS-HASH-NAME-ID."
+;;   (s-join " " `("#+TODO:"
+;;                 ,@(let ((res-list))
+;;                     (maphash
+;;                      (lambda (name _)
+;;                        (-> name
+;;                            orgtrello-controller--convention-property-name
+;;                            orgtrello-controller--compute-keyword-separation
+;;                            (push res-list)))
+;;                      board-lists-hash-name-id)
+;;                     (nreverse res-list)))))
+  )
+
 ;; 'mode-local-init-hook
 ;; (autoloadp (symbol-function 'ascii-on))
 
@@ -1821,17 +1849,6 @@ to the position where the property exists."
     )
   (load (expand-file-name "~/.emacs.d/elpa/package.el")))
 
-(setq package-archives
-      '(("melpa" . "http://melpa.org/packages/")
-        ("gnu" . "http://elpa.gnu.org/packages/")
-        ("ELPA" . "http://tromey.com/elpa/")))
-
-;;  ("marmalade" . "http://marmalade-repo.org/packages/")
-;;  ("SC" . "http://joseito.republika.pl/sunrise-commander/")))
-;;   (package-refresh-contents)
-;;   (package-initialize)
-;;   (package-install 'el-get)
-;;   (require 'el-get))
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
 (if (require 'el-get nil 'noerror)
@@ -1840,6 +1857,9 @@ to the position where the property exists."
       (setq el-get-verbose t)
 	; install process running at background, so this report error when first time.
       (add-to-list 'el-get-recipe-path "~/linux-initial/emacs/recipes/")
+      ;; Plato Wu,2017/08/10: china repository, sometimes foreign repository is interfere by wall.
+      (add-to-list 'package-archives
+            '("popkit" . "http://elpa.popkit.org/packages/"))
       (require 'el-get-package)
       )
   ;; Plato Wu,2017/04/06: http proxy enviroment variable don't work for
@@ -1851,5 +1871,14 @@ to the position where the property exists."
      (goto-char (point-max))
      ;; Plato Wu,2016/09/07: @todo need wait evaluation
      (eval-print-last-sexp))))
+;; Plato Wu,2017/08/10: initial package-archives is ("gnu" . "http://elpa.gnu.org/packages/")
+;; el-get will add ("marmalade" . "http://marmalade-repo.org/packages/")
+;; ("melpa" . "http://melpa.org/packages/")
+;; ("milkbox" . "http://melpa.milkbox.net/packages/") ("SC" . "http://joseito.republika.pl/sunrise-commander/")
+;; may be for some minority packages
+;; (setq package-archives '(("marmalade" . "http://marmalade-repo.org/packages/")))
+;; (package-refresh-contents)
+;; (package-initialize)
+
 
 (provide 'my-packages)

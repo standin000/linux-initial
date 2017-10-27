@@ -1,10 +1,15 @@
 #!/bin/bash
 filehome=~/linux-initial/auth
 # Plato Wu,2017/05/04: .hgauth no need now, for code.google.com is broken.
-authfiles=".authinfo id_rsa"
+authfiles=".authinfo id_rsa standin000.el"
+
 for authfile in $authfiles; do
     if [ "$authfile" == "id_rsa" ]; then
+        mkdir ~/.ssh
         cd ~/.ssh
+    elif [ "$authfile" == "standin000.el" ]; then
+        mkdir -p ~/.emacs.d/.trello
+        cd ~/.emacs.d/.trello
     else
         cd ~
     fi    

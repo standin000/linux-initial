@@ -12,6 +12,8 @@ quotepath = false
 # gitproxy = ~/.ssh/proxy.sh
 # ignore file permission in Windows
 filemode = false
+saftcrlf = true
+autocrlf = false
 
 [alias]
 co = checkout
