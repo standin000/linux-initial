@@ -467,6 +467,11 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
      (t (find-tag tagname next-p regexp-p)))))
 
 (define-key emacs-lisp-mode-map "\M-." 'find-tag-also-for-elisp)
+
+(unless (higher-version 25)
+  (global-set-key (kbd "\M-,") 'pop-tag-mark)
+  )
+
 (define-key lisp-interaction-mode-map "\M-." 'find-tag-also-for-elisp)
 ;; Plato Wu,2015/09/21: now cygwin support emacsclient.
 ;; or (is-system "cygwin") 
