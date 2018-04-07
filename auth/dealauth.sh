@@ -1,7 +1,7 @@
 #!/bin/bash
 filehome=~/linux-initial/auth
 # Plato Wu,2017/05/04: .hgauth no need now, for code.google.com is broken.
-authfiles=".authinfo id_rsa standin000.el"
+authfiles=".authinfo id_rsa standin000.el gnupg.asc"
 
 for authfile in $authfiles; do
     if [ "$authfile" == "id_rsa" ]; then
@@ -25,7 +25,7 @@ for authfile in $authfiles; do
     # for export, copy  and import private key
     # gpg --export-secret-keys -a -o private.asc
     ##############################
-    # gpg --import private.asc
+    # gpg --import gnupg.asc
     # gpg -e -a -r "Plato Wu" $authfile will encrypt file with public key
     # Plato Wu,2017/05/04: it need input password one by one
     gpg -o $authfile -d $filehome/$authfile.asc
