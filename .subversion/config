@@ -4,7 +4,8 @@
 ### how to use this file.
 # Plato Wu,2011/05/31: 
 # use svn propedit svn:ignore directory to edit directory'own ignore mode.
-# use svn propset svn:executable ON file to set file exectuable 
+# use svn propset svn:executable on file to set file exectuable
+# use svn propdel svn:executable
 # attribute. @todo: confirm whether it will keep its exectuable 
 # attribute if is added with this attribute.
 
