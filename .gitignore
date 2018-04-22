@@ -1,15 +1,11 @@
 *.fasl
 *~
-*.dll
-*.bin
 *.scc
 *.axf
 *.tdt
 *.o
 *.via
 *.stg
-*.obj
-*.so
 *.bak
 TAGS
 id_rsa
