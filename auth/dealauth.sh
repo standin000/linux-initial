@@ -4,7 +4,7 @@ filehome=~/linux-initial/auth
 authfiles=".authinfo id_rsa standin000.el"
 
 if [ ! -f "~/gnupg.asc" ]; then
-    gpg  -o "$HOME/gnupg.asc" -d gnupg.asc.asc
+    gpg -o "$HOME/gnupg.asc" -d gnupg.asc.asc
     gpg --import ~/gnupg.asc
 fi
 
