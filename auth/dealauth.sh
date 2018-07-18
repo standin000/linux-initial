@@ -3,6 +3,11 @@ filehome=~/linux-initial/auth
 # Plato Wu,2017/05/04: .hgauth no need now, for code.google.com is broken.
 authfiles=".authinfo id_rsa standin000.el"
 
+if [ ! -f "~/gnupg.asc" ]; then
+    gpg -o "$HOME/gnupg.asc" -d gnupg.asc.asc
+    gpg --import ~/gnupg.asc
+fi
+
 for authfile in $authfiles; do
     if [ "$authfile" == "id_rsa" ]; then
         mkdir ~/.ssh
@@ -23,7 +28,7 @@ for authfile in $authfiles; do
     # gpg --send-keys --keyserver subkeys.pgp.net gtalk000@gmail.com
     # gpg --keyserver subkeys.pgp.net --recv-keys E87C1128
     # for export, copy  and import private key
-    # gpg --export-secret-keys -a -o private.asc
+    # gpg --export-secret-keys -a -o gnupg.asc
     ##############################
     # gpg --import gnupg.asc
     # gpg -e -a -r "Plato Wu" $authfile will encrypt file with public key
