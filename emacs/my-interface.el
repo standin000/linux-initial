@@ -93,7 +93,7 @@
 ;; Plato Wu,2015/01/19: vc-ediff is good than svn diff
 (if (higher-version 24)
     (eval-after-load "vc-hooks"
-      '(define-key vc-prefix-map "=" 'vc-ediff))) 
+      '(define-key vc-prefix-map "=" 'vc-ediff)))
 ;; Plato Wu,2015/02/27: highlight diffs which is not focus caues it disappear under default ediff colors
 ;; use it in the future.
 ;; Please note: to set Ediff's faces, use only copy-face or set/make-face-... as shown above. Emacs's low-level face-manipulation functions should be avoided.
