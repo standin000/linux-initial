@@ -12,7 +12,6 @@
 
 (require 'my-utility)
 (require 'my-packages)
-;;(require 'el-get-package)
 (require 'my-interface)
 
 ;; Plato Wu,2014/09/01: if kill-emacs don't exit all process, use desktop-save first.
