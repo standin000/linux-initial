@@ -14,6 +14,8 @@ quotepath = false
 filemode = false
 saftcrlf = true
 autocrlf = false
+# sshCommand = ssh -i ~/.ssh/finland_git_id_rsa -F /dev/null
+# or GIT_SSH_COMMAND="ssh -i ~/.ssh/finland_git_id_rsa -F /dev/null" git
 
 [alias]
 co = checkout

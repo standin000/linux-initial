@@ -2,27 +2,29 @@
 
 linkfiles=".emacs .bash_profile .sbclrc .bash_logout .gnus.el .vimrc
 .ssh .subversion/config .subversion/servers .sawfishrc .screenrc .hgrc .hgignore .tmux.conf
-.gitconfig .gitignore .inputrc .bashrc .Xresources .stumpwmrc .minttyrc emacs texmf"
-#linkfiles="test test1 test2/test2"
-#echo $linkfiles
+.gitconfig .gitignore .inputrc .bashrc .Xresources .stumpwmrc .minttyrc emacs texmf .config/youtube-dl/config"
+
 filehome=~/linux-initial
+cd ~
 
 linkfile(){
     if [ $2 ]; then
-        mv $linkfile $linkfile.old
+        mv $1 $1.old
         echo "make a copy with", $linkfile
     fi
 
-    if [ "$1" == ".emacs" ]; then
-        ln -s $filehome/emacs/.emacs .emacs
-    else
-	ln -s $filehome/$linkfile $linkfile
+    file=$(basename $1)
+    dir=$(dirname $1)
+
+    if [ ! -d $dir ]; then
+        echo "not exist $dir "
+        mkdir -p $dir
     fi
+
+    ln -s $filehome/$1 $1
 
     echo "make a link with", $linkfile
 }
-
-cd ~
 
 for linkfile in $linkfiles; do
     # Plato Wu,2014/02/16: it there is a regular file

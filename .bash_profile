@@ -27,7 +27,7 @@ fi
 # User specific aliases and functions
 # alias rm='mv --target-directory ~/Trash'
  alias rm='~/linux-initial/shell/movetotrash.sh'
- alias del='/bin/rm -i -f'
+ alias del='/bin/rm -I -r'
  alias cp='cp -p -i'
  alias mv='mv -i'
  alias vi='vim'
@@ -115,7 +115,14 @@ shopt -s histappend
 
 # When changing directory small typos can be ignored by bash
 # for example, cd /vr/lgo/apaache would find /var/log/apache
+# Plato Wu,2013/06/27: spell checking for cd command
 shopt -s cdspell
+
+# Plato Wu,2018/04/15: let cp/mv considering dot files
+shopt -s dotglob
+#
+# shopt -s expand_aliases
+# shopt -u expand_aliases # disable alias
 
 # Completion options
 # ##################
@@ -230,9 +237,6 @@ fi
 # Plato Wu,2013/06/15: for Kitty to invoke winscp
 # Plato Wu,2015/12/15: Start Winscp(set path in kitty.ini) can't set path of server
 winscp() { echo -ne "\033];__ws:${PWD}\007"; }
-
-# Plato Wu,2013/06/27: spell checking for cd command
-shopt -s cdspell
 
 # Plato Wu,2015/04/08: local::lib method
 # download local::lib
