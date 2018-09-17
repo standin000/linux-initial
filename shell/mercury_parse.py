@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # sudo apt install libxml2-dev
 # sudo apt install libxslt-dev
+# sudo apt install python2-dev
 # sudo apt install python-pip
 # pip install requests --user
 # pip install wheel-0.31.1-py2.py3-none-any.whl  --user
@@ -28,8 +29,8 @@ def get_content_to_file( url, htmlfilename ):
         date_publish_string = data['date_published']
         excerpt = data['excerpt']
         url = data['url']
-       # html = BeautifulSoup( content, 'lxml' )
-        html = BeautifulSoup( content, 'html5lib' )
+        html = BeautifulSoup( content, 'lxml' )
+       # html = BeautifulSoup( content, 'html5lib' )
         #
         ## now all png objects to inline
         if not os.path.exists(title):

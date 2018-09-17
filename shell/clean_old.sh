@@ -56,6 +56,7 @@ clean_old(){
           clean_old $1
        fi
     else
+        # Plato Wu,2018/09/17: touch -d "90 days ago" filename
         find $1 -maxdepth 1 ! -type d -mtime +90 -print -delete
         # Plato Wu,2009/07/27: use mindepth avoid delete itself
         find $1 -mindepth 1 -maxdepth 1 -type d -mtime +90 -print -exec /bin/rm -rf {} \;
@@ -67,15 +68,15 @@ clean_old ~/Trash/ try
 if [  $1 ]; then
     clean_old $1 try
 else
-#     if [ "$OSTYPE" = "cygwin" ]; then
-# 	    mount_point=/cygdrive
-#     else
-# 	    mount_point=/mnt
-#     fi
-#     for dir in $mount_point/*; do
     # Plato Wu,2017/04/08: df of cygwin64 don't list all partion, df -a can not
-    # run at busybox, findmnt is NG in cygwin, so consider mount
-    mount_dirs=`df | awk 'FNR > 1 {print $6}'`
+    # run at busybox, findmnt is NG in cygwin.
+    if [ "$OSTYPE" = "cygwin" ]; then
+	    mount_dirs=`ls -d -1 /cygdrive/*`
+    else
+#	    mount_point=/mnt
+        mount_dirs=`df | awk 'FNR > 1 {print $6}'`
+    fi
+#     for dir in $mount_point/*; do
     for dir in $mount_dirs; do
 	    trash=$dir/Trash/
         # Plato Wu,2009/05/18: Wuala has a hidden Trash directory

@@ -456,9 +456,11 @@
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
 ;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line
 
-;; (when (higher-version 24)
 ;; Plato Wu,2017/01/05: molokai theme is not suitable
-;;  (load-theme 'molokai t nil))
+(when (higher-version 24)
+  (add-to-list 'custom-theme-load-path "~/emacs/")
+  (load-theme 'molokai t nil)
+  )
 
 
 ;; Plato Wu,2013/06/29: for emacs w32
