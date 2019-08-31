@@ -8,6 +8,8 @@
 # pip install bs4 --user
 # pip install lxml --user 256M memory is not enough
 # pip install html5lib-1.0.1-py2.py3-none-any.whl --user # use html5lib instead 
+# http://m.7624.net/iyule/5147451/20180516A1H8K600.html
+# https://news.boxun.com/news/gb/china/2018/05/201805071304.shtml is ng
 
 import os, sys, requests, base64, urllib, codecs, urlparse
 from bs4 import BeautifulSoup
@@ -67,9 +69,9 @@ def get_content_to_file( url, htmlfilename ):
 
 if __name__=='__main__':
     parser = OptionParser( )
-    parser.add_option('--url', dest='url', type=str, action='store',
+    parser.add_option('-i', '--url', dest='url', type=str, action='store',
                       help = "Name of the URL to output into an HTML file.")
-    parser.add_option('--htmlfile', dest='htmlfile', type=str, action='store',
+    parser.add_option('-o', '--htmlfile', dest='htmlfile', type=str, action='store',
                       help = 'Name of the HTML file to store the underlying data.')
     opts, args = parser.parse_args( )
 #    assert(all(map(lambda tok: tok is not None, ( opts.url, opts.htmlfile ) ) ) )
