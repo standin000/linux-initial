@@ -469,6 +469,7 @@
 ;; Plato Wu,2009/11/23: HOME variable must set in Windows first.
 ;; (load "~/linux-backup/.emacs")
 ;; Plato Wu,2017/03/07: chmod server-socket-dir(/tmp/emacs(userid) ) 700
+;; Plato Wu,2019/09/28: chmod 700 is NG in portable cygwin?
 ;; windows reports permission are incorrectly orded, skip it.
 ;; (setq server-socket-dir "~/.emacs.d/server") or EMACS_SERVER_FILE in bashrc
 ;; emasclient -s socket-name
