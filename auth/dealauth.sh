@@ -1,7 +1,7 @@
 #!/bin/sh
 filehome=~/linux-initial/auth
 # Plato Wu,2017/05/04: .hgauth no need now, for code.google.com is broken.
-authfiles=".authinfo id_rsa standin000.el .mailrc"
+authfiles=".authinfo id_rsa id_dsa standin000.el .mailrc"
 
 if [ ! -f "$HOME/gnupg.asc" ]; then
     gpg -o "$HOME/gnupg.asc" -d gnupg.asc.asc
