@@ -229,8 +229,9 @@
           #'(lambda ()
             (set-process-query-on-exit-flag
               (get-buffer-process (current-buffer)) nil))) 
-
-(global-auto-revert-mode 1)
+;; Plato Wu,2019/04/12: cause very slow response in emacs 26.1
+(if (not (higher-version 26.1))
+ (global-auto-revert-mode 1))
 
 (when (is-system "cygwin")
   ;; Plato Wu,2010/03/29: emacs in cygwin does not support . of num area key

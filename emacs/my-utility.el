@@ -26,7 +26,7 @@
 ;;       result)))
 
 (defun higher-version (no)
-  (>= (string-to-int emacs-version) no))
+  (>= (string-to-number emacs-version) no))
 
 (defun mycomment (arg)
   (interactive "*P")
