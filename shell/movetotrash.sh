@@ -4,6 +4,16 @@ pause_print_error(){
   exit $1
 }
 
+# Plato Wu,2018/06/08: skip all -opt paramters
+while getopts ":" opt; do
+    case ${opt} in
+        \? )
+             ;;
+    esac
+done
+
+shift $((OPTIND -1))
+
 for p in "$@"; do 
 # Plato Wu,2009/04/23: use "" to escape space symbol
 # Plato Wu,2009/12/30: Only convert DOS path which is "?:*" or ?:*
@@ -53,7 +63,8 @@ if [ $error != 0 ]; then
     pause_print_error $error
 fi
 
-newpath=`basename "$path"`
+newpath=$(basename $path)
+
 while [ -e $rootpath/Trash/"$newpath" ]
 do
     newpath="1${newpath}"
@@ -68,4 +79,4 @@ fi
 
 done
 
-# Plato Wu,2015/12/09: -filename which start with - can not be rm, need  rm ./-file
+# Plato Wu,2015/12/09: -filename which start with - can not be rm, need rm ./-file

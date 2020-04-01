@@ -229,8 +229,9 @@
           #'(lambda ()
             (set-process-query-on-exit-flag
               (get-buffer-process (current-buffer)) nil))) 
-
-(global-auto-revert-mode 1)
+;; Plato Wu,2019/04/12: cause very slow response in emacs 26.1
+(if (not (higher-version 26.1))
+ (global-auto-revert-mode 1))
 
 (when (is-system "cygwin")
   ;; Plato Wu,2010/03/29: emacs in cygwin does not support . of num area key
@@ -460,9 +461,11 @@
 ;; http://lists.gnu.org/archive/html/bug-gnu-emacs/2011-12/msg00463.html
 ;; Plato Wu,2012/07/29: (flush-lines "^$") delete empty line
 
-;; (when (higher-version 24)
 ;; Plato Wu,2017/01/05: molokai theme is not suitable
-;;  (load-theme 'molokai t nil))
+(when (higher-version 24)
+  (add-to-list 'custom-theme-load-path "~/emacs/")
+  (load-theme 'molokai t nil)
+  )
 
 
 ;; Plato Wu,2013/06/29: for emacs w32
@@ -471,6 +474,7 @@
 ;; Plato Wu,2009/11/23: HOME variable must set in Windows first.
 ;; (load "~/linux-backup/.emacs")
 ;; Plato Wu,2017/03/07: chmod server-socket-dir(/tmp/emacs(userid) ) 700
+;; Plato Wu,2019/09/28: chmod 700 is NG in portable cygwin?
 ;; windows reports permission are incorrectly orded, skip it.
 ;; (setq server-socket-dir "~/.emacs.d/server") or EMACS_SERVER_FILE in bashrc
 ;; emasclient -s socket-name

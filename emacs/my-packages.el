@@ -1345,7 +1345,7 @@ this function is called."
     "force to kill program which is debugging"
     (interactive)
     (let ((process-id
-	   (string-to-int
+	   (string-to-number
 	    (shell-command-to-string
 	     (concat "ps -u $USER | grep " gdb-executable
 		     " | gawk '{print $1}'")))))
@@ -1400,7 +1400,7 @@ this function is called."
 		      (setq gdb-stop-p gud-last-last-frame))
 ;;;To Debug
 	     (let ((process-id
-		    (string-to-int
+		    (string-to-number
 		     (shell-command-to-string
 		      (concat "ps -u $USER | grep " gdb-executable
 			      " | gawk '{print $1}'")))))

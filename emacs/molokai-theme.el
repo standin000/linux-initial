@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2013 Huang Bin
 
-;; Author: Huang Bin <embrace.hbin@gmail.com>
+;; Author: Huang Bin <huangbin88@foxmail.com>
 ;; URL: https://github.com/hbin/molokai-theme
 ;; Version: 0.8
 
@@ -82,9 +82,8 @@
 
    ;; font lock
    `(font-lock-builtin-face ((t (:foreground ,molokai-chartreuse))))
-   ;; Plato Wu,2015/02/27: use molokai-slateblue intead molokai-base01 in comment and delimiter
-   `(font-lock-comment-face ((t (:foreground ,molokai-slateblue))))
-   `(font-lock-comment-delimiter-face ((t (:foreground ,molokai-slateblue))))
+   `(font-lock-comment-face ((t (:foreground ,molokai-base01))))
+   `(font-lock-comment-delimiter-face ((t (:foreground ,molokai-base01))))
    `(font-lock-constant-face ((t (:foreground ,molokai-purple))))
    `(font-lock-doc-string-face ((t (:foreground ,molokai-darkgoldenrod))))
    `(font-lock-function-name-face ((t (:foreground ,molokai-chartreuse))))
@@ -124,6 +123,13 @@
    ;; show-paren
    ;; rainbow-delimiters
    ;; highlight-symbols
+
+   ;; neotree
+   `(neo-banner-face ((t (:foreground ,molokai-darkgoldenrod))))
+   `(neo-header-face ((t (:foreground ,molokai-chartreuse))))
+   `(neo-root-dir-face ((t (:foreground ,molokai-pink :weight bold))))
+   `(neo-dir-link-face ((t (:foreground ,molokai-chartreuse))))
+   `(neo-expand-btn-face ((t (:foreground ,molokai-orange+5 :weight bold))))
    ))
 
 (defcustom molokai-theme-kit nil

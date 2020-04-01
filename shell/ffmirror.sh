@@ -17,7 +17,6 @@
 # source http://ubuntuforums.org/showthread.php?t=251398
 
 FILE="mirror_list.txt"
-MIRRORS=$(cat "$FILE")
 
 #!/bin/bash
 # ffmirror.sh - http://grulos.blogspot.com
@@ -31,7 +30,7 @@ MIRRORS=$(cat "$FILE")
 # trap 'printf "\ncaught signal\nGot only ${#slist[@]}\n" &&
 #   printf "%s\n" "${slist[@]}" && exit 1' 2
 
-while read line; do
+while read -r line; do
 #while read ${MIRRORS}; do    
 
   # b-a to get time difference.
@@ -42,7 +41,7 @@ while read line; do
   a=${a/./}
 
   # wget stuff
-  /bin/wget --spider -q -O /dev/null $line &&
+  wget --spider -q -O /dev/null $line &&
      b=$(</proc/uptime) &&
        b=${b%%\ *} &&
          b=${b/./}
@@ -59,7 +58,7 @@ while read line; do
   done
   # slist[$c]="$((b-a))0ms $line"
   slist[$c]="$line\n"
-done
+done < "$FILE"
 
 printf "%s\n" "${slist[@]}"
 #printf "${slist[@]}"
