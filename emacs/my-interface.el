@@ -378,6 +378,10 @@
 (add-to-list 'grep-files-aliases
              '("cchh" . "*.[ch] *.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++"))
 
+(add-to-list 'grep-files-aliases
+             '("js" . "*.js *.json"))
+
+
 ;;C-x ( start-kbd-macro; C-x ) end-kbd-macro; C-x e call-last-kbd-macro
 ;; Dos to unix
 ;; M-x set-buffer-file-coding-system RET undecided-unix save the file (C-x C-s)

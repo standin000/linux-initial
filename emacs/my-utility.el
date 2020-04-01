@@ -933,6 +933,9 @@ BEG and END (region to sort)."
       (set-process-sentinel process
                             #'comint-write-history-on-exit))))
 
+;; Plato Wu,2019/03/08: (kill-process "process name"); get from (list-processes)
+
+
 ;; Plato Wu,2014/08/21:   case kill emacs, don't use provisional
 
 ;; (defun mapc-buffers (fn)
