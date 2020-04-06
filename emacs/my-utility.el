@@ -26,7 +26,7 @@
 ;;       result)))
 
 (defun higher-version (no)
-  (>= (string-to-int emacs-version) no))
+  (>= (string-to-number emacs-version) no))
 
 (defun mycomment (arg)
   (interactive "*P")
@@ -469,7 +469,7 @@ Replaces default behaviour of comment-dwim, when it inserts comment at the end o
 (define-key emacs-lisp-mode-map "\M-." 'find-tag-also-for-elisp)
 
 (unless (higher-version 25)
-  (global-set-key (kbd "\M-,") 'pop-tag-mark)
+  (global-set-key "\M-," 'pop-tag-mark)
   )
 
 (define-key lisp-interaction-mode-map "\M-." 'find-tag-also-for-elisp)
@@ -932,6 +932,9 @@ BEG and END (region to sort)."
       (comint-read-input-ring)
       (set-process-sentinel process
                             #'comint-write-history-on-exit))))
+
+;; Plato Wu,2019/03/08: (kill-process "process name"); get from (list-processes)
+
 
 ;; Plato Wu,2014/08/21:   case kill emacs, don't use provisional
 

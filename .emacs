@@ -1,6 +1,18 @@
 ;; This file only record configuration of Emacs itself. Of course it will
 ;; call other modules.
 
+;; Plato Wu,2019/01/15: for .dir-locals.el
+;; ((nil .
+;;       ((eval . (progn
+;;                  (setq tags-file-name (concat (locate-dominating-file default-directory "TAGS") "TAGS"))
+;;                  ;; (setq tags-file-name "TAGS")
+;;                  ;; (let ((i 0))
+;;                  ;;   (while (and (not (file-exists-p tags-file-name))
+;;                  ;;               (< i 5))
+;;                  ;;     (setq tags-file-name (concat "../" tags-file-name))
+;;                  ;;     (setq i (+ 1 i)))
+;;                  ;;   (if (= i 5) (setq tags-file-name nil)))
+;;                  )))))
 
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,

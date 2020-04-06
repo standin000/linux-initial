@@ -9,6 +9,9 @@
 *.bak
 TAGS
 id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
 known_hosts
 authorized_keys2
 # add ! to negative rules

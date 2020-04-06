@@ -93,7 +93,7 @@
 ;; Plato Wu,2015/01/19: vc-ediff is good than svn diff
 (if (higher-version 24)
     (eval-after-load "vc-hooks"
-      '(define-key vc-prefix-map "=" 'vc-ediff))) 
+      '(define-key vc-prefix-map "=" 'vc-ediff)))
 ;; Plato Wu,2015/02/27: highlight diffs which is not focus caues it disappear under default ediff colors
 ;; use it in the future.
 ;; Please note: to set Ediff's faces, use only copy-face or set/make-face-... as shown above. Emacs's low-level face-manipulation functions should be avoided.
@@ -229,8 +229,9 @@
           #'(lambda ()
             (set-process-query-on-exit-flag
               (get-buffer-process (current-buffer)) nil))) 
-
-(global-auto-revert-mode 1)
+;; Plato Wu,2019/04/12: cause very slow response in emacs 26.1
+(if (not (higher-version 26.1))
+ (global-auto-revert-mode 1))
 
 (when (is-system "cygwin")
   ;; Plato Wu,2010/03/29: emacs in cygwin does not support . of num area key
@@ -378,6 +379,10 @@
 (add-to-list 'grep-files-aliases
              '("cchh" . "*.[ch] *.cc *.[ch]xx *.[ch]pp *.[CHh] *.CC *.HH *.[ch]++"))
 
+(add-to-list 'grep-files-aliases
+             '("js" . "*.js *.json"))
+
+
 ;;C-x ( start-kbd-macro; C-x ) end-kbd-macro; C-x e call-last-kbd-macro
 ;; Dos to unix
 ;; M-x set-buffer-file-coding-system RET undecided-unix save the file (C-x C-s)
@@ -469,6 +474,7 @@
 ;; Plato Wu,2009/11/23: HOME variable must set in Windows first.
 ;; (load "~/linux-backup/.emacs")
 ;; Plato Wu,2017/03/07: chmod server-socket-dir(/tmp/emacs(userid) ) 700
+;; Plato Wu,2019/09/28: chmod 700 is NG in portable cygwin?
 ;; windows reports permission are incorrectly orded, skip it.
 ;; (setq server-socket-dir "~/.emacs.d/server") or EMACS_SERVER_FILE in bashrc
 ;; emasclient -s socket-name

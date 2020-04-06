@@ -226,7 +226,9 @@
         svn-status-hide-unmodified t
         ;; Plato Wu,2009/07/27: disable modeline mark display for there
         ;; is not image for console emacs.
-        svn-status-state-mark-modeline nil))
+        svn-status-state-mark-modeline nil
+        svn-status-hide-unknown t
+        ))
 
 (defun dired-single-configuration ()
 ;  (require 'dired)
@@ -427,7 +429,25 @@
                            (mode . gnus-summary-mode)
                            (mode . gnus-article-mode)
                            (name . "^\\.bbdb$")
-                           (name . "^\\.newsrc-dribble")))))))))
+                           (name . "^\\.newsrc-dribble"))))))))
+  (defun my-compile ()
+    (interactive)
+    (condition-case nil
+        (projectile-compile-project nil)
+      (error (smart-compile 1))))
+  ;  (autoload 'smart-compile "smart-compile" "load smart compile")
+;Plato Wu,2013/04/15: use (symbol-function 'cc-mode) to get autoload for eval-after-load
+;Plato Wu,2013/05/14: there is cc-mode.el) to get autoload for eval-after-load
+  ;; Plato Wu,2019/01/29: projectile-compile-project only support Makefile project
+  (eval-after-load
+    "cc-mode"
+   '(progn (define-key c-mode-map [f7] 'my-compile)
+          (define-key c++-mode-map [f7] 'my-compile)))
+
+  (eval-after-load
+    "make-mode"
+    '(define-key makefile-mode-map [f7] 'projectile-compile-project))
+  )
 
 ;; Enable default groups by default
 (add-hook 'ibuffer-mode-hook
@@ -1308,17 +1328,6 @@ this function is called."
 ;;               (ggtags-mode 1)))))
 
 (defun smart-compile-configuration ()
-;  (autoload 'smart-compile "smart-compile" "load smart compile")
-;Plato Wu,2013/04/15: use (symbol-function 'cc-mode) to get autoload for eval-after-load
-;Plato Wu,2013/05/14: there is cc-mode.el) to get autoload for eval-after-load
- (eval-after-load
-    "cc-mode"
-   '(progn (define-key c-mode-map [f7] 'smart-compile)
-          (define-key c++-mode-map [f7] 'smart-compile)))
-
-  (eval-after-load
-    "make-mode"
-    '(define-key makefile-mode-map [f7] 'smart-compile))
 
   (setq compilation-read-command nil)
   (setq compilation-scroll-output t)
@@ -1336,7 +1345,7 @@ this function is called."
     "force to kill program which is debugging"
     (interactive)
     (let ((process-id
-	   (string-to-int
+	   (string-to-number
 	    (shell-command-to-string
 	     (concat "ps -u $USER | grep " gdb-executable
 		     " | gawk '{print $1}'")))))
@@ -1391,7 +1400,7 @@ this function is called."
 		      (setq gdb-stop-p gud-last-last-frame))
 ;;;To Debug
 	     (let ((process-id
-		    (string-to-int
+		    (string-to-number
 		     (shell-command-to-string
 		      (concat "ps -u $USER | grep " gdb-executable
 			      " | gawk '{print $1}'")))))
