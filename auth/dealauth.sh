@@ -9,10 +9,10 @@ if [ ! -f "$HOME/gnupg.asc" ]; then
 fi
 
 for authfile in $authfiles; do
-    if [ "$authfile" == "id_rsa" ]; then
+    if ([ "$authfile" = "id_rsa" ] || [ "$authfile" = "id_dsa" ]); then
         mkdir ~/.ssh
         cd ~/.ssh
-    elif [ "$authfile" == "standin000.el" ]; then
+    elif [ "$authfile" = "standin000.el" ]; then
         mkdir -p ~/.emacs.d/.trello
         cd ~/.emacs.d/.trello
     else
@@ -37,7 +37,7 @@ for authfile in $authfiles; do
     if ([ -f $authfile.old ]); then
         diff $authfile.old $authfile
         error=$?
-        if [ $error == 0 ]; then
+        if [ $error = 0 ]; then
             echo "remove $authfile.old"
             rm $authfile.old
         fi
