@@ -70,3 +70,9 @@ push = +refs/tags/*
 # [credential]
 # helper = store
 # or add into netrc(authinfo)?
+[gui]
+	encoding = utf-8
+[i18n "commit"]
+	encoding = utf-8
+[i18n]
+	logoutputencoding = utf-8
