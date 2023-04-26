@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# The Mercury Web Parser API will be shut down and stop responding to requests on April 15, 2019
+# open source to https://github.com/postlight/mercury-parser 
 # sudo apt install libxml2-dev
 # sudo apt install libxslt-dev
 # sudo apt install python2-dev
@@ -31,8 +33,8 @@ def get_content_to_file( url, htmlfilename ):
         date_publish_string = data['date_published']
         excerpt = data['excerpt']
         url = data['url']
-        html = BeautifulSoup( content, 'lxml' )
-       # html = BeautifulSoup( content, 'html5lib' )
+#        html = BeautifulSoup( content, 'lxml' )
+        html = BeautifulSoup( content, 'html5lib' )
         #
         ## now all png objects to inline
         if not os.path.exists(title):
